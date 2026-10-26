@@ -1,0 +1,512 @@
+
+===== STRONA 1 =====
+S03E05  Bazy Gr afowe
+overment Admin 7h
+I'm just curious.
+» Lekka wersja przeglądarkowa «
+📎 Pobierz treść tej lekcji w formacie markdown
+📎 Pobierz treść tej lekcji w formacie markdown (EN)
+17:37
+Back to Lekcje programu [AI3]
+PS
+22.11.2024, 12:29 S03E05 — Bazy Grafowe | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e05-bazy-grafowe 1/21
+
+===== STRONA 2 =====
+Wyszukiwanie hybrydowe o którym mówiliśmy w lekcji S03E03 osiąga wysoką
+skuteczność w precyzyjnym docieraniu do informacji bezpośrednio zawartych w
+zestawie danych. Łatwo jednak spotkać codzienne sytuacje w których będzie
+nam zależało na uzyskaniu odpowiedzi na pytania wymagające czegoś więcej,
+niż "znalezienia igły w stogu siana".
+Wyobraźmy sobie sytuację, w której mamy agenta AI zdolnego do
+zapamiętywania informacji o zasobach wiedzy. Jego możliwości pozwolą nam
+łatwo przypomnieć sobie nazwę lub link do materiału, który widzieliśmy kilka
+miesięcy wcześniej, nawet jeśli nie podamy bezpośredniej nazwy, a jedynie
+ogólny opis.
+Dla porządku i łatwiejszego przeszukiwania, zasoby podzielone są na kategorie:
+aplikacje, urządzenia, książki, kursy, filmy, materiały wideo, obrazki,
+społeczności, muzyka, artykuły, kanały youtube, dokumenty i notatki.
+Jeśli zapytamy o "bazę grafową", agent wybierze kategorię "apps" i bez
+problemu powiąże ją z notatką o Neo4J. Wyszukiwanie semantyczne w
+połączeniu z filtrem kategorii zawężającym obszar przeszukiwania będzie
+wystarczające.
+22.11.2024, 12:29 S03E05 — Bazy Grafowe | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e05-bazy-grafowe 2/21
+
+===== STRONA 3 =====
+Proces wyszukiwania znacznie skomplikuje się w przypadku zapytania o "listę
+narzędzi, które zostały wymienione w materiałach na temat neo4j".
+Tutaj nie wystarczy ani dopasowanie słów kluczowych, ani dopasowanie
+znaczenia. Nawet zastosowanie filtrów może okazać się niewystarczające,
+ponieważ sam proces wyszukiwania zaczyna się komplikować, nawet pomimo
+faktu, że mówimy o dość prostym zapytaniu.
+W tym miejscu do gry wchodzą bazy grafowe, takie jak Neo4J dzięki którym
+wynik dla powyższego zapytania, prezentuje się następująco:
+Jest to graf, którego struktura składa się z tzw. "node", które można porównać do
+dokumentów lub rekordów, oraz "edge" opisujących relacje pomiędzy nimi.
+Zarówno "node" jak i "edge" stanowią dwa podstawowe elementy struktury
+grafu.
+22.11.2024, 12:29 S03E05 — Bazy Grafowe | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e05-bazy-grafowe 3/21
+
+===== STRONA 4 =====
+Dla naszego zapytania otrzymaliśmy więc centralny dokument na temat Neo4j.
+Został on powiązany z trzema dokumentami (2x artykuł, 1x video), które także
+posiadają swoje powiązania z dokumentami, które zostały wspomniane w ich
+treści.
+Uzyskanie takiego rezultatu było możliwe z pomocą jednego, prostego zapytania
+zapisanego w Cypher (to query language, podobnie jak SQL).
+Wnioski są następujące:
+Wyszukiwanie pełnotekstowe oraz znaczeniowe sprawdza się, gdy
+potrzebujemy precyzyjnie dotrzeć do informacji zawartych w zestawie
+danych. Natomiast uchwycenie szerokiej perspektywy lub odnalezienie
+powiązań, jest bardzo utrudnione
+Bazy grafowe pozwalają na budowanie powiązań pomiędzy dokumentami i
+nawigowanie po strukturze grafu w poszukiwaniu informacji rozproszonych po
+całym zestawie danych
+Nasuwa to zasadne pytanie o to, w jakich sytuacjach baza grafowa może okazać
+się nam przydatna i czy rzeczywiście zawsze zaadresuje wszystkie nasze
+problemy.
+Wprowadzenie do Neo4j
+Podczas wybierania bazy grafowej, mamy do dyspozycji przynajmniej kilka opcji,
+jednak spośród wszystkich najbardziej wyróżnia się Neo4J. Jest to bardzo
+dojrzałe rozwiązanie, które sprawnie odnalazło się w świecie generatywnego AI.
+W naszym przypadku skorzystamy z wersji OpenSource, której instalacja różni
+się od sytemu operacyjnego (dla macOS wystarczy brew install neo4j oraz neo4j
+start). Domyślnie Neo4j będzie dostępne dla nas pod adresem
+http://localhost:7474/ i gdy wszystko pójdzie w porządku, powinniśmy zobaczyć
+poniższy panel.
+22.11.2024, 12:29 S03E05 — Bazy Grafowe | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e05-bazy-grafowe 4/21
+
+===== STRONA 5 =====
+Poza tym będziemy korzystać także z neo4j-javascript-driver, aby połączyć się z
+neo4j po stronie kodu JavaScript / Node.js.
+Sama składnia języka Cypher może być nowa dla wielu z nas, dlatego warto
+skorzystać z pomocy LLM do generowania podstawowych zapytań. Kilka z nich
+zapisałem w przykładzie neo4j-101. Po jego uruchomieniu do bazy zostanie
+dodanych kilka rekordów, a następnie zapytań wyświetlających dane w różnych
+konfiguracjach.
+Przykłady zapytań uwzględniają połączenia takie jak "Kto grał w filmie X", "Filmy
+w których grał aktor Y" czy "Którzy aktorzy grali wspólnie w więcej niż jednym
+22.11.2024, 12:29 S03E05 — Bazy Grafowe | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e05-bazy-grafowe 5/21
+
+===== STRONA 6 =====
+filmie".
+Zrozumiałe powinny być już teraz możliwości grafowych baz danych oraz ich
+przewag. Natomiast wszystkie powyższe zapytania opierają się o bardzo
+konkretne dopasowania dokumentów, a na tym możliwości Neo4j się nie kończą.
+Neo4j pozwala nam także na dodanie vector index, który pozwoli nam na
+przechowywanie embeddingu oraz przeszukiwanie dokumentów. To właśnie
+dzięki temu zapytanie o treści "Sauron" (imię głównego antagonisty Władcy
+Pierścieni) zostało poprawnie dopasowane do filmu oraz aktora "Hugo Waving'a"
+grającego Agenta Smitha w Matrixie oraz Elronda w serii LOTR.
+Podsumowując:
+Zainstaluj Neo4J na swoim komputerze, dodaj zmienne środowiskowe w pliku
+.env i uruchom przykład neo4j-101
+Skorzystaj z pomocy LLM do generowania zapytań języka Cypher oraz zadaj
+kilka pytań na temat składni, aby móc ją zrozumieć przynajmniej w
+podstawowym zakresie
+22.11.2024, 12:29 S03E05 — Bazy Grafowe | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e05-bazy-grafowe 6/21
+
+===== STRONA 7 =====
+Wskazówka: w celu usunięcia treści dokumentów z bazy Neo4j uruchom
+zapytanie: "MATCH (n) DETACH DELETE n" oraz "DROP INDEX movie_index" i
+"DROP INDEX actor_index". Możesz to zrobić w panelu Neo4j.
+Strukturyzowanie danych
+Przygotowanie danych na potrzeby grafowej bazy danych może polegać na
+strukturyzowaniu istniejących danych (np. pochodzących z Internetu), i/lub
+budowania grafu od podstaw w wyniku interakcji z agentem AI. Natomiast do
+samego budowania grafu możemy wykorzystać LLM, lub własne,
+wyspecjalizowane w danej domenie modele.
+Już teraz dostępne są narzędzia takie jak GraphRAG czy metody dostępne w
+LangChain, które oferują możliwość przekonwertowania nieustrukturyzowanego
+tekstu na serię dokumentów oraz połączeń pomiędzy nimi. Ustrukturyzowane
+dane mogą następnie zostać wykorzystane na potrzeby budowania kontekstu dla
+systemu RAG.
+Na uwagę zasługują prompty wymienione na stronie projektu, które skupiają się
+na:
+Wypisaniu listy podmiotów i relacji między nimi
+Utworzeniu podsumowań opisujących podmioty i relacje
+Opisaniu stanu podmiotu i relacji w różnych kontekstach
+Opisaniu zależności pomiędzy podmiotami
+Inaczej mówiąc, celem tych operacji jest wydobycie ustrukturyzowanych
+informacji w taki sposób, aby utworzone dokumenty były użyteczne na potrzeby
+kontekstu dla modelu.
+Nietrudno zauważyć, że przeprocesowanie dużej ilości treści będzie
+czasochłonne i kosztowne ze względu na konieczność wykonania wielu
+22.11.2024, 12:29 S03E05 — Bazy Grafowe | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e05-bazy-grafowe 7/21
+
+===== STRONA 8 =====
+promptów dla tych samych zestawów danych. Obecnie kwestię kosztów możemy
+zaadresować poprzez cache promptów, natomiast nadal pozostaje problem
+skuteczności wydobywania i łączenia informacji.
+Transformacja danych może odbywać się na podstawie z góry ustalonego
+schematu (np. lista bohaterów książki i relacji pomiędzy nimi), albo mieć
+charakter "open-ended" pozwalający na ukształtowanie schematu wraz z
+odkrywaniem kolejnych informacji. Ostatecznie strategia którą wybierzemy,
+będzie zależeć od potrzeb danego projektu i obie mają swoje wady oraz zalety.
+W praktyce dość szybko okazuje się, że zbyt duża dowolność w tworzeniu
+dokumentów i relacji pomiędzy nimi, prowadzi do duplikacji treści oraz
+problemów z jej późniejszą aktualizacją. Dlatego podobnie jak w przypadku baz
+danych oraz indeksów silników wyszukiwania, należy zaplanować ścieżkę
+uwzględniającą dostarczanie, organizację, odzyskiwanie i aktualizację treści —
+czyli tematy, które poruszaliśmy na przestrzeni ostatnich lekcji.
+Ciekawy przykład, który może służyć jako pewien punkt odniesienia, kształtujący
+nasze wyobrażenie na temat strukturyzowania treści, pochodzi z repozytorium
+funktio-ai-samples. Konkretnie w tym notebooku można znaleźć przykładowe
+prompty odpowiedzialne za poszczególne etapy przetwarzania danych na
+potrzeby bazy grafowej.
+Poniżej znajduje się przykład promptu odpowiedzialnego za wypisanie listy
+podmiotów i ich powiązań. Choć ogólne założenie jest słuszne, nasze
+doświadczenia z poprzednich lekcji wskazują, że takie zadanie powinno być
+podzielone na co najmniej dwa etapy: pobieranie listy podmiotów oraz, przy
+użyciu drugiego promptu, opisywanie zależności dla każdego z nich. Dzięki temu
+model koncentruje się na jednej czynności, co zazwyczaj prowadzi do większej
+precyzji.
+22.11.2024, 12:29 S03E05 — Bazy Grafowe | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e05-bazy-grafowe 8/21
+
+===== STRONA 9 =====
+Podsumowując:
+Praca z bazą grafową opiera się o dwa etapy: strukturyzowania danych i ich
+późniejszego wyszukiwania.
+Dane na potrzeby bazy grafowej muszą zostać przekonwertowane na formę
+Node (Dokument) + Edge (Połączenie) z opisującymi je właściwościami.
+Transformacja zwykle będzie odbywać się z pomocą LLM i serii promptów
+odpowiedzialnych za pobieranie informacji oraz tworzenie powiązań.
+Ustrukturyzowane dane trafiają wówczas do bazy grafowej / indeksu
+wektorowego. Aktywność ta kończy etap strukturyzowania danych.
+Proces wyszukiwania/wczytywania informacji na potrzeby kontekstu dla LLM
+odbywa się na podobnych zasadach jak w przypadku bazy wektorowej czy
+klasycznych silników wyszukiwania. Jednak w tym przypadku celem jest
+wygenerowanie zapytania Cypher (lub serii zapytań) i połączenie danych w
+jeden kontekst.
+Przejdźmy więc do drugiego etapu, związanego z wyszukiwaniem informacji.
+Grafy wiedzy i Retrieval Augmented Generation
+Gdy mamy już ustrukturyzowane dane i bazę grafową gotową do przeszukiwania,
+to kolejnym krokiem jest jej połączenie z LLM. Podobnie jak w przypadku bazy
+wektorowej musimy wygenerować zapytania, a następnie zwrócone wyniki
+przeformatować tak, aby mogły zostać dołączone do kontekstu promptu
+systemowego.
+Chociaż LLM potrafią skutecznie generować zapytania SQL/Cypher, to poza
+sytuacjami budowania rozwiązań na własne potrzeby, wykorzystywanie tego do
+przeszukiwania całej bazy wiedzy nie jest dobrym pomysłem z powodu
+potencjalnego Prompt Injection. Zamiast tego, model powinien wskazywać
+obszary i zapytania, które programistycznie przekształcimy na docelowe
+zapytania, narzucając przy tym własne ograniczenia, takie jak poziom uprawnień
+dostępu do wybranych danych.
+W przykładzie neo4j przygotowałem więc Neo4jService w którym znajduje się
+seria metod pełniących rolę interfejsu umożliwiającego komunikację pomiędzy
+modelem, a bazą grafową. Przykładowo poniżej mamy zapytanie, w przypadku
+którego LLM generuje zapytania oraz listę filtrów (która również jest parsowana w
+innym miejscu w kodzie tak, aby nie oddawać modelowi zbyt dużej
+odpowiedzialności).
+22.11.2024, 12:29 S03E05 — Bazy Grafowe | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e05-bazy-grafowe 9/21
+
+===== STRONA 10 =====
+Dodatkowo model ma do dyspozycji trzy rodzaje wyszukiwań (wynika to tylko z
+mojej decyzji):
+Przeszukiwanie ogólne: pobiera dokumenty z danej kategorii
+Przeszukiwanie wektorowe: pobiera dokumenty zbliżone znaczeniem do
+zapytania z opcjonalnym filtrowaniem względem kategorii
+Przeszukiwanie relacyjne: pobiera dokumenty zbliżone znaczeniem do
+zapytania, ale uwzględnia także możliwość pobrania informacji powiązanych z
+rezultatem (np. artykuły na temat wskazanego narzędzia)
+Model w ramach jednego zapytania może zdecydować o wykonaniu kilku zapytań
+z każdej z kategorii. Jednak zamiast zwracać składnię Cypher, generuje tylko
+obiekt JSON z parametrami wyszukiwania. Poniżej mamy jeden z przykładów
+takiego obiektu, utworzonego na podstawie prośby o "Odnalezienie Neo4j i
+powiązanych z nim wideo".
+Cała logika polega na zidentyfikowaniu, czy zapytanie użytkownika wymaga
+interakcji z pamięcią asystenta. Następnie, w zależności od podjętej decyzji, dane
+są zapamiętywane lub odczytywane, a informacje o tych działaniach zapisywane
+są w kontekście.
+22.11.2024, 12:29 S03E05 — Bazy Grafowe | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e05-bazy-grafowe 10/21
+
+===== STRONA 11 =====
+Rozbijając to na kroki:
+Analiza zapytania: Jest to prompt decydujący o tym, jakie rodzaje akcji mają
+być podjęte (READ|WRITE|ANSWER) przez asystenta.
+Przypominanie: Jest to seria promptów, w przypadku której dochodzi do
+opisania strategii wyszukiwania oraz zapytań w celu wczytania danych do
+kontekstu
+Zapamiętanie: Jeśli model zdecyduje się na zapisanie informacji, to
+uruchamiany jest prompt opisujący nowy dokument oraz logika, która dodaje
+go do pamięci (w naszym przykładzie nie rozszerzałem go o tworzenie relacji
+pomiędzy dokumentami)
+Odpowiedź: Na podstawie pobranego kontekstu generowana jest odpowiedź
+Jest to prosty przykład implementacji GraphRAG, który obrazuje główne
+interakcje pomiędzy użytkownikiem, modelem, a źródłem danych. Jeśli jednak
+zdecydowalibyśmy się na korzystanie z niego, to koniecznie będzie
+rozbudowanie go o logikę łączenia ze sobą rekordów, a także weryfikacji tego,
+czy rekordy nie są zduplikowane.
+Widzimy po nim także, że ogólny schemat systemu RAG jest zbliżony do tego,
+który omawialiśmy przy okazji wcześniejszych lekcji na temat wyszukiwania
+hybrydowego. Tutaj jednak zyskujemy nowe możliwości odpytywania bazy
+wiedzy, ale też musimy mierzyć się z nowymi problemami, takimi jak budowanie
+właściwych powiązań czy nawigowanie po strukturze grafu.
+Podsumowanie
+Bazy grafowe bez wątpienia są istotnym elementem generatywnych aplikacji i
+warto mieć je na uwadze przy podejmowaniu decyzji o doborze zestawu
+22.11.2024, 12:29 S03E05 — Bazy Grafowe | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e05-bazy-grafowe 11/21
+
+===== STRONA 12 =====
+narzędzi. Dobrze je także uwzględnić na mapie swojego rozwoju i zdobywania
+nowych umiejętności, aczkolwiek w tym obszarze bardzo pomocne okazuje się
+także wsparcie ze strony LLM.
+Sam nie posiadam jeszcze zbyt dużo praktycznego doświadczenia w pracy z
+grafowymi bazami danych i patrząc na materiały dostępne w sieci w obszarze
+łączenia grafów z LLM, wciąż jest jeszcze dość wcześnie. Dobrym źródłem
+wiedzy jest jednak oficjalny blog Neo4j, a także mniej oficjalne źródło w postaci
+kanału NodusLabs. Co prawda jedno i drugie ukierunkowane jest na swoje własne
+produkty, tak wśród publikowanych materiałów można znaleźć wiele
+wartościowych wskazówek na temat budowania własnych narzędzi.
+Poza tym wspomniałem także o GraphRAG oraz integracjach dostępnych w
+LangChain czy innych frameworkach. Nawet nasz przykład neo4j pokazuje, że
+zwykle zależy nam na dopasowaniu interakcji z grafem do własnych potrzeb, ale
+niekiedy gotowe rozwiązania mogą okazać się bardziej przydatne, chociażby ze
+względu na łatwość wdrożenia.
+Jeśli masz zabrać z tej lekcji tylko jedną rzecz, to spróbuj połączyć przykład
+neo4j-101 i zapisać, a następnie odczytać kilka zestawów własnych danych.
+Wykorzystaj także LLM w celu wyjaśnienia składni Cypher oraz generowania
+przykładowych zapytań.
+Powodzenia!
+NOTATKA ZYGFRYDA
+22.11.2024, 12:29 S03E05 — Bazy Grafowe | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e05-bazy-grafowe 12/21
+
+===== STRONA 13 =====
+ZADANIE
+Korzystając z tabeli “connectionsˮ, która znajduje się w bazie danych MySQL, do
+której zdobyliśmy dostęp w S03E03, wyznacz najkrótszą drogę od Rafała do
+Barbary. Wspomniana tabela zawiera listę połączeń między osobami.
+Drogę zwróć jako imiona kolejnych osób na drodze, począwszy od imienia Rafał,
+a kończąc na Barbara. Zastosuj przecinek jako separator imion. Raport zgłoś
+22.11.2024, 12:29 S03E05 — Bazy Grafowe | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e05-bazy-grafowe 13/21
+
+===== STRONA 14 =====
+Liked by Grzegorz and 14 others
+Comment 128 comment s
+Maciej Góra 12m
+jako zadanie o nazwie connections. Wykorzystaj do tego zadania bazę grafową.
+Sugerujemy użycie NEO4j, ale możesz użyć tej, która będzie dla CIebie wygodna.
+Co należy zrobić w zadaniu?
+Pobierz zawartość tabel Users (tutaj są imiona oraz ID) oraz Connections
+(tutaj jest mapowanie powiązań między ID). Możesz zapisać je u siebie
+lokalnie, ponieważ ich zawartość się nie zmienia. Twój automat nie musi
+odpytywać bazy o dane na bieżąco.
+Tabela “connectionsˮ zawiera dwa ID użytkowników. Źródłowego i
+docelowego. Oznaczenie pary “17,29ˮ oznacza więc, że użytkownik od ID=17
+zna użytkownika o ID=29
+Dla uproszczenia zadania zbudowaliśmy relację jednokierunkową. Czyli jeśli
+Marian zna Stefana, to w bazie prawdopodobnie nie znajdziesz informacji o
+tym, że Stefan zna Mariana. Nie musisz obsługiwać takiej sytuacji. Aby
+jeszcze bardziej uprościć analizę, imiona osób są unikalne.
+Zbuduj strukturę w bazie grafowej, która będzie pokazywać, która osoba kogo
+zna. Załóż oczywiście, że jedna osoba może znać wiele innych osób. Nie są to
+połączenia jeden do jednego.
+Odpytaj bazę o najkrótszą drogę od Rafała do Barbary
+Odpowiedź wyślij w formie stringa podobnego do tego poniżej do /report jako
+zadanie connections.
+Rafał, Andrzej, Stefan, Marian, Artur, Barbara
+Wielkość liter nie ma znaczenia.
+Uwaga: celem zadania jest praktyczne zaznajomienie Cię z obsługą baz
+grafowych. Bezpośrednie zastosowanie LLMa w tym zadaniu nie jest konieczne.
+Bazy tego typu przydadzą Ci się do lepszej organizacji zbioru informacji w
+przyszłości.
+SS
+Like
+MG
+Tak z ciekawości czy u kogoś jeszcze nie można pobrać lekcji w
+formacie md?
+22.11.2024, 12:29 S03E05 — Bazy Grafowe | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e05-bazy-grafowe 14/21
+
+===== STRONA 15 =====
+Like Reply
+Adrian Kajda 1h
+Like Reply 1 like
+Jakub Modz elewski 42m
+ModK ub
+Like Reply
+Adrian Kajda 40m
+Like Reply 1 like
+Marcin Sobiecki 2h
+Projektant Automatyki: Entuzjasta Technologii i AI
+Czy jest jakiś kruczek czy błąd w zadaniu? Są dwie poprawne
+odpowiedzi. Akurat kod zawsze mi zwraca tę niepoprawną jako
+pierwszą. A prawidłowa jest druga. Wydaje mi się, że warto zaliczać
+te dwie poprawne.
+Adrian Kajda uzyj tego zapytania:
+MATCH path = (start:User {username: "Rafał"})-[:KNOWS*1..10]-(end:Use
+r {username: "Barbara"})
+RETURN path, length(path) AS steps
+ORDER BY steps ASC
+LIMIT 2;
+Jakub Modzelewski Jasne. Ale nie zmienię to faktu, że mamy
+dwa poprane rozwiązania. I chyba tutaj sortowanie nie powinno
+mieć znaczenia
+Mój pierwszy kontakt z bazami grafowymi. Neo4j super narzędzie ❤
+dzięki overment 🤩
+22.11.2024, 12:29 S03E05 — Bazy Grafowe | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e05-bazy-grafowe 15/21
+
+===== STRONA 16 =====
+Like Reply 4 likes
+overment Admin 1h
+I'm just curious.
+Like Reply 1 like
+Bartłomiej Kreczmer 2h
+Fullstack webdeveloper
+można zacząc weekend ! 🙂
+Marcin Sobiecki 🫠 dzięki również!
+Dobrego weekendu!
+Mamy to, trochę czasu zajęło ale jest.
+22.11.2024, 12:29 S03E05 — Bazy Grafowe | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e05-bazy-grafowe 16/21
+
+===== STRONA 17 =====
+Like Reply 3 likes
+overment Admin 2h
+I'm just curious.
+Like Reply 2 likes
+Łukasz Olszak 2h
+DevOps
+See more
+Like Reply 1 like
+Paweł Dulak (dulare) AI_Dev 2h
+I'm here to help
+Like Reply 1 like
+Łukasz Olszak 1h
+DevOps
+Bartłomiej Kreczmer gratz!
+Poproszę o wsparcie :)
+SPOILER
+…
+Łukasz Olszak miałem problem kiedy używałem “idˮ bo z tego
+co widzę Neo4j używa tego do swoich potrzeb - zamiast tego
+użyłem “user_idˮ i poszło. Zerknij czy to nie ten problem.
+Paweł Dulak (dulare) Niestety nie pomogło. Kombinuje dalej :)
+22.11.2024, 12:29 S03E05 — Bazy Grafowe | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e05-bazy-grafowe 17/21
+
+===== STRONA 18 =====
+Like Reply
+Paweł Dulak (dulare) AI_Dev 1h
+I'm here to help
+Like Reply 1 like
+Show more replies
+Grzegorz Cymborski 🥷 501 3h
+trochę tu, trochę tam 🙂
+Like Reply 6 likes
+overment Admin 3h
+I'm just curious.
+Like Reply 4 likes
+Grzegorz Anioł 3h
+Like Reply 3 likes
+Jarek Szczepaniak 3h
+Łukasz Olszak Jeśli na podglądzie grafu masz taką krótką
+ścieżkę, to coś masz nie w porządku.
+Upewnij się że dobrze wstawiasz relacje proszę - to tutaj
+prawdopodobnie jest problem. Zerknij sobie w bazie z kim
+łączy się Barbara a co wyszło na grafie. Podobnie z Rafałem.
+Podrzucam fajną prezentację o Neo4j i ogólnie bazach grafowych,
+dobrze wyjaśnione co i jak. Polecam do kawki ☕
+Grzegorz Cymborski 👀 rzucam wszystko i oglądam :)
+GA
+Jeśli ktoś robi w pajtonach, to można lżej i szybciej z NetworkX
+(pomimo że ❤ Neo4j)
+JS
+22.11.2024, 12:29 S03E05 — Bazy Grafowe | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e05-bazy-grafowe 18/21
+
+===== STRONA 19 =====
+See more
+Like Reply 3 likes
+overment Admin 3h
+I'm just curious.
+Like Reply
+Jarek Szczepaniak 2h
+Like Reply 1 like
+Paweł Dulak (dulare) AI_Dev 2h
+I'm here to help
+overment Mam problem, żeby zalogować do neo4j na localu
+Cały env uzupełniony.
+W ogóle jak puściłem bun to żadnego consola loga mi nie wypluł
+Na mojej instancji w neo4js w dashboardzie od nich też mi nic się nie
+pojawiło …
+Jarek Szczepaniak no to jak nie możesz się zalogować do
+panelu, to prawdopodobnie masz niepoprawne hasło 🤔
+Spróbuj je zresetować: https://neo4j.com/docs/operations-
+manual/current/kubernetes/operations/reset-password/
+JS
+overment Tylko do panelu tam online to bez problemu się
+logujemy tymi danymi. Z localhostem tylko mam problem.
+22.11.2024, 12:29 S03E05 — Bazy Grafowe | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e05-bazy-grafowe 19/21
+
+===== STRONA 20 =====
+Like Reply
+Show more replies
+Aleksandra Łucja Jaworska 3h
+Aleksandra Łucja Jaworska
+Like Reply 3 likes
+overment Admin 2h
+I'm just curious.
+Jarek Szczepaniak hm, a jak masz zainstalowane neo4j
+lokalnie? W dockerze? To był docker-compose? Podawałeś
+gdzieś hasło przy instalacji?
+Jestem raczej team 7-rano (bo o 5 to jest noc tak na prawde - nie
+wiecie ? 😄 ) i kurcze chciałam zadanie zrobic bez neo4j - tak aby
+zobaczyc czy dam rade. No wiec wniosek taki, ze z neo4j i LLM do
+pomocy przy cypher poszlo od strzala. Zdazyłam na styk przed praca,
+wiec moge sie juz na luzaku zalogowac do kompa sluzbowego.
+Zagadka nr 12 zostaje na weekend 😊 Podobnie jak lektura lekcji i
+dokumentacja neo4j…. 😜
+Aleksandra Łucja Jaworska wow :) pięknie to wygląda
+22.11.2024, 12:29 S03E05 — Bazy Grafowe | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e05-bazy-grafowe 20/21
+
+===== STRONA 21 =====
+Like Reply 2 likes
+Aleksandra Łucja Jaworska 1h
+Aleksandra Łucja Jaworska
+Like Reply
+Grzegorz Anioł 3h
+Like Reply 5 likes
+overment Admin 3h
+I'm just curious.
+Like Reply 1 like
+Show more comment s
+No wiec wniosek taki, ze z neo4j i LLM do pomocy przy
+cypher poszlo od strzala
+Niesamowite to jest, co? Wiadomo, że to takie pierwsze kroki,
+ale pomimo tego. Sama możliwość zadania pytania na
+praktycznie dowolny temat, czy przesłania screenʼa z panelu,
+jest świetna.
+:)
+overment dokładnie tak. Tak mialam dzis konkluzje, ze w sumie
+juz nie wiem po co byly mi te studia z informatyki ze sciezka
+algorytmiczna potrzebne… ale tyle maglowalam grafy na
+studiach 😄
+GA
+Pięknie, doczekałem się w końcu Neo4j
+Grzegorz Anioł daj znać po przeczytaniu lekcji. Jeśli masz w
+nim już jakieś doświadczenie, to wskoczmy na Dyskusje i
+pogadajmy.
+Bardzo chętnie wymienię się doświadczeniem i
+nauczę czegoś nowego. Bazy grafowe to dla mnie wciąż
+świeży temat.
+PS
+Post
+What are your thoughts?
+22.11.2024, 12:29 S03E05 — Bazy Grafowe | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e05-bazy-grafowe 21/21

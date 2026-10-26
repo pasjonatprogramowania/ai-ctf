@@ -1,0 +1,529 @@
+
+===== STRONA 1 =====
+S03E04  Źr ódła danych
+overment Admin 1d
+I'm just curious.
+» Lekka wersja przeglądarkowa «
+📎 Pobierz treść tej lekcji w formacie markdown
+📎 Pobierz treść tej lekcji w formacie markdown (EN)
+EDIT 2024-11-22 08:45 CET - poprawka ostatniego (7.) punktu opisu zadania -
+sposób wysyłki nazwy znalezionego miasta do Centrali → Nazwa miasta ma być
+w tym samym formacie jak została zwrócona z API czyli np. LODZ. Wysyłka
+nazwy Łódź nie zostanie zaliczona.
+Back to Lekcje programu [AI3]
+PS
+22.11.2024, 12:29 S03E04 — Źródła danych | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e04-zrodla-danych 1/21
+
+===== STRONA 2 =====
+23:03
+Wiemy już całkiem sporo na temat organizacji treści, jej wyszukiwania oraz
+przekazywania do modelu. Nadszedł więc czas, abyśmy zatrzymali się nieco na
+źródłach danych i różnych formatach plików, których zawartość nie zawsze jest
+dostępna dla modelu.
+Choć multimodalność pozwala nam już na dość swobodne przetwarzanie obrazu,
+dźwięku czy nawet wideo, to wciąż mamy do czynienia z różnymi limitami, które
+wymagają działań po stronie kodu. Z kolei w przypadku innych formatów plików,
+takich jak pdf, xls, doc czy zip, sytuacja się komplikuje.
+Dziś narzędzia takie jak LangChain czy CrewAI dążą do tego, aby zaoferować
+nam łatwe wczytywanie różnych formatów plików. Szybko okazuje się jednak, że
+w domyślnie dostępnych 'loaderach' brakuje detali odpowiadających za tak
+krytyczne elementy, jak zarysowanie kontekstu dla modelu. Mam tutaj na myśli
+dokładnie metadane, o których rozmawialiśmy w lekcji S03E01 — Dokumenty i o
+które musimy samodzielnie zadbać.
+Praca z plikami i katalogami
+Zawartość plików wczytywanych do kontekstu LLM powinna być zapisywana
+także na dysku (sam plik) oraz w bazie danych (informacje na temat pliku).
+Powodem jest tutaj nie tylko potrzeba skorzystania z tych danych w przyszłości,
+ale także sam proces przetwarzania, który może składać się z wielu kroków.
+22.11.2024, 12:29 S03E04 — Źródła danych | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e04-zrodla-danych 2/21
+
+===== STRONA 3 =====
+Dlatego w zależności od języka programowania z którym pracujesz, warto
+zapoznać się z dostępnym API pozwalającym na interakcję z systemem plików
+(file system). Poza tym, warto pamiętać o kilku detalach:
+Wgrywane pliki powinny być podzielone na kategorie
+Struktura katalogów powinna uwzględniać datę utworzenia, abyśmy nie
+doprowadzili do sytuacji w której wewnątrz jednego folderu znajdują się
+dziesiątki tysięcy plików
+W strukturze katalogów warto uwzględnić uuid pliku, co pozwoli na uniknięcie
+przypadkowego nadpisania istniejącego dokumentu
+Warto zachowywać oryginalną nazwę pliku zarówno na dysku, jak i w danych
+zapisywanych w bazie
+Treść plików należy weryfikować na podstawie mime-type, a nie samej nazwy
+(o ile nie mówimy o pliku tekstowym, np. markdown)
+Pliki tymczasowe należy usuwać tak szybko, jak przestają być potrzebne
+W bazie danych informacje na temat plików mogą pochodzić bezpośrednio z
+wygenerowanego dokumentu, którego przykład widzimy poniżej.
+22.11.2024, 12:29 S03E04 — Źródła danych | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e04-zrodla-danych 3/21
+
+===== STRONA 4 =====
+Dokument ten opisuje treść pliku xlsx, który poza treścią tekstową (która posiada
+ograniczone formatowanie ze względu na konieczne uproszczenia), zawiera
+także właściwość screenshots z listą zrzutów ekranu poszczególnych arkuszy. W
+ten sposób model może 'dostrzec' złożone elementy, takie jak wykresy czy
+strukturę tabel. Poniżej przykład zrzutu ekranu arkusza, na którym widoczna jest
+prosta wizualizacja danych.
+Tymczasem do korzyści wynikających z przechowywania plików na dysku oraz
+bazie danych jeszcze wrócimy.
+Wczytywanie treści plików
+Odczytanie zawartości pliku plan/text, z perspektywy programistycznej, jest
+bardzo proste. Sprawa komplikuje się nieco bardziej w przypadku obrazów i
+plików audio, ale tutaj ze względu na możliwości LLM również można uznać to za
+stosunkowo proste.
+Problemy zaczynają się pojawiać przy dużych plikach, dużej liczbie plików lub
+gdy te kwestie się łączą. Również duże problemy występują przy formatach
+takich jak docx, xlsx czy PDF. Możliwości dotarcia do treści i jej transformacji
+różnią się w zależności od języka programowania. Jednak w zależności od
+sytuacji, możemy podejść do tego zadania w sposób nieco bardziej kreatywny i
+wykorzystać fakt, że ktoś włożył sporo wysiłku w to, aby obsłużyć różne typy
+dokumentów.
+22.11.2024, 12:29 S03E04 — Źródła danych | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e04-zrodla-danych 4/21
+
+===== STRONA 5 =====
+W sieci możemy znaleźć wiele narzędzi i bibliotek oferujących możliwość zmiany
+formatu xlsx -> csv czy docx -> HTML. Większość z nich nie radzi sobie jednak
+nawet z dość prostymi strukturami, aczkolwiek warto i tak je sprawdzić, ponieważ
+mogą sprawdzić się w naszym przypadku. Znacznie lepiej wypadają tutaj usługi
+oferujące API, dla których ważnym elementem biznesu, jest poprawne odczytanie
+pliku. Jedną z takich firm jest Google.
+Przygotowałem więc przykład loader zdolny do wczytania treści plików o różnych
+formatach, za pośrednictwem prostej funkcji process, której zadaniem jest
+zwrócenie listy dokumentów (treść + metadata).
+Ważne: do uruchomienia projektu i należy uzupełnić w pliku .env klucze
+GOOGLE_PROJECT_ID, GOOGLE_PRIVATE_KEY_ID, GOOGLE_PRIVATE_KEY,
+GOOGLE_CLIENT_EMAIL, GOOGLE_CLIENT_ID. Ich wartości można pobrać po
+utworzeniu projektu "Google Cloud" w którym należy uruchomić API Google
+Drive, Google Sheets i Google Docs. Następnie w zakładce IAM & Admin należy
+pobrać klucze dla IAM Account w formacie JSON (Manage Keys -> Add Keys ->
+JSON -> Create).
+22.11.2024, 12:29 S03E04 — Źródła danych | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e04-zrodla-danych 5/21
+
+===== STRONA 6 =====
+Zacznijmy jednak od tego, że przykład ten oparłem o narzędzia z których sam
+korzystam, aczkolwiek w tym nowym wydaniu nie miałem jeszcze okazji
+sprawdzić ich skuteczności na większej skali. Dlatego z dużym
+prawdopodobieństwem kod ten zawiera jeszcze trochę błędów i może być
+zoptymalizowany na różne sposoby.
+Skupmy się jednak na jego funkcjonalności, która prezentuje się następująco
+(otwórz tę grafikę w nowej karcie):
+22.11.2024, 12:29 S03E04 — Źródła danych | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e04-zrodla-danych 6/21
+
+===== STRONA 7 =====
+22.11.2024, 12:29 S03E04 — Źródła danych | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e04-zrodla-danych 7/21
+
+===== STRONA 8 =====
+Ciekawostka: powyższy diagram został wygenerowany przez LLM, który ma
+możliwość tworzenia składni mermaid. Wystarczy o nią zapytać i wkleić do
+edytora
+Jak widać, obsługujemy cztery typy plików: pliki tekstowe (np. markdown),
+dokumenty (docx, xlsx), pliki PDF, obrazy oraz pliki audio. Konkretnie rozkłada się
+to następująco:
+pliki tekstowe: ze względu na prostą strukturę, są po prostu wczytywane i
+zamieniane na dokument, który ewentualnie może zostać podzielony na
+fragmenty
+dokumenty: docx/xlsx są w pierwszej kolejności wgrywane na Google Drive, a
+następnie pobierane w formie HTML lub CSV i dopiero wtedy na markdown.
+Dodatkowo pobieram je także w formacie PDF, którego poszczególne strony
+zamieniam na pliki JPG (zrzuty ekranu)
+PDF: ten format sprawia najwięcej problemu i nie spodziewam się, aby
+poradził sobie ze złożonymi strukturami. Zdarza mi się jednak odczytywać
+rachunki czy faktury, w związku z czym wykonuję jego zrzuty ekranu oraz
+(jeśli to możliwe) pobieram także jego treść
+audio: w pierwszej kolejności wykrywam ogólny poziom ciszy, a następnie
+segmentuję cały dokument na "fragmenty ciszy" i fragmenty podczas których
+ktoś mówi. Następnie dzielę cały plik na kawałki, uwzględniając mały bufor na
+początku oraz na końcu każdego z fragmentów. Pliki zamieniane są następnie
+na format ogg (bardzo optymalny), i poddawane transkrypcji przez OpenAI
+Whisper.
+obrazy: tutaj mam najmniejsze możliwości i wczytywanie dokumentów polega
+jedynie na ich przeprocesowaniu przez VLM, którego odpowiedź zamieniana
+jest na tekstową formę
+Ostatecznie otrzymujemy odpowiedź w formie listy dokumentów gotowych do
+wczytania do kontekstu oraz bazy danych.
+Zatem, aby skorzystać z przykładu loader, wystarczy przekazanie ścieżki do pliku
+bądź adresu URL. Jeśli tylko jego format będzie zgodny z jednym z
+obsługiwanych, otrzymamy poprawną treść. Przez wspierane formaty rozumiem:
+Pliki tekstowe: .txt, .md, .json, .html, .csv
+Pliki audio: .mp3, .mp4, .wav, .ogg
+Pliki obrazu: .jpg, .jpeg, .png, .gif, .bmp, .webp
+Dokumenty: .pdf, .doc, .docx, .xls, .xlsx
+Proxy dla zewnętrznego API
+22.11.2024, 12:29 S03E04 — Źródła danych | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e04-zrodla-danych 8/21
+
+===== STRONA 9 =====
+Dane dla LLM nie zawsze będą pochodzić z pliku. Nierzadko źródłem będzie
+zewnętrzna usługa (tak jak w przypadku przykładu linear), np. Notion czy
+dowolne inne API, dostarczające jakiś rodzaj informacji.
+Choć teoretycznie moglibyśmy łączyć się bezpośrednio z zewnętrzną usługą,
+niemal zawsze będzie nam zależało na zbudowaniu własnego "proxy", które
+będzie pośredniczyło między naszym agentem a usługą.
+Powodem jest większa elastyczność oraz możliwość dopasowania zarówno
+formatu odpowiedzi, formatu błędów czy połączenia ze sobą informacji z
+różnych narzędzi.
+Idea proxy nie jest szczególnie skomplikowana, ale zwracam na nią uwagę,
+ponieważ odgrywa istotną rolę w planowaniu struktury narzędzi dla agenta AI. W
+praktyce takie proxy mamy nawet w przykładzie loader, w którym odpowiedź ze
+strony Google Drive nie jest wczytywana natychmiast do kontekstu modelu, lecz
+wcześniej zamieniana na strukturę danych, spójną dla wszystkich pozostałych
+narzędzi, czyli dokumenty (mam na myśli "treść + metadata").
+Treści stron www
+Przez pryzmat "dokumentów" można patrzeć także na treści stron www. Możemy
+zatem wykorzystać narzędzia takie jak FireCrawl (lub alternatywy) i połączyć je z
+logiką, którą mamy w przykładzie loader.
+Dzięki temu do metody process możemy przesłać dowolny adres URL
+pochodzący z dopuszczalnych przez nas domen. Wówczas treść strony zostanie
+zamieniona na format dokumentów i będzie gotowa do do pracy z LLM, a także
+zapisana w formie pliku markdown.
+W tym obszarze nie ma już nic nowego, poza tym, co omówiliśmy w przykładzie
+websearch i lekcji S01E01 — Interakcja.
+22.11.2024, 12:29 S03E04 — Źródła danych | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e04-zrodla-danych 9/21
+
+===== STRONA 10 =====
+Zapamiętywanie informacji od użytkownika
+Źródłem informacji może być także sama interakcja z LLM, w tym dane
+pochodzące od użytkownika oraz modelu. Rzecz w tym, że taka interakcja zwykle
+będzie wielopoziomowa, więc "przepisywanie" treści za każdym razem nie
+będzie wskazane. W zamian możemy wyposażyć model w możliwość zapisania
+treści pliku tak, aby w dalszych krokach posługiwał się wyłącznie identyfikatorem.
+Przykład context pokazuje prosty scenariusz w którym model posiada informacje
+na temat dłuższego dokumentu wraz z instrukcją, że w razie potrzeby cytowania
+jego zawartości, powinien skorzystać z placeholder'a [[uuid]]. Następnie
+programistycznie podmieniamy treść, która może zostać przekazana do
+kolejnego promptu, bądź zwrócona użytkownikowi.
+Praktyczną sytuacją w której będziemy chcieli wykorzystać taki scenariusz, jest
+agent przesyłający mail. Poniżej widzimy treść jednej z takich wiadomości, w
+której Alice przesłała mi podsumowanie jednego z filmów na YouTube.
+22.11.2024, 12:29 S03E04 — Źródła danych | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e04-zrodla-danych 10/21
+
+===== STRONA 11 =====
+Zbierając to w całość:
+Model powinien mieć możliwość odczytywania oraz zapisywania plików
+Poza zapisem pliku, model powinien mieć możliwość udostępnienia pliku i
+uzyskania do niego adresu URL na potrzeby dalszej pracy
+Model powinien mieć możliwość posługiwania się identyfikatorami /
+placeholderami dzięki którym nie będzie konieczne przepisywanie długich
+form treści (co nierzadko będzie też niemożliwe ze względu na limity output
+token).
+Praktycznie każdy rodzaj danych na których pracuje model, powinien (jest to
+sugestia, nie konieczność) być sprowadzony do jednego formatu, wspólnego
+dla wszystkich rodzajów treści.
+Organizowanie danych w bazie
+Zapisywanie danych dokumentów w bazie danych może przybierać różne formy,
+w zależności od tego, jak będziemy z nich korzystać. Najbardziej
+prawdopodobne scenariusze uwzględniają:
+Połączenie dokumentu z użytkownikiem z zablokowaniem dostępu do jego
+treści innym użytkownikom
+Połączenie dokumentu z konwersacją, umożliwiające przywołanie kontekstu w
+razie wznowienia rozmowy
+Połączenie dokumentu z zadaniem realizowanym przez agenta i/lub etapem
+większego procesu, na wypadek konieczności wznowienia go
+22.11.2024, 12:29 S03E04 — Źródła danych | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e04-zrodla-danych 11/21
+
+===== STRONA 12 =====
+Zapisywanie fragmentów przeprocesowanej treści. Np. tłumacząc długi
+dokument, zapisujemy ukończone fragmenty tak, aby móc wznowić proces w
+miejscu w którym pojawił się problem
+Zapisywanie oryginalnej treści dokumentu oraz jego zmienionych form na
+wypadek potrzeby odwołania się do niej lub powtórzenia procesu
+przetwarzania
+Zapisanie informacji o dacie wygaśnięcia dokumentu, szczególnie w
+przypadku plików udostępnionych pod publicznym adresem URL
+Powiązanie wpisu w bazie danych z zawartością pliku znajdującą się na
+dysku. W przypadku krótszych dokumentów (np. wygenerowanych chunków))
+wskazane jest przechowywanie ich treści bezpośrednio w bazie.
+Sam temat przechowywania treści w bazie danych będzie pojawiać się jeszcze w
+kolejnych lekcjach AI_devs 3.
+Praca z wrażliwymi danymi
+Wiemy już, że w przypadku pracy z plikami zawierającymi prywatne dane,
+możemy wykorzystać modele działające lokalnie bądź skorzystać z biznesowych
+planów usług takich jak Amazon Bedrock o ile pozwala na to regulamin firmy i
+umowy z klientami.
+Jednak samo przetwarzanie danych przez model nie jest jedyną sytuacją o której
+powinniśmy pamiętać, ponieważ jeśli oddajemy w ręce modelu treść plików, to
+gdy związane z tym uprawnienia będą zbyt duże, narażamy się na wyciek
+danych.
+Przykładowo, jeśli to LLM będzie odpowiedzialny za zapisanie pliku i wskazanie
+użytkownika do którego ten plik ma być przypisany, to może dojść tutaj do
+pomyłki. W takiej sytuacji konieczne jest kontrolowanie tego procesu po stronie
+programistycznej i zapisanie pliku na podstawie aktywnej sesji czy tokenu
+użytkownika, który nie zależy od wyniku działania modelu.
+To samo dotyczy sytuacji w której model decyduje o wysłaniu wiadomości e-mail
+lub posługiwania się komunikatorem. Tutaj także konieczne jest narzucenie
+programistycznych ograniczeń.
+Zasadniczo zawsze gdy przy przetwarzaniu plików pojawia się przestrzeń na
+pomyłkę, musimy zaangażować tam kod lub w ostateczności człowieka. Np.
+wspomniane maile mogą być tworzone jako "szkice", które musi zaakceptować
+odpowiedzialna za to osoba.
+Kolejnym przykładem ograniczenia, z którego już korzystaliśmy, było limitowanie
+domen, które mogły być przeszukane lub scrapowane. Choć tam chodziło nam
+22.11.2024, 12:29 S03E04 — Źródła danych | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e04-zrodla-danych 12/21
+
+===== STRONA 13 =====
+przede wszystkim o utrzymanie jakości treści, tak wątek zachowania prywatności
+również jest tutaj bardzo ważny.
+Złota zasada mówi więc o tym, aby kontakt modelu z zewnętrznym światem był
+ograniczony tak bardzo, jak to możliwe poprzez programistyczne ograniczenia.
+Podsumowanie
+Dzisiejsza lekcja pokazała nam, że LLM możemy połączyć z praktycznie
+dowolnym źródłem danych, aczkolwiek wymaga to sporego zaangażowania po
+stronie kodu.
+Przekonaliśmy się także po raz kolejny, że narzucanie własnych ograniczeń na
+system jest krytyczne zarówno z punktu widzenia jego stabilności, jak i
+zachowania prywatności.
+Ostatecznie jednak to od nas będzie zależało jak dużo swobody przekażemy w
+ręce modeli oraz czy będziemy weryfikować efekty ich pracy. Musimy mieć tylko
+na uwadze, że odpowiedzialność za działanie systemu ponosimy my, firma w
+której pracujemy bądź nasi klienci. Warto więc rozważnie podejść do tego
+tematu.
+Myślę także, że to, co zobaczyliśmy w tej lekcji w temacie wczytywania plików do
+kontekstu, dobrze łączy się ze wszystkim, czego nauczyliśmy się do tej pory.
+Dlatego tak ważne jest to, aby przetestować działanie przykładu loader i albo
+zapoznać się z jego treścią w celu jego dalszego rozwoju, albo stworzenia jego
+prostszej, bardziej dopasowanej do nas wersji.
+Zasadniczo narzędzie umożliwiające wczytywanie i zapis zewnętrznych źródeł
+danych do modelu, będzie nam niezbędne w kolejnych tygodniach szkolenia.
+NOTATKA ZYGFRYDA
+22.11.2024, 12:29 S03E04 — Źródła danych | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e04-zrodla-danych 13/21
+
+===== STRONA 14 =====
+ZADANIE
+Musisz pomóc nam namierzyć Barbarę Zawadzką! Zdobyliśmy dostęp do dwóch
+systemów, które mogą nam w tym pomóc.
+Pierwszy z nich to wyszukiwarka członków ruchu oporu. Możemy
+wyszukiwać ich z użyciem imienia podanego w formie mianownika, a w
+22.11.2024, 12:29 S03E04 — Źródła danych | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e04-zrodla-danych 14/21
+
+===== STRONA 15 =====
+odpowiedzi otrzymamy listę miejsc, w których ich widziano.
+https://centrala.ag3nts.org/people
+Drugi system to wyszukiwarka miejsc odwiedzonych przez konkretne osoby.
+Podajesz nazwę miasta do sprawdzenia (bez polskich znaków) i w odpowiedzi
+dowiadujesz się, których z członków ruchu oporu tam widziano.
+https://centrala.ag3nts.org/places
+Interfejs dla obu systemów wygląda tak samo. Przyjmuje on zapytanie w formacie
+JSON jak poniżej:
+{
+ "apikey":"TWÓJ KLUCZ",
+ "query": "IMIE lub MIASTO"
+}
+Niestety, przy obu systemach ktoś majstrował i dane zwracane przez nie mogą
+być niekompletne. Musisz jednak poradzić sobie z tym, co masz.
+Zdobyliśmy także część notatki na temat Barbary, pochodząca z systemu
+zbierającego informacje o osobach poszukiwanych.
+https://centrala.ag3nts.org/dane/barbara.txt
+Połącz wszystkie dane w jedną całość i uzupełnij brakujące informacje. Kto był
+współpracownikiem Aleksandra i Barbary? Z kim widział się Rafał? Być może
+znalezienie informacji na ten temat pozwoli nam wytypować kolejne miejsce, w
+którym warto poszukać Barbary.
+Co należy zrobić w zadaniu?
+Ściągnij notatkę (plik TXT) na temat Barbary.
+Zastanów się jakie osoby i jakie nazwy miast są wspomniane w notatce
+Odpytaj o wspomniane poszlaki odpowiednie API
+Istnieje szansa, że z danych otrzymanych przez API otrzymasz kolejne imiona
+lub nazwy miast
+Odpytuj o nie kolejno tak długo, aż znajdziesz miasto, w którym znajduje się
+BARBARA
+Istnieje szansa, że idąc jakąś pokrętną drogą natrafisz na sekretną flagę 🚩
+Gdy namierzysz miasto, w którym znajduje się BARBARA, wyślij nazwę miasta
+do centrali (/report) do zadania loop. Nazwa miasta ma być w tym samym
+22.11.2024, 12:29 S03E04 — Źródła danych | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e04-zrodla-danych 15/21
+
+===== STRONA 16 =====
+Liked by Damian and 38 others
+Comment 174 comment s
+Wojciech Czaplejewicz 2h
+Like Reply 1 like
+Grzegorz Anioł 3h
+Like Reply 1 like
+Dominik Trznadel 4h
+#teamp ython
+Like Reply
+Paweł Dulak (dulare) AI_Dev 4h
+I'm here to help
+formacie jak została zwrócona z API czyli np. LODZ. Wysyłka nazwy Łódź nie
+zostanie zaliczona.
+Podpowiedź: tego zadania nie da się rozwiązać z użyciem, zaledwie jednego
+prompta. Wymagane jest pewne zapętlenie zapytań, ale uważaj, aby nie zapętlić
+się w nieskończoność. Pamiętaj, że API odpytujemy słowami w mianowniku i bez
+polskich znaków (SLASK, a nie ŚLĄSKIEGO i GRZESIEK, a nie GRZEŚKOWI).
+KM
+Like
+WC
+“Final answer found after 11 iterations...ˮ dla gpt4o. Kluczem tutaj jest
+odpowiedni prompt i zmuszenie AI do każdorazowej analizy danych
+po otrzymaniu nowego miasta albo imienia. W przeciwnym razie leci
+trochę na ślepo.
+GA
+To dzisiejsze zadanie pasowało mi na wykorzystaniu wywołań do obu
+endpointów jako tooli w langchain (ewentualnie mogły by być function
+calls) i wykrzystanie Agenta z OpenAI. Niestety próbowałem różnych
+promptów ale 4o nie dał rady, albo muszę zebrać więcej
+doświadczenia. Tak czy inaczej finalnie przerobiłem na bardziej
+“programistyczneˮ rozwiązanie, co widzę wiele osób też tak do tego
+podeszło.
+Mógłbyś powiedzieć trochę więcej o flow dokumentów xls/doc? W
+mermaid wygląda to prosto (przekonwertuj na pdf, potem idoc i potem
+plaintext), a później piszesz o google drive. Rozumiem, że ścieżka
+konwersji na pdf I text to “chamskaˮ zamiana na format tekstowy, a
+wysyłanie do google drive trochę lepiej układa dokument z pomocą
+jakichś googlowych API?
+Dominik Trznadel rozumiem że to pytanie do overment ? :)
+22.11.2024, 12:29 S03E04 — Źródła danych | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e04-zrodla-danych 16/21
+
+===== STRONA 17 =====
+Like Reply
+Piotr Błaszczyk 10h
+See more
+Like Reply
+Paweł Dulak (dulare) AI_Dev 4h
+I'm here to help
+Like Reply 1 like
+Mateusz Pabiś 🥷 501 10h
+ML Engineer
+Spojler (zawężający liste miast)
+.
+.
+.
+.
+.
+.
+.…
+Piotr Błaszczyk dzięki za uwagę, dopisałem komentarze do
+instrukcji powyżej. Nie chciałem grzebać w walidatorze bo tam
+łatwiej coś zepsuć :)
+Gdzieś ktoś napisał, że się nie da tego zadania zrobić jednym
+promptem / jednym uruchomieniem prompta…
+22.11.2024, 12:29 S03E04 — Źródła danych | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e04-zrodla-danych 17/21
+
+===== STRONA 18 =====
+Like Reply 1 like
+Krzysztof Wadrzyk 11h
+Like Reply 1 like
+Paweł Dulak (dulare) AI_Dev 4h
+I'm here to help
+Like Reply 1 like
+Krzysztof Wadrzyk 4h
+Like Reply 1 like
+Piotr Wyszyński 13h
+Like Reply 1 like
+Adam Nosz czyński 13h
+hint: funkcja exec w pythonie ;-)
+KW
+czy nazwe miasta mamy wysłać jako String do /report ?
+Krzysztof Wadrzyk w standardowym formacie - nazwa taska,
+api key, a w polu “answerˮ ma być sam string z nazwą miasta :)
+KW
+Paweł Dulak (dulare) dzięki, już ogarnięte :)
+Zdecydowanie moje ulubione zadanie do tej pory!
+22.11.2024, 12:29 S03E04 — Źródła danych | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e04-zrodla-danych 18/21
+
+===== STRONA 19 =====
+See more
+Like Reply 2 likes
+Lucjan Szreter 10h
+Nie po to człowiek stworzył komputery aby teraz pozwalać im samodzielnie myśleć
+:)
+Like Reply 1 like
+Krzysztof Rakowski 2h
+Like Reply 2 likes
+Przemysław Siedlecki 13h
+Like Reply 1 like
+Peter 13h
+Dzisiejsze zadanie aż kusi zrobić programistycznie. W moim
+przypadku udało się napisać kod bez poprawek przez cursor. Użyłem
+pętli która naprzemiennie odpytuje o miasto i osobę (o ile jeszcze
+są nieprzeszukane) a następnie wynik zapisuje do plików .json. Na
+koniec wczytuje plik do LLM i wypluwa odpowiedź. Sama mechanika z
+zapisem do pliku oczywiście jest zbędna dopóki tych danych jest
+mało i można o nie pytać model co run.
+.…
+LS
+Adam Noszczyński LLM to do zrobienia początkowej listy miast
+i osób na podstawie tekstu – bo LLM-a miałem pod ręką a bazy
+maist/imion musiałby dopiero szukać 🙂
+Potem lokalizacja B. i sekret same wpadły przy rekurencyjnym
+odpytywaniu API (gdy się wykluczyło KRK).
+Za robienie tego zadania LLM-em to powinny być odbierane
+flagi 🙂
+Za robienie tego zadania LLM-em to powinny być odbierane
+flagi 🙂
+ale wiecie, jesteśmy na kursie z AI a nie podstaw
+programowania :)
+PS
+Da się przy pomocy jednego prompta, ale w moim przypadku
+potrzebował 13 iteracji
+P
+22.11.2024, 12:29 S03E04 — Źródła danych | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e04-zrodla-danych 19/21
+
+===== STRONA 20 =====
+See more
+Like Reply
+Paweł Dulak (dulare) AI_Dev 13h
+I'm here to help
+Like Reply
+Peter 13h
+See more
+Like Reply
+Peter 12h
+Samo zadanie zrobione w sumie szybko, czy optymalnie nie mam
+pojecia. Nie mam sily podazac za rozumowaniem tych LLMʼow.
+Raz rozwiazuje w
+13 krokow - gtp4, raz w 16-18 gpt-4o,
+Inne silniki sobie nie radzily po kilku probach, rezygnowalem z
+dalszych testow.
+Wyprobowany reasoning po angielsku i polsku - bez roznicy.
+Deterministycznosc wynikow taka sobie. Nie bede robil za duzo …
+Peter akurat wysyłka do naszego API nie kosztuje, może warto
+odpytać o inne miasta?
+nie używaj gpt-4 - to w tym momencie strata kasy. gpt-4o jest
+zdecydowanie lepsze i tańsze.
+P
+Paweł Dulak (dulare)
+nie używaj gpt-4
+probowalem gpt-4 dla zasady zeby sprawdzic roznice, brak
+znaczacej.
+kurat wysyłka do naszego API nie kosztuje, może warto
+odpytać o inne miasta?
+Czyli brutal force, wzglednie rozgladanie sie w kolo. OK,
+sprobuje, dzieki. Ja jestem embedded, ja optymalizuje kazda …
+P
+22.11.2024, 12:29 S03E04 — Źródła danych | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e04-zrodla-danych 20/21
+
+===== STRONA 21 =====
+See more
+Like Reply
+Show more replies
+Show more comment s
+Paweł Dulak (dulare)
+kurat wysyłka do naszego API nie kosztuje, może warto
+odpytać o inne miasta?
+Odpytalem zarowno endpoint do raportu i end point do ludzi jak
+i miast, mam wrazenie ze wyciagnalem wszystkie miasta i
+wszystkich ludzi. Jedyne co mi wpadlow oko to GLIT** dla
+Konina. No coz nie mozna miec wszystkiego. Najwyrazniej moj
+prompt i algorytm jest za dobry zeby zejsc z kursu za daleko i…
+PS
+Post
+What are your thoughts?
+22.11.2024, 12:29 S03E04 — Źródła danych | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e04-zrodla-danych 21/21

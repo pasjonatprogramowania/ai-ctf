@@ -1,0 +1,516 @@
+
+===== STRONA 1 =====
+S00E05  R ozwój
+overment Admin Aug 28
+I'm just curious.
+» Lekka wersja przeglądarkowa «
+Programowanie to umiejętność, która zwykle kojarzy się z aktywnością
+zawodową i nierzadko projektami realizowanymi po godzinach. Z jakiegoś
+powodu stosowanie jej w celu zbudowania narzędzi przydatnych na co dzień, jest
+dość rzadkie. Jednocześnie to właśnie w takim przypadku możemy
+stworzyć środowisko na wzór piaskownicy, w której możemy uczyć się nowych
+rzeczy, eksplorować narzędzia czy popełniać błędy.
+Tworzenie takich projektów po godzinach nie jest łatwe. Nie każdy chce
+poświęcać czas na aktywności podobne do tych realizowanych na etacie czy we
+własnej firmie. Jednak od czasu popularyzacji LLM przez ChatGPT, mamy do
+dyspozycji narzędzie, dzięki któremu znacznie szybciej zbudujemy prototyp,
+zrozumiemy dokumentację, skonfigurujemy serwer czy znajdziemy błąd w
+kodzie.
+Nietrudno zauważyć, że generatywne AI rozwija się bardzo szybko i ciągle
+pojawiają się nowe techniki oraz narzędzia. Podobnie jest w obszarach
+programistycznych, gdzie obserwujemy nowe wersje frameworków i bibliotek. W
+rezultacie nadążanie za zmianami w branży stanowi duże wyzwanie, dlatego
+warto wykorzystać umiejętność programowania, aby to sobie ułatwić.
+Budowanie własnych narzędzi i API
+Back to Lekcje programu [preAI3]
+PS
+22.11.2024, 12:21 S00E05 — Rozwój | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e05-rozwoj 1/16
+
+===== STRONA 2 =====
+Frameworki takie jak Next.js czy Nest.js bardzo ułatwiają budowanie własnego
+API, nawet jeśli nie posiadamy dużego doświadczenia na back-endzie. Przez
+'prywatne API' mam na myśli zestaw funkcji realizujących działania z naszej
+codzienności. Przykłady to: zarządzanie zadaniami, kalendarzem,
+wiadomościami, przetwarzanie dokumentów czy udostępnianie plików.
+Poniższa lista uwzględnia podział API na kilka kategorii:
+Przetwarzanie plików: typowe akcje wykonywane na plikach, co wymaga ich
+podziału na mniejsze fragmenty (tzw. Chunking) oraz precyzyjnego
+przetwarzania fragmentami
+Pamięć długoterminowa: mechanizm pamięci dla agenta AI, obejmujący
+możliwość zapamiętywania informacji i posługiwania się nimi podczas
+rozmowy, a nawet wykonywania zadań
+Aplikacje i Urządzenia: integracja z aplikacjami i urządzeniami poprzez API, co
+pozwala na automatyzację czynności związanych z ich obsługą
+Dostęp do sieci: dostęp do wyszukiwarki, stron Internetowych czy
+zarządzania systemem CMS
+Code Interpreter: samodzielne uruchamianie wygenerowanego kodu
+Generowanie obrazów: możliwość generowania i transformacji obrazów
+Całość można określić (z przymróżeniem oka) jako 'osobiste AGI', ponieważ
+powyższym API może posługiwać się Agent AI z którym możemy współpracować,
+przesyłając mu zwykłe wiadomości na Slacku czy polecenia głosowe przez Siri.
+Zestaw wymienionych powyżej modułów, może być też ograniczony do
+konkretnego obszaru, np. pracy z kodem czy bazą wiedzy. Jednak w każdym
+22.11.2024, 12:21 S00E05 — Rozwój | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e05-rozwoj 2/16
+
+===== STRONA 3 =====
+przypadku mówimy tutaj o sytuacji w której posiadamy API z którego korzystamy
+za pośrednictwem asystenta AI. Co ciekawe, interakcja z asystentem może
+odbywać się przez różne interfejsy.
+Wybór zestawu technologicznego
+Do zbudowania API, poza technologią backendową i frameworkiem, będziemy
+potrzebować także kilku dodatkowych narzędzi. W przypadku większości z nich
+wystarczą nam bezpłatne plany. Nie wszystkie z wymienionych poniżej będą nam
+niezbędne.
+Model: Claude 3.5 Sonnet (Anthropic), GPT-4o (OpenAI), Gemma 27B
+(DeepMind), Whisper (speech to text), TTS (OpenAI, text to speech)
+Hosting (VPS): DigitalOcean lub Mikr.us
+Baza danych: SQLite, PostgreSQL (np. przez xata.io) lub inna, dopasowana do
+własnych preferencji oraz ORM, np. Prisma lub DrizzleORM
+Silnik wyszukiwania: Qdrant, Algolia, Chroma, Supabase
+Przeszukiwanie sieci: FireCrawl, Crawlee, Tavily, BraveSearch, exa.ai
+Code Interpreter: e2b, Open Interpreter
+Generowanie obrazów: Ideogram, Leonardo, Stable Diffusion 3,
+HTMLCSSToImage
+Transkrypcje: Insanely Fast W hisper
+Interfejsy: Slack / Telegram / Siri Shortcuts
+Aplikacja do zadań: Linear, Todoist, ClickUp
+Aplikacja do notatek: Notion
+Aplikacja do aktualności: Feedly, Readwise
+Automatyzacje no-code: make.com, n8n, buildship
+W przypadku prywatnego API warto wybrać takie technologie i narzędzia, które
+pozwolą nam możliwe szybko się poruszać i skupić na generowaniu wartości.
+Wyjątek stanowią sytuacje w których celowo wybieramy nową, trudną dla nas
+ścieżkę, aby np. nauczyć się obsługi nowego narzędzia.
+Dodatkowo kluczową zmienną, którą musimy brać pod uwagę, jest fakt, aby
+usługi, narzędzia, aplikacje i urządzenia, które wybieramy, miały dostępne dobrze
+prowadzone API. Można powiedzieć, że w tej sytuacji będzie nam zależało na
+odejściu od graficznego interfejsu, na rzecz programistycznych integracji.
+Przydatne narzędzia
+22.11.2024, 12:21 S00E05 — Rozwój | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e05-rozwoj 3/16
+
+===== STRONA 4 =====
+Choć wspominany już LangChain nie ma obecnie dobrej reputacji w kontekście
+produkcyjnym, tak skorzystanie z jego elementów na własne potrzeby może
+okazać się dobrą decyzją. Podobnie sytuacja wygląda z narzędziami takimi jak
+CrewAI, LangGraph oraz LangFlow. Każde z tych narzędzi dynamicznie
+się rozwija, więc warto obserwować zmiany wprowadzane w nowych wersjach, a
+także konkurencyjne rozwiązania pojawiające się na rynku.
+W treści lekcji AI_devs 3 omawiałem i będę omawiał mnóstwo różnych narzędzi i
+platform. Części z nich poświęcimy więcej czasu, a inne zostaną tylko
+wspomniane. Natomiast poniższa lista to zestaw ogólnych rozwiązań, o których
+istnieniu warto wiedzieć.
+ollama: Aplikacja dzięki której z łatwością uruchomimy modele Open Source i
+połączymy się z nimi przez API (w formacie OpenAI)
+exo: Narzędzie umożliwiające połączenie ze sobą urządzeń Apple na potrzeby
+inferencji modeli Open Source
+ElevenLabs (lub Deepgram lub Hume.ai): Platformy udostępniające modele
+Text To Speech / Text To Audio (tylko Elevenlabs)
+Superwhisper (lub Flow): Aplikacja speech-to-text, ułatwiająca głosowe
+wprowadzanie tekstu
+v0: Narzędzie do generowania interfejsów użytkownika na podstawie promptu
+Unstructured: Narzędzie do strukturyzowania danych na potrzeby RAG
+Unsloth: Platforma ułatwiająca fine-tuning modeli Open Source
+Replicate: Platforma oferująca dostęp do różnych modeli przez API
+OpenRouter: Platforma oferująca dostęp do różnych modeli językowych przez
+API
+RunPod: Platforma umożliwiająca wynajęcie GPU
+comfyUI: Zaawansowany, wizualny interfejs do generowania grafik z pomocą
+np. Flux
+PrivateGPT: Narzędzie open source, umożliwiające rozmowę z dokumentami z
+zachowaniem prywatności
+AgentOps: Podobnie jak LangFuse czy LangSmith, ułatwia monitorowanie
+Agentów AI
+RunwayML: Narzędzie do generowania wideo na podstawie tekstu i/lub
+obrazu
+Za każdym z wymienionych narzędzi stoją ludzie, którzy często dzielą się swoją
+wiedzą na profilach w mediach społecznościowych czy serwisach takich jak X,
+Medium czy Substack. Dodatkowo powstają wokół nich społeczności, do których
+warto dołączyć, aby odkrywać nowe techniki pracy oraz inne rozwiązania.
+22.11.2024, 12:21 S00E05 — Rozwój | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e05-rozwoj 4/16
+
+===== STRONA 5 =====
+Wartościowe źródła wiedzy
+Choć praktyczne doświadczenie jest niezastąpionym sposobem nauki, tak warto
+sięgać także po sprawdzone źródła wiedzy oraz rzetelnie raportowane
+aktualności.
+Stanford Online: Kanał YouTube z nagraniami wykładów wśród których można
+znaleźć wątki związane z generatywnym AI i dużymi modelami językowymi
+ArXiv Papers: Lista najciekawszych publikacji pojawiających się na ArXiv w
+tematach związanych z branżą AI
+StatQuest: Kanał YouTube, który (z dość charakterystycznym humorem)
+wyjaśnia zagadnienia związane między innymi z LLM
+3blue1brown: Podobnie jak StatQuest, publikuje bardzo jakościowe filmy,
+nierzadko poruszające wątki generatywnego AI
+AI Explained: Kanał YouTube skupiający się głównie na komentowaniu i
+analizie publikacji naukowych oraz wydarzeń z branży
+AI Engineer: Kanał YouTube z nagraniami z różnych wystąpień i warsztatów
+Andrej Karpathy: Kanał YouTube jednej z najbardziej rozpoznawalnych postaci
+w branży. Karpathy jest byłym szefem autopilota Tesli i przez kilka lat
+był zaangażowany w rozwój OpenAI
+Anthropic Research: Choć niemal wszystkie firmy stojące za najlepszymi
+modelami językowymi dzielą się swoimi doświadczeniami na blogach, to w
+przypadku Anthropic można znaleźć bardzo praktyczną wiedzę i techniki
+pracy z modelami
+Prompt Engineering Guide (Anthropic): Zestaw porad na temat projektowania
+promptów od Anthropic
+Prompt Engineering Guide (OpenAI): Zestaw porad na temat projektowania
+promptów od OpenAI
+Prompt Engineering Guide: Zestaw porad na temat projektowania promptów,
+rozwijany przez DAIR.AI
+LMSYS: To organizacja stojąca między innymi za Chatbot Areną i rankingiem
+LMSYS Chatbot Arena Leaderboard
+Deeplearning.ai: To platforma z kursami online rozwijanymi przez Andrew Ng
+Code Your Own AI: To niszowy, choć interesujący kanał na YouTube, łączący
+praktykę z teorią
+LifeArchitect: To strona gromadząca najważniejsze publikacje, aktualności
+oraz (potencjalne) informacje na temat nadchodzących modeli
+Matthew Berman: To kanał YouTube skupiający się na aktualnościach, testach
+nowych modeli i popularnych narzędzi GenAI
+22.11.2024, 12:21 S00E05 — Rozwój | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e05-rozwoj 5/16
+
+===== STRONA 6 =====
+Poza wymienionymi wyżej źródłami, warto obserwować także profile takie jak:
+Yann LeCun: Szef Meta AI, stojący między innymi za modelami Llama.
+Aktywny na X, ale w sieci można spotkać wiele wartościowych rozmów z nim
+Geoffrey Hinton: Określany mianem "ojca chrzestnego obecnego AI", który
+mocno przyczynił się do rozwoju generatywnego AI
+Ilya Sutskever: Od czasu odejścia z OpenAI nie jest aktywny w sieci, lecz na
+YouTube można znaleźć jego wykłady i wystąpienia. Ilya uznawany jest za
+"osobę stojącą za ChatGPT"
+Pliny the Liberator: Publikuje wpisy głównie na temat Jailbreakingu modeli i
+związanych z tym zagrożeń oraz możliwości
+Georgi Gerganov: Twórca llama.cpp, zajmuje się głównie modelami Open
+Source
+Awni Hannun: Główna osoba stojąca za Apple MLX i podobnie jak Gerganov
+zajmuje się modelami Open Source
+Elvis: Researcher mówiący głównie o najnowszych publikacjach i odkryciach.
+Rozwija organizację [DAIR.AI](https://github.com/dair-ai
+Stephen Wolfram: Twórca modelu Wolfram Alpha, obecnie publikuje także
+materiały obejmujące Generatywne AI
+Robert Scoble: Codziennie udostępnia wartościowe treści i gromadzi
+społeczność osób skupionych wokół generatywnego AI i najnowszych
+technologii
+Choć źródeł wiedzy wartych obserwowania jest znacznie więcej, warto zacząć
+od tych wymienionych powyżej. Wśród publikowanych przez nie treści można
+znaleźć inne godne uwagi źródła wiedzy i narzędzia. Dobrze jest więc wyrobić
+sobie nawyk przeglądania mediów społecznościowych (głównie X i YouTube) pod
+kątem profili obserwowanych przez osoby, które wnoszą nam wartość.
+Pogłębianie wiedzy w obszarze AI
+AI jest bardzo obszerną dziedziną, a w AI_devs 3 skupiamy się przede wszystkim
+na generatywnym AI, a w szczególności na dużych modelach językowych. Nie
+schodzimy jednak w niskopoziomowe tematy związane z ich budowaniem od
+podstaw, lecz korzystaniem z ich możliwości poprzez API.
+Już po pierwszych lekcjach można zauważyć, że miejscami wchodzimy w nieco
+bardziej zaawansowane obszary (np. mówiąc o tokenach, Fine-Tuningu czy pracy
+z modelami Open Source) i nie dzieje się tak bez powodu. Wiedza na temat
+działania modeli, ich budowy, procesu trenowania, alignment'u czy ogólnego
+kierunku rozwoju jest potrzebna po to, aby móc skuteczniej z nimi pracować.
+22.11.2024, 12:21 S00E05 — Rozwój | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e05-rozwoj 6/16
+
+===== STRONA 7 =====
+Możliwy jest także rozwój własnej kariery w obszarze AI, co także będzie
+wymagać zdobycia wiedzy i umiejętności wykraczających poza materiał AI_devs
+(choć ten może stanowić dobry punkt startowy). W takiej sytuacji przydatne
+mogą okazać się poniższe źródła:
+W hat is ChatGPT Doing?
+Build a Large Language Model
+Let's reproduce GPT-2
+Let's build the GPT Tokenizer
+Stanford CS25
+(nieco luźniejsze, choć inspirujące):
+The Singularity is Nearer
+W hy Machines Learn
+Genius Makers
+Zagadnienia związane z architekturą "Transformers" czy "Attention Mechanism"
+mogą być początkowo trudne do zrozumienia. Mogą też wydawać się odległe od
+tego, czym zajmujemy się podczas pracy z LLM przez API. Bez wątpienia jednak
+zrozumienie nawet wybranych koncepcji pozwala na bardziej świadomą pracę z
+modelami i korzystanie z ich możliwości.
+Pozostawanie na bieżąco
+Ogromny zakres wiedzy, umiejętności i narzędzi, który omówiliśmy, może być
+trudny do przyswojenia. Sprawy nie ułatwia fakt, że niemal każdego tygodnia
+pojawiają się nowe rozwiązania i modele, co utrudnia nadążanie za tym
+wszystkim. Mówiąc wprost — jest to niemożliwe.
+Dlatego zamiast skupiać się na tym, co nam umyka lub samodzielnie testować
+wszystkie pojawiające się nowości, wystarczy tylko skupić się na najbardziej
+wartościowych źródłach wiedzy i otoczyć się nimi. Mam tutaj na myśli
+zasubskrybowanie kanałów na YouTube, obserwowanie profili na X czy zapisanie
+się do newsletterów. W ten sposób najważniejsze tematy będą docierać do nas z
+każdej strony i w końcu uda nam się wychwycić sygnał spośród szumu.
+Niestety w sieci pojawia się mnóstwo informacji, które nie mają zbyt wiele
+wspólnego z rzeczywistością. Różnego rodzaju benchmarki, prototypy czy
+zapowiedzi przełomowych rozwiązań, rzadko przekładają się na praktykę i
+mają w sobie więcej marketingowej narracji niż realnej wartości.
+Właśnie z tego powodu wspomniany projekt "prywatnego API" czy też
+"osobistego AGI" odgrywa istotną rolę w eksplorowaniu generatywnego AI. Po
+prostu w ten sposób mamy okazję do samodzielnego przetestowania nowych
+22.11.2024, 12:21 S00E05 — Rozwój | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e05-rozwoj 7/16
+
+===== STRONA 8 =====
+rozwiązań i bliższego poznania popularnych technik pracy, a także kształtowania
+własnych.
+Współpraca z LLM w nauce i programowaniu
+Generowanie treści bezpośrednio przez LLM zwykle charakteryzuje się wysokim
+poziomem konfabulacji, niewystarczającą jakością wypowiedzi lub po prostu
+niedopasowaniem jej do naszego kontekstu. Wiemy jednak, że model może
+pracować na informacjach dostarczonych przez nas do promptu. Co prawda
+nadal istnieje ryzyko wygenerowania błędnych treści, jednak dzieje się to
+zdecydowanie rzadziej.
+Wartość, jaką daje nam współpraca z LLM jest proporcjonalna do możliwości
+samego modelu oraz naszych umiejętności pracy z nim. Obie te rzeczy możemy
+ze sobą połączyć, wspierając się przy tym kilkoma narzędziami.
+Przede wszystkim, dopasowanie LLM do naszych potrzeb wymaga napisania
+głównego promptu systemowego, zawierającego najważniejsze zasady
+generowania wypowiedzi. Przykład takiego promptu znajduje się poniżej i skupia
+się na stylu wypowiedzi, sposobie rozumowania, czy wykorzystywanych
+technologiach.
+When answering, strictly follow these rules:
+<rules>
+- Think aloud before you answer and NEVER rush with answers. Be patient and calm.
+- Ask questions to remove ambiguity and make sure you're speaking about the right thing
+- Ask questions if you need more information to provide an accurate answer.
+- If you don't know something, simply say, "I don't know," and ask for help.
+- By default speak ultra-concisely, using as few words as you can, unless asked otherwise
+- When explaining something, you MUST become ultra comprehensive and speak freely
+- Split the problem into smaller steps to give yourself time to think.
+- Start your reasoning by explicitly mentioning keywords related to the concepts, ideas, function
+alities, tools, mental models .etc you're planning to use
+- Reason about each step separately, then provide an answer.
+- Remember, you're speaking with an experienced full-stack web developer who knows JavaScr
+ipt, Node.js, Rust, and common web technologies.
+- Always enclose code within markdown blocks.
+- When answering based on context, support your claims by quoting exact fragments of availabl
+e documents, but only when those documents are available. Never quote documents that are not
+available in the context.
+- Format your answer using markdown syntax and avoid writing bullet lists unless the user explic
+itly asks for them.
+- Continuously improve based on user feedback.
+</rules>
+22.11.2024, 12:21 S00E05 — Rozwój | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e05-rozwoj 8/16
+
+===== STRONA 9 =====
+Więcej inspiracji dla takich promptów można znaleźć na stronie cursor.directory i
+choć skupiają się na instrukcjach dla Cursor IDE, to widoczne w nich schematy
+można stosować także w innych kontekstach pracy z modelami.
+Dobrze jest także zdecydować o sposobie interakcji z LLM i wybrać pomiędzy
+ChatGPT, Perplexity, Claude.ai lub ewentualnie klientem desktopowym. Główna
+idea polega tutaj na tym, aby zawsze mieć łatwy dostęp do LLM, który
+uwzględnia instrukcję systemową dopasowaną do nas.
+Kolejnym etapem w pracy z LLM jest dołączenie szerszego kontekstu, który może
+obejmować dynamiczne informacje na nasz temat lub aktualnie omawianego
+problemu. Przykładowo podczas pracy z nową biblioteką, możemy pobrać ją na
+swój komputer i uruchomić Cursor, a zadać pytanie na temat konfiguracji projektu
+lub konkretnych pytań z którymi mamy problem, a które nie zostały uwzględnione
+w dokumentacji.
+Podobnie można pracować z dokumentacją, której treść także może trafić do
+kontekstu. Cursor domyślnie oferuje dostęp do dokumentacji popularnych
+narzędzi i frameworków, ale także daje możliwość wczytania dokumentacji na
+podstawie adresu URL. Co prawda w tym przypadku często i tak będziemy chcieli
+zajrzeć do konkretnych podstron, jednak praca na takim kontekście zwiększa
+22.11.2024, 12:21 S00E05 — Rozwój | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e05-rozwoj 9/16
+
+===== STRONA 10 =====
+skuteczność generowanego kodu i często uwzględnia metody, o których sami nie
+wiedzieliśmy, a które faktycznie są dostępne.
+Zatem podczas pracy i nauki przydatny jest nawyk korzystania z LLM, jednak
+zamiast opierać się wyłącznie o bazową wiedzę modelu, znacznie lepiej jest
+skorzystać z narzędzi umożliwiających łatwe dołączenie dodatkowego kontekstu.
+Nie zawsze jednak nasze zadania będą powiązane z kodem czy dokumentacjami
+narzędzi. Wówczas wartość znajdziemy w aplikacjach oferujących możliwość
+"rozmawiania z plikami", przeszukiwania Internetu czy przetwarzania różnych
+formatów plików (np. audio czy wideo).
+Jeśli temat Cursor IDE Cię zainteresował, to poniżej znajduje się mój warsztat na
+ten temat. Jest to materiał opcjonalny, choć rekomendowany.
+22.11.2024, 12:21 S00E05 — Rozwój | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e05-rozwoj 10/16
+
+===== STRONA 11 =====
+Liked by Mateusz and 150 others
+Comment 154 comment s
+Paweł Tutak Nov 10
+Podsumowanie
+Rozwój w obszarze Generatywnej Sztucznej Inteligencji można sprowadzić do
+połączenia praktyki z najlepszymi źródłami wiedzy. Pomimo dynamicznego
+tempa rozwoju, otoczenie się wartościowymi materiałami oraz realizowanie
+projektu w ramach swoich zainteresowań wystarcza do skutecznego zdobywania
+nowych umiejętności. Co więcej, w każdej z tych aktywności może towarzyszyć
+nam AI.
+Poligon 🎓
+Wiemy, że się powtarzamy, ale jeśli jakimś cudem umknęła Ci informacja o
+istnieniu naszej platformy do ćwiczeń, to teraz jest idealny moment, aby ją
+odwiedzić i spróbować swoich sił z zadaniami i z integracją z naszym API.
+↳ https://poligon.aidevs.pl/
+Like
+PT
+Budowanie własnych narzędzi i API
+Znalazłem, że
+“Next.js is a popular React framework for building web applications.ˮ
+22.11.2024, 12:21 S00E05 — Rozwój | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e05-rozwoj 11/16
+
+===== STRONA 12 =====
+Like Reply
+Paweł Dulak (dulare) AI_Dev Nov 10
+I'm here to help
+Like Reply
+Lukasz Matusz ewski 3d
+Cooking AI for Sales & Marketing.
+See more
+Like Reply
+Paweł Dulak (dulare) AI_Dev 3d
+I'm here to help
+Like Reply 1 like
+Ania Kuś Nov 9
+Like Reply
+overment Admin Nov 9
+I'm just curious.
+Ale przecież to React jest frameworkiem. To jakiś błąd?
+Paweł Tutak Next.js jest frameworkiem zbudowanym na
+frameworku React :) → https://nextjs.org/learn/react-
+foundations/what-is-react-and-nextjs
+Paweł Dulak (dulare) wiele osób się spiera, że React to
+biblioteka, a nie pełen framework ;)
+Żeby było śmieszniej, korzystam ostatnio z PayloadCMS który
+jest swojego rodzaju frameworkiem do budowania paneli
+administracyjnych (nie tylko CMS), opartym o framework
+Next.js, który jest oparty o “framework" React.js 😜
+Świat FE nie jest wcale taki prosty jakby się mogło wydawać :D
+Lukasz Matuszewski na szczęście nie jestem programistą
+JS/TS :) a w moim ColdFusion frameworków właściwie nie ma
+:D
+Jak to było? Biblioteka to coś co Twój kod wywołuje, framework
+to coś co wywołuje Twój kod :)
+overment Czy możesz udostępnić tutaj swój prompt systemowy do
+Cursora? 😊
+22.11.2024, 12:21 S00E05 — Rozwój | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e05-rozwoj 12/16
+
+===== STRONA 13 =====
+See more
+Like Reply 7 likes
+Wojtek Sierakowski Nov 9
+Software Architect
+Like Reply 1 like
+overment Admin Nov 9
+I'm just curious.
+Like Reply 1 like
+Kamil Raróg Nov 6
+Like Reply
+Ania Kuś a mogę :)
+When answering, strcitly follow these rules:
+<rules>
+- Think aloud before you answer and NEVER rush with
+answers. Be patient and calm.
+- Ask questions to remove ambiguity and make sure you're
+speaking about the right thing…
+Cursor chyba sobie nie poradzi z wczytaniem dokumentacji w każdym
+przypadku. Chciałem aby wczytał https://platform.openai.com/docs/
+ale nie daje rady bo dokumentacja jest zabezpieczona captchą.
+Pozostaje chyba ściągnąć ją jako markdown i lokalnie zaimportować.
+Wojtek Sierakowski ano nie poradzi. To samo będzie miało
+miejsce, gdy strona jest zbudowana tak, że scrapper będzie
+miał trudność z dostaniem się do niej.
+Dlatego nadal istotne jest budowanie własnych bibliotek, które
+wczytujesz do danego projektu.
+Swoją drogą OpenAI miało odblokować dokumentację i nadal
+tego nie zrobili.
+KR
+Chciałem zobaczyć film opisujący Cursor IDE. Niestety zamiast wideo
+widzę błąd:
+Czy to tylko mój problem? :D
+22.11.2024, 12:21 S00E05 — Rozwój | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e05-rozwoj 13/16
+
+===== STRONA 14 =====
+Paweł Dulak (dulare) AI_Dev Nov 6
+I'm here to help
+Like Reply
+overment Admin Nov 6
+I'm just curious.
+Like Reply 1 like
+Adrian Ambroziak 🥷 501 Nov 4
+Quality Assurance Specialist and DevOps Expert at Fujitsu
+Like Reply
+Maciej Podkowa Nov 4
+Java Game De veloper
+Like Reply 1 like
+Maciej Podkowa Nov 4
+Java Game De veloper
+Like Reply 1 like
+Wojciech Korczyński Nov 3
+Like Reply
+Kamil Raróg u mnie w FF na Ubuntu ten sam efekt, ale to
+pewnie problem z Vimeo na którym ten film jest hostowany.
+Możemy zapytać overment czy coś wie na ten temat
+Kamil Raróg odśwież proszę stronę
+Czy trzeba zapłącić te 20 USD , żeby mieć opcję dodawania plików do
+kontekstu w Cursor? Nie widzę tej opcji u siebie w wersji free. Z tym
+się tak nie da rpacować. Kasa na openAi, kasa na Anthropic, kasa na
+Cursor… i co jeszcze?
+Adrian Ambroziak w darmowej wersji przez 14 dni masz
+możliwość korzystania z funkcji premium i międzyinnymi
+dodawanie plików z projektu do kontekstu. Spróbuj w czacie po
+prawej użyć @ program sam zaproponuje menu kontekstowe
+Adrian Ambroziak można także jeszcze podpiąć swój klucz API
+openai do Cursora, ale tak jak mówił overment wersja Pro jest
+potrzebna jeśli chcemy korzystać z Composerʼa
+WK
+Tak z czystej ciekawości - jaki język programowania najbardziej
+polecacie do pracy z zadaniami? Widzę, że w przykładach jest TS 🙂
+22.11.2024, 12:21 S00E05 — Rozwój | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e05-rozwoj 14/16
+
+===== STRONA 15 =====
+Paweł Dulak (dulare) AI_Dev Nov 4
+I'm here to help
+Like Reply 1 like
+Wojciech Korczyński Nov 4
+Like Reply
+Paweł Dulak (dulare) AI_Dev Nov 4
+I'm here to help
+Like Reply 1 like
+Rafał Szczukiewicz Nov 3
+Like Reply 1 like
+Piotr Petrycki Nov 3
+Like Reply
+Dominik Trznadel Nov 3
+#teamp ython
+Like Reply 1 like
+Dominik Trznadel Nov 3
+#teamp ython
+Wojciech Korczyński Taki w którym najmniej będziesz się
+męczyć z językiem :) czyli najlepiej ten w którym piszesz na
+codzień. Ale jeśli czujesz się OK z TS, to będzie najprościej
+wykorzystywać kod z przykładów.
+WK
+Paweł Dulak (dulare) Dzięki za odpowiedź. Myślałem jeszcze o
+takim aspekcie jak ewentualna dostępność bibliotek,
+frameworków, itp. Jak dla mnie TS jak najbardziej jest OK 🙂
+Wojciech Korczyński TS, Python - najlepsza dostępność
+bibliotek, ale w innych też jest z czego wybierać.
+mam i ja 🙂
+Ready: Player V ✌ 🚀
+A macie może polecajki repozytoriów ze zrobionymi osobistymi
+asystentami, żęby się zainspirować, nauczyći i wziąć coś dla siebie?
+A co myślicie o zamianie notion na obsidian w tym stacku? Mi bardziej
+podpasował do robienia notatek (na razie przez UI)
+22.11.2024, 12:21 S00E05 — Rozwój | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e05-rozwoj 15/16
+
+===== STRONA 16 =====
+Like Reply 1 like
+Show more comment s
+PS
+Post
+What are your thoughts?
+22.11.2024, 12:21 S00E05 — Rozwój | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e05-rozwoj 16/16

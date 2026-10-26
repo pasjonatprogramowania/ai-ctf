@@ -1,0 +1,527 @@
+
+===== STRONA 1 =====
+S02E02  R ozumienie obrazu i wideo
+overment Admin Nov 12
+I'm just curious.
+» Lekka wersja przeglądarkowa «
+📎 Pobierz treść tej lekcji w formacie markdown
+📎 Pobierz treść tej lekcji w formacie markdown (EN)
+16:46
+Back to Lekcje programu [AI3]
+PS
+22.11.2024, 12:26 S02E02 — Rozumienie obrazu i wideo | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e02-rozumienie-obrazu-i-wideo 1/23
+
+===== STRONA 2 =====
+Modele multimodalne, takie jak GPT-4o i Sonnet, są zdolne do przetwarzania nie
+tylko tekstu, ale także obrazu. Możemy więc przeprowadzać zaawansowaną
+analizę obrazu, korzystając ze wszystkich umiejętności modelu. Całym procesem
+możemy sterować programistycznie, korzystając z dostępu do systemu plików,
+schowka systemowego, dostępu do sieci czy kamery urządzeń mobilnych.
+W przypadku vision language models również obowiązują ograniczenia, takie jak
+konfabulacje czy limity context window, a także kilka dodatkowych, związanych z
+samym sposobem przetwarzania obrazu. Z drugiej strony możemy korzystać z
+podobnych technik projektowania promptów, takich jak chociażby Self-
+Consistency czy Chain of Thought.
+W tej lekcji przejdziemy przez podstawy pracy z vision language models, co
+pozwoli nam na ich późniejsze, praktyczne wykorzystanie na potrzeby budowania
+agentów AI oraz samodzielnych automatyzacji.
+API do przetwarzania obrazu i praca z plikami
+Podobnie jak przy przetwarzaniu tekstu, zapytanie do VLM tworzymy poprzez
+format ChatML, ale właściwość content nie jest ciągiem znaków, lecz tablicą,
+która może zawierać obiekty typu image_url oraz text. Możemy zatem w ten
+sposób przekazać wiele obrazów w ramach jednej konwersacji. Musimy jednak
+pamiętać o tym, że LLM API jest bezstanowe, a to oznacza, że obrazy
+będą interpretowane każdorazowo, co może przełożyć się na istotne koszty.
+W każdym razie widzimy, że struktura listy wiadomości wygląda inaczej i pozwala
+nam na przekazanie obrazu w formie base64. W przypadku OpenAI możliwe jest
+także określenie szczegółowości (parametr detail), a nawet podanie adresu URL
+kierującego bezpośrednio do obrazka. Zwykle jednak będziemy chcieli pozostać
+przy base64.
+22.11.2024, 12:26 S02E02 — Rozumienie obrazu i wideo | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e02-rozumienie-obrazu-i-wideo 2/23
+
+===== STRONA 3 =====
+Choć schemat interakcji z VLM niemal zawsze wygląda tak samo, to w przypadku
+Anthropic są małe różnice w strukturze zapytania. Jest to jeden z powodów, dla
+którego będziemy chcieli skorzystać ze wspominanych w lekcji S00E03 — API
+bibliotek lub ostatecznie frameworków, szczególnie gdy będzie nam zależało na
+pracy z modelami różnych dostawców.
+22.11.2024, 12:26 S02E02 — Rozumienie obrazu i wideo | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e02-rozumienie-obrazu-i-wideo 3/23
+
+===== STRONA 4 =====
+W przykładzie vision znajduje się kod w którym VLM (w tym przypadku GPT-4o)
+odpowiada na pytanie związane ze zrzutem ekranu lekcji AI_devs 3, a jego
+zadaniem jest wypisanie liczby komentarzy i polubień widocznych pod każdą z
+lekcji.
+22.11.2024, 12:26 S02E02 — Rozumienie obrazu i wideo | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e02-rozumienie-obrazu-i-wideo 4/23
+
+===== STRONA 5 =====
+Po uruchomieniu tego przykładu widzimy odpowiedź w formie tabeli, zawierającą
+wartości, o które prosił użytkownik. Co więcej, w konsoli wyświetla się także
+liczba tokenów, obliczana dla tekstu za pomocą narzędzia Tiktoken, a dla obrazu
+przez funkcję napisaną na podstawie dokumentacji OpenAI.
+Dodatkowo w tle dzieje się kilka dodatkowych akcji, takich jak kompresja obrazu,
+a także jego skalowanie z zachowaniem proporcji. Skalowanie jest o tyle istotne,
+że Vision Language Models są w stanie przetwarzać obrazy o określonym
+rozmiarze. Musimy więc brać pod ten fakt w kontekście zdolności modelu do
+rozpoznania detali.
+Aktualne możliwości Vision Language Model
+Choć w pierwszej chwili możliwości rozpoznawania obrazu wydają się niezwykle
+imponujące, tak bardzo szybko ujawniają się ich ograniczenia. Część z nich
+została opisana w publikacji "Vision language models are blind" z którą warto
+się zapoznać, aby wyrobić sobie podstawowe zrozumienie ograniczeń modeli.
+Pierwszym przykładem jest trudność z rozpoznawaniem przecinających się
+kształtów czy zdolności do poruszania się po szachownicy.
+22.11.2024, 12:26 S02E02 — Rozumienie obrazu i wideo | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e02-rozumienie-obrazu-i-wideo 5/23
+
+===== STRONA 6 =====
+Równie wartościowe jest także zapoznanie się z GPT-4 Research oraz GPT-4V
+System Card, które prezentują ogólne możliwości modeli. Natomiast gdy
+przyjdzie nam pracować z VLM, to i tak konieczne będzie przetestowanie jego
+możliwości na testowych danych.
+Kolejną wartą uwagi publikacją jest dokument "Eyes W ide Shut?" w której
+wskazane są ograniczenia związane z rozpoznawaniem kierunku, obrotu czy
+różnych zdarzeń związanych z prawami fizyki.
+22.11.2024, 12:26 S02E02 — Rozumienie obrazu i wideo | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e02-rozumienie-obrazu-i-wideo 6/23
+
+===== STRONA 7 =====
+Z moich obserwacji wynika, że:
+VLM są w stanie rozpoznawać kolory, ale nie potrafią zwrócić faktycznej
+palety, np. w formacie HEX. Dlatego kwestię kolorów powinniśmy adresować
+po stronie programistycznej
+VLM nie są w stanie określać rozmiaru obrazka, a także odległości pomiędzy
+elementami czy ich dokładnej lokalizacji. Tutaj pomocne mogą być modele
+takie jak Segment Anything od Meta. Poza tym najnowsze modele Anthropic
+są trenowane z myślą o większej precyzji przeliczania pikseli na potrzeby
+Computer Use.
+VLM obowiązuje knowledge cutoff, więc nie są w stanie rozpoznawać rzeczy,
+które wychodzą poza ich bazową wiedzę. Wyjątek stanowią sytuacje, w
+których opis obiektu przekazany w kontekście pozwoli na jego identyfikację
+VLM również dotyczy prompt injection, który może być przekazany
+bezpośrednio w treści obrazu
+VLM są świetne w rozpoznawaniu tekstu (OCR), jednak tutaj nadal zdarzają
+się pomyłki, nierzadko bardzo rażące.
+Należy jednak pamiętać, że rozwój VLM jest bardzo dynamiczny i kolejne wersje
+prezentują coraz większe możliwości oraz precyzję rozpoznawania obrazów, a
+nawet formatu wideo. Obecnie warto także patrzeć na VLM jako modele zdolne
+do ogólnego rozumienia obrazów, z pominięciem precyzyjnych detali. Patrząc
+22.11.2024, 12:26 S02E02 — Rozumienie obrazu i wideo | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e02-rozumienie-obrazu-i-wideo 7/23
+
+===== STRONA 8 =====
+jednak na nowe możliwości modelu Claude 3.5 Sonnet (wersja z października), to
+może okazać się, że szybko powyższe stwierdzenie stanie się nieaktualne.
+Prompty dla modeli Vision
+Wspomniałem, że tworzenie promptów dla VLM pozwala na zastosowanie
+technik, które znamy z samego przetwarzania tekstu. Zatem przykłady Few-Shot,
+Chain of Thought czy Self-Consistency sprawdzą się w połączeniu z obrazem.
+Dodatkowo, gdy pozwala na to sam model, możemy skorzystać także z Function
+Calling oraz JSON Mode.
+W repozytorium Cookbook od Anthropic można znaleźć kilka przykładowych
+instrukcji dla VLM. Jedną z nich jest poniższy obraz, na którym zostało zapisane
+pytanie na temat pola powierzchni okręgu. Model jest w stanie poprawnie je
+odczytać, a następnie odpowiedzieć.
+Oznacza to, że Vision Language Models są w stanie bardzo dobrze rozumieć
+treść obrazu, wliczając w to tekst oraz dodatkowe obiekty, które się na nim
+znajdują. Obejmuje to także elementy, które możemy dodawać programistycznie
+(np. strzałki, ramki czy siatki).
+Jeśli chodzi o same instrukcje kierowane do VLM, to poza klasycznymi dla modeli
+językowych technikami, możemy wykorzystać zwroty takie jak "you have perfect
+vision" czy "take a closer look". Widzimy to na przykładzie poniższego promptu
+ze wspomnianego repozytorium Anthropic. Naturalnie nie sprawią one, że modele
+22.11.2024, 12:26 S02E02 — Rozumienie obrazu i wideo | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e02-rozumienie-obrazu-i-wideo 8/23
+
+===== STRONA 9 =====
+magicznie zaczną widzieć absolutnie wszystkie szczegóły, ale zwiększymy
+szansę na to, że zadanie zostanie zrealizowane poprawnie.
+Zatem prompt dla VLM to nie tylko tekst, ale także obraz(y). Oznacza to, że
+sposób, w jaki oznaczymy i/lub wykadrujemy treść, będzie mieć znaczenie. Co
+więcej, problemy modeli takich jak GPT-4 z rozpoznawaniem obrazów można
+adresować poprzez wsparcie modeli wyspecjalizowanych w określonych
+zadaniach, np. segmentowaniu obrazu.
+Na potrzeby przykładu segment (do jego uruchomienia potrzebny jest klucz API
+Replicate) wziąłem zrzut mojego ekranu na którym widoczna jest strona główna
+AI_devs 3 oraz aplikacja Alice. Model klasy GPT-4o jest w stanie całkiem
+precyzyjnie odpowiadać na większość pytań związanych z treścią widoczną na
+ekranie.
+Jednak jeśli pytanie będzie dwuznaczne w szerszym kontekście lub będzie
+dotyczyło jakiegoś mniejszego szczegółu, jakość odpowiedzi spadnie.
+Przykładowo, jeśli zapytamy o aktywny model, otrzymamy nazwę "Alice", co
+jest oczywiście błędne, bo to imię avatara, a nie modelu.
+22.11.2024, 12:26 S02E02 — Rozumienie obrazu i wideo | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e02-rozumienie-obrazu-i-wideo 9/23
+
+===== STRONA 10 =====
+Aby zmienić kontekst zapytania, zastosowałem model adirik/grounding-dino
+dostępny na Replicate. Dzięki niemu zaznaczyłem okno aplikacji "Alice", co
+przełożyło się na poniższy rezultat. Zrzut ekranu został oznaczony ramkami
+opisującymi elementy możliwie pasujące do promptu, a samo API zwróciło
+współrzędne każdej z nich.
+Wystarczyło zatem przeliczyć wartości na potrzeby kadrowania obrazu, a
+następnie zapisać rezultat w nowym pliku.
+22.11.2024, 12:26 S02E02 — Rozumienie obrazu i wideo | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e02-rozumienie-obrazu-i-wideo 10/23
+
+===== STRONA 11 =====
+Ponowne zadanie pytania, ale tym razem w połączeniu z kadrowanym oknem
+aplikacji pozwoliło na uzyskanie poprawnej nazwy modelu, czyli "Claude 3.5
+Sonnet".
+Wniosek jest więc taki, że nawet jeśli Vision Language Models nie radzą sobie z
+przetworzeniem wybranego obrazu, możemy zmodyfikować kontekst zapytania,
+zarówno zmieniając samą instrukcję, jak i modyfikując obraz, lub nawet dodając
+kolejne obrazy, które pomogą modelowi lepiej zrozumieć nasz problem. Tutaj
+pomocna może okazać się także platforma Roboflow oferująca dostęp do modeli
+wyspecjalizowanych np. w segmentowaniu oraz opisywaniu obrazu i wideo.
+Rozpoznawanie obiektów
+Publicznie dostępne VLM są ograniczane pod kątem zdolności do rozpoznawania
+znanych osób. Wspominałem jednak o możliwości dostarczenia opisu do
+kontekstu promptu, który model może skojarzyć z przesłanym obrazem.
+Analogicznie też możemy dołączać inne obrazy, które będą stanowiły punkt
+odniesienia.
+22.11.2024, 12:26 S02E02 — Rozumienie obrazu i wideo | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e02-rozumienie-obrazu-i-wideo 11/23
+
+===== STRONA 12 =====
+W przykładzie recognize znajduje się katalog avatars. Zawiera on 9 awatarów
+moich agentów AI, lecz dwa z nich przedstawiają "Alice", choć nieco różnią się od
+siebie. Naturalnie GPT-4o nie posiada wiedzy na temat moich projektów, więc
+muszę dostarczyć w kontekście wiedzę na ich temat.
+Opis Alice wygenerowałem z pomocą modelu, prosząc o opis zdjęcia Alice_.png
+oraz jego zapis z perspektywy pierwszej osoby. Jak widać, jest on całkiem
+wyczerpujący. Każdy z tych detali pozwoli nam w dalszej identyfikacji tej postaci.
+W pliku recognize/app.ts znajduje się funkcja processAvatars, która wczytuje pliki
+z katalogu, a następnie każdy z nich przetwarza z pomocą OpenAI i modelu GPT-
+4o. Sam prompt systemowy zawiera prośbę o odpowiedź "It's me" lub "It's not
+me" w zależności od tego, czy zdjęcie pasuje do opisu.
+22.11.2024, 12:26 S02E02 — Rozumienie obrazu i wideo | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e02-rozumienie-obrazu-i-wideo 12/23
+
+===== STRONA 13 =====
+Po uruchomieniu skryptu zobaczymy tabelę z podsumowaniem, oraz
+poprawną klasyfikacją dwóch zdjęć. Oznacza to, że opis został poprawnie
+połączony z właściwymi obrazami, pomimo tego, że postać prezentowana na
+jednym z nich została przedstawiona inaczej, niż oryginał.
+Naturalnie, tutaj także nie możemy liczyć na 100% skuteczność, ale myślę, że ten
+przykład pokazał potencjalne możliwości związane z klasyfikacją obrazów, które
+można wykorzystać w procesach biznesowych — obsłudze klienta, sprzedaży
+czy analizie dokumentów.
+Modele Open Source
+Jeszcze kilka dni przed napisaniem tych słów, ten fragment lekcji wyglądałby
+zupełnie inaczej. Jednak Mistral udostępnił świetny VLM, który pod kątem
+precyzji można realnie porównać do najlepszych dostępnych modeli Vision. Sam
+model dostępny jest zarówno przez API, jak i na HuggingFace.
+22.11.2024, 12:26 S02E02 — Rozumienie obrazu i wideo | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e02-rozumienie-obrazu-i-wideo 13/23
+
+===== STRONA 14 =====
+Praca VLM działającymi lokalnie, nie różni się szczególnie od pracy z modelami
+komercyjnymi. Naturalnie trzeba pamiętać o ich ograniczeniach oraz odpowiednio
+niższej skuteczności.
+W przykładzie recognize_pixtral zastosowałem dokładnie tą samą logikę, co w
+przykładzie recognize. Konieczne było jednak lekkie dostosowanie promptu
+systemowego poprzez instrukcję kontrolującą długość wypowiedzi. I choć
+zadanie zostało zrealizowane poprawnie (co widać poniżej), tak Pixtral nie
+zawsze poprawnie rozpoznaje oba zdjęcia.
+Nie zmienia to jednak faktu, że VLM działające lokalnie można już z powodzeniem
+stosować przy budowaniu narzędzi wymagających rozpoznawanie obrazu. Poza
+Pixtralem, pod uwagę można wziąć także modele Vision z rodziny Phi czy Qwen.
+Dodatkową zaletą modeli Open Source jest także możliwość ich dopasowania do
+swoich potrzeb poprzez Fine-Tuning, aczkolwiek temat ten wykracza poza zakres
+AI_devs 3.
+Podsumowanie
+W tej chwili oczywiste powinno być to, że Vision Language Models oferują bardzo
+duże możliwości związane z rozumieniem obrazu, aczkolwiek nadal
+posiadają mnóstwo ograniczeń, które niekiedy trudno jest ominąć.
+Na uwagę zasługuje tutaj przede wszystkim fakt, że skuteczność działania VLM
+będzie różnić się nie tylko w zależności od naszej instrukcji, ale także
+przekazanych obrazów, ich kompresji czy opisania poprzez graficzne oznaczenia.
+Co więcej, nawet jeśli VLM nie sprawdza się w danym zakresie dziś, nie oznacza,
+że kolejnych wersji modeli również będzie to dotyczyć. Warto zatem obserwować
+22.11.2024, 12:26 S02E02 — Rozumienie obrazu i wideo | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e02-rozumienie-obrazu-i-wideo 14/23
+
+===== STRONA 15 =====
+przede wszystkim rozwój modeli OpenAI, Anthropic czy Google DeepMind i co
+jakiś czas weryfikować ich postępy.
+Jeśli z tej lekcji masz zabrać ze sobą tylko jedną rzecz, to na przykładzie kodu z
+recognize utwórz prosty skrypt, którego zadaniem będzie OCR obrazu. W
+sytuacji gdy tekst będzie nieczytelny lub nie będzie go w ogóle, model powinien
+zwrócić 'no text'.
+Powodzenia!
+NOTATKA ZYGFRYDA
+ZADANIE
+22.11.2024, 12:26 S02E02 — Rozumienie obrazu i wideo | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e02-rozumienie-obrazu-i-wideo 15/23
+
+===== STRONA 16 =====
+Na podstawie dostarczonych w teczce fragmentów mapy, korzystając także z
+podpowiedzi z treści filmu powyżej, określ, z jakiego miasta one pochodzą.
+Pamiętaj, że jeden z fragmentów mapy może być błędny i może pochodzić z
+innego miasta. Użyj do tego celu modelu zdolnego do rozpoznawania obrazu.
+Wyślij nam do centrali nazwę tej miejscowości jako flagę.
+Co należy zrobić w zadaniu?
+Na podstawie mapy z teczki (papierowej lub elektronicznej) przygotuj cztery
+grafiki z czterema elementami mapy. Wykonanie fotek a pomocą smartfona
+pozwoli Ci zrozumieć, jak dokładny bywa model przy pracy z tego rodzaju
+skanami dokumentów przy różnych warunkach oświetlenia.
+Użyj dowolnego modułu typu Vision, do rozpoznania co jest na obrazach
+(możesz użyć GPT-4o, który potrafi świetnie poradzić sobie z inputem
+graficznym)
+W ramach dodatkowego prompta określ, co jest zadaniem, jakie informacje
+posiadasz i czego oczekujesz od modelu.
+Otrzymaną nazwę miasta zgłoś do centrali jako flagę (przez UI. W tym
+zadaniu nie używamy API)
+UWAGA: wielu agentów rozpoznało jakie to miasto za pomocą technik OSINT-
+owych. To świetne podejście, ale nie na szkoleniu z LLM. Zachęcamy do
+zapoznania się z tym, jak wygląda praca z modelami do rozpoznawania obrazów.
+🚩 Szukasz flagi? Zygfryd coś o niej wie.
+22.11.2024, 12:26 S02E02 — Rozumienie obrazu i wideo | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e02-rozumienie-obrazu-i-wideo 16/23
+
+===== STRONA 17 =====
+Liked by Damian and 136 others
+Comment 409 comment s
+dozm 12h
+See more
+Like Reply
+dozm 12h
+See more
+Like Reply
+dozm 12h
+Like Reply
+Paweł Dulak (dulare) AI_Dev 4h
+I'm here to help
+Like Reply
+Piotr Sieniawski3d
+Like
+D
+gpt-4-turbo:
+Analysis result: From examining the street names visible in the map
+fragments, the name "Warschauer Str." repeats in at least two of the
+fragments. This suggests that the city most frequently appearing in
+these maps is likely Berlin, Germany, as "Warschauer Straße" is a
+known street in Berlin.
+…
+D
+Gpt-4o
+Analysis result: The map fragments show the following city
+names based on the street names:
+1. Fragment 1: Brzeźna, Grochowa, Chłodnicza - likely from
+Wrocław, Poland.
+2. Fragment 2: Kosmonautów, Kosmiczna, Słoneczna - likely
+from Wrocław, Poland.…
+D
+Co ja pacze?
+dozm przede wszystkim - czemu taki model?
+Przesiądź się na gpt-4o :)
+22.11.2024, 12:26 S02E02 — Rozumienie obrazu i wideo | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e02-rozumienie-obrazu-i-wideo 17/23
+
+===== STRONA 18 =====
+Like Reply 2 likes
+Kacper Nadst oga 3d
+Like Reply 1 like
+Paweł Dulak (dulare) AI_Dev 3d
+I'm here to help
+Like Reply
+Kacper Nadst oga 3d
+See more
+Like Reply
+Paweł Dulak (dulare) AI_Dev 2d
+I'm here to help
+Like Reply 2 likes
+Niezbadane są ścieżki myślenia LLMów. Rzucał się po różnych
+miastach, póki mu nie kazałem wraz z nazwą miasta podać
+“probabilityˮ. Wtedy zakotwiczył gdzie trzeba i co najwyżej podawał
+listę z właściwym na pierwszym miejscu.
+W jaki sposób zoptymalizować zdjęcia aby później zakodowane w
+base64 nie powodowały przekroczenia kontekstu? Próbuje na różne
+sposoby przeskalować, ale wciąż przekraczam limit tokenów. 🤔
+Kacper Nadstoga base64 to właściwie konwersja zapisu
+binarnego na “tekstowyˮ więc wielkość pliku z którego
+korzystasz ma wprost przełożenie na wielkość base64. Nie
+wiem jakiego formatu używasz, ale można png dobrze
+skompresować i nie będzie kłopotu. Druga sprawa - wielkość
+nie większa niż 1024×1024 bo takie wystarcza :)
+Paweł Dulak (dulare) Miałem błąd gdzie indziej (błędny klucz
+parametru do liczby tokenów miałem). Ale jednej rzeczy nie
+rozumiem. Widzę rozbieżność między wynikami wyliczonych
+tokenów. Przykładowo wykorzystuje funkcję
+calculateImageTokens (algorytm taki sam z przykładu) dla
+tablicy czterech zdjęć w b64 dla jakości high. Zwraca mi
+powiedzmy wartość powiedzmy 2720. Ale jak już sprawdzam
+liczbę tokenów funkcją countTokens dla wejściowych …
+Kacper Nadstoga nie badałem nigdy tokenizera od microsoftu
+(użyty w countTokens), ale na pierwszy rzut oka - do
+wyliczenia ilości tokenów dla obrazka, trzeba znać jego
+wielkość. Nie sądzę żeby on sobie (tokenizer od microsoftu)
+dekodował base64 i liczył. To jest wg mnie tokenizer do tekstu.
+22.11.2024, 12:26 S02E02 — Rozumienie obrazu i wideo | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e02-rozumienie-obrazu-i-wideo 18/23
+
+===== STRONA 19 =====
+Piotr Szymacha 4d
+Like Reply 1 like
+Paweł Dulak (dulare) AI_Dev 4d
+I'm here to help
+Like Reply 1 like
+Piotr Sieniawski3d
+Like Reply
+Piotr Szymacha 3d
+Like Reply
+Marcin Matysek 5d
+Like Reply
+Paweł Dulak (dulare) AI_Dev 5d
+I'm here to help
+Like Reply
+Michał Łata 5d
+PS
+Czy ja o czymś nie wiem, a wy w jakiś sposób korzystacie z GPT
+mogącego przeszukiwać internet? Bo u mnie na prośbę o to,
+odpowiadał, że nie ma dostępu (zwykłe gpt-4o przez API OpenAI), a
+wszelkie techniki jakie opisywaliście wyżej nie pomagały, ciągle
+zgadywał, nie znając topografii miast. I najczęściej proponował Łódź,
+bo cmentarz… Ale to od razu odrzucałem bo jestem z Łodzi :P
+Piotr Szymacha API nie umie korzytać z Internetu, rozpoznanie
+miasta tego nie wymaga. Wewnętrzna wiedza modelu
+wystarcza.
+Piotr Szymacha Przez klienta desktopowego/webowego?
+PS
+Piotr Sieniawski nie, przez API
+Kolejne fajne zadanko 🙂
+Automatyzacja z zapytaniem o nazwę miasta, zadziałała praktycznie
+od pierwszego strzała 🙂 Byłem nieźle zaskoczony. Nie sądziłem że
+GPT-4o vision tak łatwo sobie z tym poradzi.
+Prompt do obrazków to tylko 68 tokenów.
+Marcin Matysek gratulacje :)
+22.11.2024, 12:26 S02E02 — Rozumienie obrazu i wideo | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e02-rozumienie-obrazu-i-wideo 19/23
+
+===== STRONA 20 =====
+See more
+Like Reply
+overment Admin 5d
+I'm just curious.
+Like Reply 1 like
+Michał Łata 5d
+Like Reply
+Pawel Karys 5d
+Like Reply 1 like
+Michał Łata 6d
+overment, mam pytanie odnośnie przykładu “visionˮ.
+Wykorzystujesz tam bibliotekę “sharpˮ w celu optymalizacji obrazków
+(w tym kompresji) i zastanawiam się, bo o ile w Twoim przykładzie
+lessons_optimized.png ma mniejszy rozmiar od lessons.png, tak kiedy
+ja wykorzystuję kod z tego przykładu do optymalizacji swoich
+obrazków – zoptymalizowane wersje potrafią mieć 2x większy rozmiar
+od oryginału.
+Czy to może być kwestia tego, że przed optymalizacją zrobiłem …
+Michał Łata może to zależeć od obrazka i ustawień sharp.
+Ewentualnie można przepuszczać obrazki przez tinypng (ja
+korzystam z tego na co dzień ale nie chciałem już dorzucać
+nowego API).
+overment, właśnie sharp ustawiony 1:1 z Twoimi ustawieniami.
+Jedyna różnica to tylko taka, że swój obrazek konwertowałem z
+.jpg do .png przez toola z “Quick Actionsˮ na macu.
+Zastanawiam się, czy to właśnie ten etap robi aż taką różnicę
+:D
+PK
+Jak się ma OCR przy pomocy biblioteki Tesseract do wyciągania
+tekstu przy pomocy jakiegoś modelu np. gpt-4o? Czy jest jakikolwiek
+sens wspomagać się biblioteką przed wysłaniem zapytania do
+modelu,? Czy jeżeli wiemy że na obrazku jest tylko tekst to czy w
+ogóle jest sens używać AI modelu do tego? Może lepiej odrazu użyć
+Tesseract i ograniczyć koszty.
+22.11.2024, 12:26 S02E02 — Rozumienie obrazu i wideo | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e02-rozumienie-obrazu-i-wideo 20/23
+
+===== STRONA 21 =====
+See more
+Like Reply 1 like
+Paweł Dulak (dulare) AI_Dev 5d
+I'm here to help
+Like Reply 1 like
+Mikołaj Kmita 5d
+See more
+Like Reply 3 likes
+Michał Łata 5d
+Like Reply 1 like
+Ania Kuś 6d
+To ciekawe, że u innych bez problemu i powtarzalnie zwraca
+poprawną nazwę miasta na gpt-4o. U mnie jakkolwiek bym się nie
+nagimnastykował to ciągle błądzi i najczęściej zwraca nazwę miasta,
+w którym są słynne tężnie. Próbowałem zarówno krótkich promptów i
+długich promptów, po po polsku i po angielsku. Tylko raz mu się udało
+trafić, ale to prawdopodobnie przypadkiem, bo robi metodą “chybił-
+trafiłˮ.
+Myślałem, że może zrobiłem zbyt niewyraźne zdjęcia, ale …
+Michał Łata możesz się podzielić promptem? Może być na priv
+:)
+MK
+Michał Łata Też całkiem długo walczyłem, bo był Toruń,
+Kraków… a tego co trzeba nie. Pomogło, jak kazałem modelowi
+zwrócić uwagę n określone szczegóły
+<spoiler alert>
+…
+Mikołaj Kmita, Twój komentarz mi wiele wyjaśnił :D.
+Zapomniałem wstrzyknąć do prompta dodatkowego kontekstu,
+o którym wspomniałeś :). Teraz jest znacznie lepiej (jeszcze nie
+idealnie) i zwraca zamiennie dwie nazwy miast (w tym jedna
+poprawna).
+Dzięki!
+Trochę takie zadanie na zgadywanie, ciągle wychodziła mi inna
+odpowiedź. W tym przykładzie chyba najmocniej dawała popalić
+22.11.2024, 12:26 S02E02 — Rozumienie obrazu i wideo | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e02-rozumienie-obrazu-i-wideo 21/23
+
+===== STRONA 22 =====
+Like Reply 2 likes
+overment Admin 5d
+I'm just curious.
+See more
+Like Reply 3 likes
+Ania Kuś 5d
+Like Reply 1 like
+Tomasz Maciej Zielinski 6d
+Tomasz Zieliński
+Like Reply 1 like
+Tomasz Maciej Zielinski 6d
+Tomasz Zieliński
+Like Reply 2 likes
+niedeterministyczna natura modeli.
+Ania Kuś no i wyobraź sobie, że masz coś takiego w aplikacji i
+nie jesteś w stanie zbyt dużo z tym zrobić.
+Dlatego mówi się o tym, że modele na produkcji wypadają
+kiepsko i nierzadko jest to prawda. Dlatego im więcej wiesz na
+temat możliwości modeli, tym łatwiej przychodzi określenie
+tego w jakich sytuacjach się sprawdzą, a kiedy nie warto po nie
+sięgać.
+W ostatnich dniach wdrażam sobie system, który realizuje ser…
+overment Mi rozwalił system przyklad summary, z któreś z
+następnych lekcji - na ile kroków można robić zwykle,
+wydawałoby się, podsumowanie. Nie wpadłabym na to, a
+jednocześnie często byłam nie do końca zadowolona z
+podsumowań które generowały modele, jak próbowałam je do
+tego wykorzystywać.
+Pomimo przejrzenia wskazówek w tej dyskusji, żadnym sposobem nie
+jestem w stanie tego rozwiązać. Otrzymałem już z 10 różnych nazw
+miast.
+No dobra… spojrzałem w dashboard i zorientowałem się, że
+używam 4o-mini zamiast 4o. Ten drugi rozpoznał miasto od
+razu.
+22.11.2024, 12:26 S02E02 — Rozumienie obrazu i wideo | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e02-rozumienie-obrazu-i-wideo 22/23
+
+===== STRONA 23 =====
+Show more comment s
+PS
+Post
+What are your thoughts?
+22.11.2024, 12:26 S02E02 — Rozumienie obrazu i wideo | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e02-rozumienie-obrazu-i-wideo 23/23

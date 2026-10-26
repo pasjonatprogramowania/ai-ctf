@@ -1,0 +1,534 @@
+
+===== STRONA 1 =====
+S02E04  P ołączenie wielu formatów
+overment Admin Nov 14
+I'm just curious.
+» Lekka wersja przeglądarkowa «
+📎 Pobierz treść tej lekcji w formacie markdown
+📎 Pobierz treść tej lekcji w formacie markdown (EN)
+Wskazówka: Przykłady summary oraz narration zawierają pliki z wynikami ich
+działania. Nie ma więc potrzeby podłączać kluczy API Gemini / ElevenLabs.
+Dodatkowo przykład summary na ten moment poradzi sobie tylko z relatywnie
+krótkimi dokumentami, które nie przekraczają limitu tokenów wyjściowych.
+Bardziej zaawansowane przykłady podsumowań będziemy omawiać w
+dalszych lekcjach.
+Na pewnym etapie multimodalność najprawdopodobniej umożliwi nam
+generowanie tekstu, audio, obrazu, a być może nawet wideo. Przykładem może
+być Advanced Voice Mode. Mówimy więc tutaj o możliwości interakcji speech-
+to-speech, a także innych konfiguracjach.
+Z drugiej strony, może nam zależeć także na interakcji z modelami
+wyspecjalizowanymi w określonych zadaniach lub po prostu nie posiadającymi
+możliwości przetwarzania wielu formatów.
+Back to Lekcje programu [AI3]
+PS
+22.11.2024, 12:27 S02E04 — Połączenie wielu formatów | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e04-polaczenie-wielu-formatow 1/20
+
+===== STRONA 2 =====
+W obu przypadkach dążymy do transformacji danych występujących w różnych
+formatach. Niekiedy będą to obszerne bazy produktów, które wymagają opisu.
+Innym razem będzie to luźna notatka głosowa, potrzebująca ustrukturyzowania
+czy film z którego będziemy chcieli pobrać jakieś informacje.
+Generowanie tekstu i audio
+W lekcji S01E03 — Limity wspominałem, że duże modele językowe znacznie
+lepiej radzą sobie z transformacją treści, niż jej generowaniem. Mowa tutaj o
+sytuacji w której na podstawie kilku słów opisu oczekujemy rozbudowanego
+dokumentu zachowującego spójność stylu oraz wysoki poziom merytoryczny.
+Nie oznacza to jednak, że LLM nie są zdolne do tworzenia rezultatów wysokiej
+jakości, aczkolwiek wymaga to nieco większego zaangażowania w stworzenie
+logiki prowadzącej model.
+Dobrym przykładem takiego prowadzenia modelu jest podsumowanie treści,
+które jest też często prezentowane jako jedna z podstawowych umiejętności
+modelu. Na poniższej animacji widzimy dwa podsumowania: pierwsze
+wygenerowane przez prosty prompt z prośbą o streszczenie jednej z lekcji
+AI_devs. Natomiast po prawej mamy wynik działania przykładu summary, który
+buduje podsumowanie wieloetapowo, uwzględniając także linki oraz obrazki
+przeplatające treść we właściwych miejscach (co nie zawsze jest oczywiste dla
+modelu).
+Mówimy tutaj o kompresji na poziomie ~55%. Co więcej, podsumowanie
+podzielone jest na części (wprowadzenie, omówione tematy, kluczowe wnioski),
+więc można zapoznać się tylko z interesującymi nas fragmentami.
+Pytanie zatem: jak stworzyłem taki proces?
+22.11.2024, 12:27 S02E04 — Połączenie wielu formatów | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e04-polaczenie-wielu-formatow 2/20
+
+===== STRONA 3 =====
+Przede wszystkim, wyszedłem od pytania jak sam napisałbym takie
+podsumowanie, lecz zamiast odpowiadać na nie samodzielnie, omówiłem je z
+Claude 3.5. Nie wydarzyło się to jednak w ramach jednego wątku, lecz kilku:
+Na początku skorzystaliśmy z modelu mentalnego "First-principles Thinking"
+(myślenie zasadami pierwszego rzędu) w celu zidentyfikowania kroków
+potrzebnych do stworzenia dobrego podsumowania. Rezultat zawierał
+przydatne wskazówki (np. scoring czy modelowanie tematów) na które sam
+bym nie wpadł. Jednak ogólny proces mi się nie podobał, więc poprosiłem o
+wygenerowanie notatki z naszej rozmowy, którą wykorzystałem w celu
+rozpoczęcia nowego wątku.
+Nowa konwersacja rozpoczęła się od wygenerowanej notatki z poprzedniej
+rozmowy. Pozwolił on na przekazanie kontekstu, co stanowiło podstawę do
+omówienia każdego z kroków indywidualnie. Sugestie ze strony modelu były
+różne i większość z nich nie miała większego sensu, ale ponownie pojawiły
+się wskazówki na które sam bym nie wpadł. Sama rozmowa pozwoliła mi także
+ustrukturyzować własne myśli.
+22.11.2024, 12:27 S02E04 — Połączenie wielu formatów | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e04-polaczenie-wielu-formatow 3/20
+
+===== STRONA 4 =====
+W rezultacie doszedłem do poniższego opisu głównych kroków (extract, draft,
+refine, critique, summarize, refine) oraz w przypadku tego pierwszego, także
+podpunktów. Opracowany plan wyglądał w porządku, więc wystarczyło przełożyć
+go na kod.
+22.11.2024, 12:27 S02E04 — Połączenie wielu formatów | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e04-polaczenie-wielu-formatow 4/20
+
+===== STRONA 5 =====
+W pliku app.ts przykładu summarize znajduje się funkcja, która równolegle
+dokonuje niezależnej ekstrakcji informacji z każdej kategorii. W ten sposób
+budujemy kontekst na podstawie którego generowana jest pierwsza wersja
+podsumowania. Następnie jest ono krytykowane z uwzględnieniem zarówno
+oryginalnej treści artykułu oraz wszystkich pobranych informacji.
+Szkic, zebrany kontekst oraz krytyka zostają następnie przekazane do promptu
+piszącego główną wersję podsumowania, która finalnie przechodzi jeszcze
+rewizję pod kątem stylu.
+Zbierając to wszystko w całość:
+Modele językowe obecnie są dość ograniczone pod kątem wykonywania
+złożonych zadań w ramach jednego zapytania. Z drugiej strony, jeśli skupimy
+ich uwagę tylko na jednej aktywności, to skuteczność jest bardzo wysoka i w
+zależności od zadania, może osiągać 100%
+Przetwarzany przez model tekst, może być analizowany wielokrotnie pod
+różnym kątem. Pozwala to na automatyczne zgromadzenie wysokiej jakości
+kontekstu, na podstawie którego może być wykonane docelowe zadanie
+Warto jednak rozważyć dodatkowe kroki, w których wygenerowana treść
+zostanie poddana krytyce, czy nawet weryfikacji pod kątem naszych
+wymagań. Tak wygenerowany feedback pozwoli wyeliminować dużą część
+błędów obecnych w pierwszej iteracji
+Finalne podsumowanie powinno już posiadać docelową strukturę oraz komplet
+informacji. Jednak ze względu na fakt, że LLM domyślnie stosują raczej mało
+22.11.2024, 12:27 S02E04 — Połączenie wielu formatów | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e04-polaczenie-wielu-formatow 5/20
+
+===== STRONA 6 =====
+precyzyjny styl wypowiedzi, warto wykonać jeszcze jeden krok, który skupi
+się już tylko na stylizacji treści (jest to jednak opcjonalne)
+WAŻNE: Wymienione powyżej kroki nie muszą być wykonywane przez jeden
+model. Wprost przeciwnie, wskazane jest łączenie ze sobą różnych modeli —
+od tych mniejszych i tańszych, zdolnych do wykonania prostych operacji, po
+te najbardziej zaawansowane, zdolne do budowania złożonych wypowiedzi.
+Efekty można zobaczyć po uruchomieniu promptu lub poprzez wgląd w treść
+plików markdown, obecnych w katalogu summary. Tymczasem chciałbym
+zwrócić uwagę na jeszcze jeden element zastosowany w kodzie, a mianowicie
+stwarzanie modelowi czasu na myślenie poprzez zastosowanie tagów xml-like,
+wewnątrz których zostaje dodana odpowiedź po wcześniejszym zastanowieniu.
+Jest to praktyczne połączenie informacji z Let me speak Freely?, technik
+sugerowanych przez Anthropic oraz Chain of Thought.
+Ostatecznie, prompty wykorzystane przy generowaniu podsumowań mogą być
+dopasowane do nas. Można też pomyśleć o przygotowaniu instrukcji na tyle
+uniwersalnych, aby sprawdzały się w różnej kolejności.
+Trzeba także zaznaczyć, że przykład summarize jest zdolny do generowania
+podsumowań o ograniczonej długości i wynika to zarówno z limitów input jak i
+output tokens. Dodatkowo możliwe są także problemy związane z
+przepisywaniem linków i pojawiającymi się w nich literówkami. Natomiast do tego
+tematu wrócimy w dalszej części AI_devs.
+Opisywanie obrazów i wideo
+W podsumowaniu generowanym przez przykład summary uwzględnione są
+obrazki, a konkretnie linki, które do nich kierują. Zgodnie z lekcją S01E02 —
+Kontekst, przechowywanie plików na własnym serwerze jest kluczowe, aby model
+mógł się nimi posługiwać w swoich wypowiedziach, korzystając z formatu
+markdown.
+Same linki nie są wystarczające, ponieważ w takiej formie, model nie może
+podejrzeć tego, co znajduje się na obrazie. Musimy więc pobrać treść pliku i
+22.11.2024, 12:27 S02E04 — Połączenie wielu formatów | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e04-polaczenie-wielu-formatow 6/20
+
+===== STRONA 7 =====
+dostarczyć do modelu w formie base64.
+Podobnie jak w przypadku podsumowania, potrzebujemy dodatkowego
+kontekstu, aby wygenerować wartościowy opis. Informacje których potrzebujemy
+obejmują podgląd obrazu oraz kontekst w postaci treści, która go otacza, które
+model może połączyć w całość.
+Mówiąc konkretnie:
+Wczytujemy treść dokumentu
+Z pomocą wyrażeń regularnych pobieramy wszystkie obrazy i wczytujemy je
+w formie base64
+Gromadzimy kontekst poprzez dwa zapytania do modelu: podgląd i kontekst
+No i na końcu łączymy obie te informacje
+Poniżej znajduje się przykład w którym widać wyraźnie połączenie wizualnej
+interpretacji obrazu, wraz z otaczającym go kontekstem. Jest to wynik działania
+przykładu captions.
+22.11.2024, 12:27 S02E04 — Połączenie wielu formatów | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e04-polaczenie-wielu-formatow 7/20
+
+===== STRONA 8 =====
+Tak wygenerowane opisy mogą być wykorzystane w przykładzie summary w celu
+wzbogacenia kontekstu na podstawie którego generujemy opis całego artykułu.
+Co więcej, nie jesteśmy tutaj ograniczeni wyłącznie do obrazów, ponieważ w
+przypadku modelu Gemini 1.5 Pro, możemy przeanalizować także materiał wideo.
+Poniżej mamy przykład z Google AI Studio w którym na podstawie fragmentu
+nagrania o ComfyUI, model poprawnie wymienił wspominane narzędzia.
+Schemat opisywania materiałów wideo wygląda podobnie jak w przypadku
+obrazów i Google AI Studio udostępnia API, które pozwoli nam ten proces
+zautomatyzować. Trzeba tylko zwrócić uwagę na liczbę tokenów, która dla
+jednominutowego materiału wideo wyniosła ponad 18 000. Sama interakcja z API
+Google AI Studio znajduje się w przykładzie video, który zawiera dwa pliki
+testowe test.mp3 z krótkim nagraniem oraz test.mp4 z kilkusekundowym filmem.
+Aby przełączyć się pomiędzy nimi, wystarczy zmiana nazwy oraz mimeType w
+funkcji processMedia.
+22.11.2024, 12:27 S02E04 — Połączenie wielu formatów | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e04-polaczenie-wielu-formatow 8/20
+
+===== STRONA 9 =====
+WAŻNE: Google AI Studio nie oferuje możliwości łatwej kontroli kosztów, a
+jedynie limity liczby zapytań dla poszczególnych usług. W przykładzie video
+uwzględniłem limit wielkości pliku wynoszący 2MB, jednak samo API pozwala na
+przesyłanie plików o wadze nawet 2GB.
+Ostatnią ważną informacją w kontekście pracy z modelami Gemini, jest możliwość
+wykorzystania pamięci podręcznej dla kontekstu, co w przypadku wielokrotnego
+przetwarzania plików audio/wideo jest koniecznością.
+(częściowo)Autonomiczna Współpraca różnych modeli
+W dotychczasowych przykładach wykorzystywaliśmy różne modele, ale
+współpraca między nimi miała charakter indywidualny. Na przykład jeden model
+generował tekst, a drugi zamieniał go na audio, lub odwrotnie. Choć w takiej
+sytuacji nie ma nic złego, możemy wyjść znacznie ponad to.
+Mianowicie, umiejętności modeli możemy połączyć programistycznie w taki
+sposób, aby wzajemnie ze sobą współpracowały, dążąc do możliwie najlepszego
+rezultatu. Namiastkę tego widzieliśmy w przykładzie summary, gdzie model o1-
+mini weryfikował pracę gpt-4o, ale tam poruszaliśmy się tylko w obszarze tekstu,
+wchodząc nieznacznie w analizę obrazu.
+UWAGA: Przykład narration opiera się o obecnie eksperymentalne możliwości
+ElevenLabs dotyczące generowania efektów dźwiękowych. Korzystanie z nich
+jest obecnie dość drogie. W katalogu tego przykładu znajdują się przykładowe
+pliki prezentujące efekt jego działania.
+Natomiast w przykładzie narration modele o1-mini (OpenAI),
+eleven_multilingual_v2 (ElevenLabs) oraz gemini-1.5-flash (Google DeepMind)
+22.11.2024, 12:27 S02E04 — Połączenie wielu formatów | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e04-polaczenie-wielu-formatow 9/20
+
+===== STRONA 10 =====
+otrzymują zadanie w postaci wygenerowania narracji na dany temat,
+wzbogaconej o efekty dźwiękowe.
+Taki scenariusz prawdopodobnie już niebawem będzie bardzo prosty do
+zrealizowania z pomocą modeli multimodalnych, które być może będą zdolne do
+generowania dźwięku. Natomiast na dzień pisania tych słów, jest on niewykonalny
+z pomocą jednego modelu.
+Mówimy tutaj o następującym scenariuszu:
+Użytkownik przesyła do modelu temat lub narrację, a model ma wygenerować
+odpowiedź w postaci narracji wzbogaconej o efekty dźwiękowe
+W pierwszym kroku z pomocą modelu wzbogacamy tekst o [opisy dźwięków],
+które mogą oddawać aktualną scenę, np. "Szedł nocą po śniegu [spokojny
+chód po zaśnieżonym chodniku], gdy nagle (...)"
+Następnie programistycznie segmentujemy tekst, grupując fragmenty
+wypowiedzi lektora oraz efekty dźwiękowe
+Mając tak ułożone dane, możemy skorzystać z Text to Speech oraz Text to
+Audio, aby wygenerować ścieżkę dźwiękową, która może być złożona w
+całość
+Nie brzmi to zbyt skomplikowanie, gdyby nie fakt, że jakość modeli Text to Audio
+jest obecnie niska i trudno za pierwszym razem wygenerować nagranie, które
+spełnia nasze oczekiwania. Tutaj do gry wchodzi gemini-1.5-flash, mający
+zdolność do rozpoznawania nie tylko mowy (tak jak modele Speech to Text), ale
+także dźwięku. Poniżej widzimy jak we właściwości _thinking zostaje określony
+ogólny nastrój nagrania i fakt, że nie pasuje ono w pełni do oczekiwanego stylu.
+Taka obserwacja prowadzi do podjęcia decyzji o tym, aby ponownie
+wygenerować ten fragment.
+22.11.2024, 12:27 S02E04 — Połączenie wielu formatów | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e04-polaczenie-wielu-formatow 10/20
+
+===== STRONA 11 =====
+Przykłady wygenerowanych w ten sposób narracji znajdują się w katalogu
+narration, a jeden z nich można odsłuchać poniżej. W przypadku chęci
+przetestowania tego mechanizmu, konieczne będzie uzupełnienie kluczy w
+Google AI Studio oraz ElevenLabs, a następnie podmiana wiadomości
+użytkownika z funkcji generateNarration pliku narration/app.ts.
+Produkcyjne zastosowanie tego mechanizmu, który miałby działać na nieco
+większej skali, wymagałoby interfejsu użytkownika pozwalającego na ręczne
+wprowadzenie poprawek. Pełna automatyzacja byłaby możliwa, pod warunkiem
+dostępu do bardziej precyzyjnego modelu odpowiedzialnego za efekty
+dźwiękowe.
+Ostatecznie przykład ten, ma na celu podkreślenie unikatowej wartości, która
+płynie z połączenia ze sobą wielu modeli. No bo analogicznie możemy spojrzeć
+na pozostałe formaty, budując narzędzia zdolne do generowania raportów,
+podcastów (podobnie jak NotebookLM) czy wideo.
+22.11.2024, 12:27 S02E04 — Połączenie wielu formatów | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e04-polaczenie-wielu-formatow 11/20
+
+===== STRONA 12 =====
+Kilka przykładów:
+Multimodalny RAG pozwalający na pracę z różnymi formatami, w tym także
+wideo, a nawet nagraniami w czasie rzeczywistym
+Wieloformatowy asystent nauki, zdolny zarówno do analizowania, jak i
+generowania różnych formatów. Dzięki narzędziom takim jak markmap czy
+mermaid mógłby wizualizować koncepcje z pomocą grafów i map myśli
+Zadania takie jak rozpoznawanie mowy czy obrazów mogą być realizowane
+równolegle przez różne modele, które wykazują różną skuteczność w
+zależności od sytuacji. Pozwala to zwiększyć skuteczność tam, gdzie jeden
+model nie jest wystarczający
+Sam proces rozumowania realizowany przez kilka modeli jednocześnie,
+również przekłada się na znaczną poprawę skuteczności. Przykładem jest
+Mixture of Agents w przypadku którego modele Open Source są zdolne do
+uzyskania lepszych rezultatów niż np. GPT-4o.
+Podsumowanie
+Multimodalność znacznie zwiększa użyteczność modeli generatywnego AI, które
+wychodząc poza sam tekst są w stanie samodzielnie realizować zadania, które
+wcześniej wymagały zaangażowania człowieka. Z drugiej strony, obecny rozwój
+modeli nie pozwala jeszcze na swobodne adresowanie dowolnego problemu. W
+dodatku modele od czasu do czasu generują treści zawierające błędy, co
+sprawia, że zaangażowanie człowieka na którymś etapie procesu jest niezbędne.
+Prawdopodobnie największym wyzwaniem związanym z praktycznym
+zastosowaniem multimodalności i tak pozostaje nasza kreatywność oraz
+programistyczne zdolności. Jest to związane z faktem, że mówimy tutaj o
+zupełnie nowych możliwościach, w przypadku których dość trudno jest "połączyć
+22.11.2024, 12:27 S02E04 — Połączenie wielu formatów | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e04-polaczenie-wielu-formatow 12/20
+
+===== STRONA 13 =====
+kropki". Dochodzi do tego aspekt samej technologii i zastosowania API oraz
+narzędzi z którym na co dzień nie mamy potrzeby pracować (np. WebSockety).
+Najważniejszym tematem tej lekcji jest zaawansowane przetwarzanie
+dokumentów przedstawione w przykładzie summary. Zatem jeśli chcesz zabrać
+ze sobą tylko jedną rzecz dziś, to uruchom go i przetestuj działanie na jakimś
+wpisie z bloga, który czytasz i sprawdź jakość podsumowania. Jeśli rezultat nie
+będzie zgodny z Twoimi oczekiwaniami, zastanów się, co możesz zmienić, aby
+do niego doprowadzić.
+Powodzenia!
+NOTATKA ZYGFRYDA
+ZADANIA
+22.11.2024, 12:27 S02E04 — Połączenie wielu formatów | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e04-polaczenie-wielu-formatow 13/20
+
+===== STRONA 14 =====
+Zadanie: Zdobyliśmy dostęp do danych z fabryki, którą nam wskazałeś. Są to
+raporty dzienne kilku działających tam oddziałów. Część z nich to zwykłe raporty
+techniczne, a część to raporty związane z bezpieczeństwem. Pozyskane dane są
+w różnych formatach i nie wszystkie zawierają użyteczne dane. Wydobądź dla
+nas proszę tylko notatki zawierające informacje o schwytanych ludziach lub o
+śladach ich obecności oraz o naprawionych usterkach hardwarowych (pomiń te
+związane z softem oraz pomiń katalog z faktami). Raport wyślij do zadania
+“kategorieˮ w formie jak poniżej. Pliki powinny być posortowane alfabetycznie.
+Oto dane źródłowe: https://centrala.ag3nts.org/dane/pliki_z_fabryki.zip
+{
+ "people": ["plik1.txt", "plik2.mp3", "plikN.png"],
+ "hardware": ["plik4.txt", "plik5.png", "plik6.mp3"],
+}
+Co trzeba zrobić w zadaniu?
+Pobierasz i rozpakowujesz plik ZIP podany w zadaniu
+W środku archiwum znajdują się pliki TXT, PNG oraz MP3
+Odczytujesz zawartość wskazanych plików (z pominięciem folderu z faktami)
+za pomocą odpowiednich modeli i umiejętności modelu
+Przy użyciu odpowiedniego prompta podejmujesz decyzję, czy w danym pliku
+znajduje się informacja o ludziach lub maszynach.
+Istnieje szansa, że znaleziona informacja nie dotyczy ani ludzi, ani maszyn!
+Wtedy po prostu ją pomijasz.
+22.11.2024, 12:27 S02E04 — Połączenie wielu formatów | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e04-polaczenie-wielu-formatow 14/20
+
+===== STRONA 15 =====
+Liked by Grzegorz and 111 others
+Comment 417 comment s
+Bartłomiej Rodak 12h
+See more
+Like Reply
+Bartosz Twardowski 29m
+See more
+Like Reply
+Bartłomiej Rodak 24m
+See more
+Like Reply
+Bartłomiej Rodak 18m
+See more
+Like Reply
+Posegregowane dane raportujesz w postaci listy nazw plików (format JSON
+jak w treści zadania) do centrali.
+Jeśli dane są przygotowane poprawnie, zdobywasz flagę.
+Like
+BR
+Hej, jest tu jakiś Javaʼowiec któremu udało się przekonwertować .png
+do Base64 i zmusić model `gpt-4o` do współpracy? Bo u mnie cały
+czas albo że przekroczyłem limit tokenów albo że nie może
+procesować obrazów 😞 (działa z przekazywaniem linku do .png ale
+Base64 ni cholery). Chętnie przyjmę jakieś rady lub zobaczę kawałek
+kodu 🙂
+BT
+Bartłomiej Rodak sprawdź czy czasami nie tworzy Ci się plik
+binarny?
+BR
+Raczej nie, porównałem pliki base64 który tworzy się u mnie w
+java i ten który jest tworzony w pythonowym przykładzie tutaj
+https://platform.openai.com/docs/guides/vision?lang=python,
+mimo że mają taką samą długość ten przykład pythonowy
+przechodzi a u mnie dalej jest coś nie tak 😟
+BR
+aktualnie planuję odpalać pythonowy skrypt z poziomu javt
+jeszcze nie wiem co z tego wyjdzie, ale docelowo i tak
+chciałbym poznać przyczynę dlaczego sam kod w Java nie
+przechodzi
+22.11.2024, 12:27 S02E04 — Połączenie wielu formatów | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e04-polaczenie-wielu-formatow 15/20
+
+===== STRONA 16 =====
+Paweł Wojcieszak 13h
+See more
+Like Reply 1 like
+Witosław Józewicz 17h
+See more
+Like Reply 1 like
+Paweł Dulak (dulare) AI_Dev 17h
+I'm here to help
+See more
+Like Reply
+Witosław Józewicz 17h
+See more
+Like Reply 1 like
+PW
+Hehe dobra nazwa flagi :D
+Udało się ostatecznie prawidłowo sklasyfikować dopiero za pomocą
+gpt-4o-mini plus:
+ - do transkrypcji audio wystarczył whisper-medium
+ - do OCR biblioteka easyocr z ustawieniem paragraph=True
+WJ
+Paweł Dulak (dulare), overment,
+Hej, wysyłam takiego JSONa:
+Response: {"code":-307,"message":"People field is incorrect - are you
+sure about 2024-11-12_report-11-sektor_C2.mp3?"}
+O co chodzi? W zip nie ma pliku 2024-11-12_report-11-sektor_C2.mp3.
+Myślałem, że w międzyczasie API podmieniło zip'a ale po kilku
+próbach mam to samo (ale fakt, zip się zmienił) - ciągle dostaję błąd …
+W itosław Józewicz Hej, ale to Ty dzwonisz :) skąd on się wziął
+w danych które wysyłasz? Co robi Twój prompt że wysyła
+informację o pliku którego nie ma?
+WJ
+Paweł Dulak (dulare),
+Mój prompt wysyłał nazwę pliku, który jest w zip ale faktycznie
+był źle klasyfikowany. Jednak API zwracając błąd, podmienia
+jeden znak w jego nazwie (z myślnika na podkreślnik) i stąd
+całe zamieszanie 😄
+22.11.2024, 12:27 S02E04 — Połączenie wielu formatów | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e04-polaczenie-wielu-formatow 16/20
+
+===== STRONA 17 =====
+Paweł Dulak (dulare) AI_Dev 17h
+I'm here to help
+See more
+Like Reply 1 like
+Show more replies
+Tomasz K ozłowski 2d
+See more
+Like Reply
+Paweł Dulak (dulare) AI_Dev 2d
+I'm here to help
+See more
+Like Reply 1 like
+Grzegorz Boński 2d
+Hobb ysta Pythonista
+See more
+Like Reply
+Tomasz K ozłowski 2d
+See more
+W itosław Józewicz no i super :) Znaczy - nie super że
+podmienia, ale super że znalazłeś problem :)
+TK
+Cześć. Jaka powinna być nazwa tagu “taskˮ w Jsonie i czy wysyłamy
+do https://centrala.ag3nts.org/report ?
+Tomasz Kozłowski zadanie nazywa się “kategorieˮ i tak też
+powinno być wpisane w “taskˮ. URL masz poprawny
+Tomasz Kozłowski ‘kategorieʼ ,adres się zgadza. Przeczytaj
+notatkę pod filmem, którą pominąłeś, bo spędzisz na tym
+zadaniu znacznie więcej czasu. Good luck 🙂
+TK
+Grzegorz Boński tak przeczytałem, chciałem się upewnić bo
+dostaję ‘400 Bad Requestʼ i wydaje mi się, że “,ˮ po “]ˮ w
+przykładzie dla hardware jest semantycznie niepoprawny, czy
+się mylę?
+{
+ "people": ["plik1.txt", "plik2.mp3", "plikN.png"],
+ "hardware": ["plik4.txt", "plik5.png", "plik6.mp3"],
+}…
+22.11.2024, 12:27 S02E04 — Połączenie wielu formatów | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e04-polaczenie-wielu-formatow 17/20
+
+===== STRONA 18 =====
+Like Reply 1 like
+Show more replies
+Paweł Wojcieszak 2d
+See more
+Like Reply
+Paweł Dulak (dulare) AI_Dev 2d
+I'm here to help
+See more
+Like Reply
+Jakub Orzoł 2d
+See more
+Like Reply
+Remigiusz Pelica 2d
+See more
+Like Reply 2 likes
+Mariusz Czabaj3d
+PW
+O co chodzi z tym podfolderem: weapons_tests to cześć do zadania
+dodatkowego ?
+Paweł Wojcieszak będzie wykorzystany w przyszłości (w
+kolejnych zadaniach) spokojnie. Nie ma tam sekretnej flagi.
+JO
+Mam pytanko do przykładu summary.
+Dlaczego np. w funkcji `draftSummary` overment stosuje role:user a w
+kolejnej, `critiqueSummary` już role:system kiedy wysyła prompta do
+modelu?
+Ma to jakieś znaczenie?
+RP
+Ciekawe zadanie, trudność rośnie. Przepaliłem tutaj 30% tokenów od
+początku kursu. Ciekawostka, bo rano Anthropic kaszlał, Cursor
+przełączał na GPT i jakość generowanego kodu była istotnie gorsza
+np wołanie o obiekt którego nie zdefiniował sic!
+MC
+22.11.2024, 12:27 S02E04 — Połączenie wielu formatów | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e04-polaczenie-wielu-formatow 18/20
+
+===== STRONA 19 =====
+See more
+Like Reply
+Mariusz Czabaj3d
+See more
+Like Reply
+Paweł Dulak (dulare) AI_Dev 2d
+I'm here to help
+See more
+Like Reply
+Jakub Ledw orowski 3d
+See more
+Like Reply 1 like
+trochę zgłupiałem: używam modelu gpt-4o do analizy PNG. LLM
+rzyga:
+The provided data appears to include an image and a text request
+titled "Read attached note and categorize it."
+The image is encoded in base64 and appears to be a binary
+representation, which I cannot directly analyze in terms of content
+or context.
+There is no plain text provided that I can read or categorize.…
+MC
+do kodowania PNG używam tej samej funkcji co w module
+vision: processImage(). Sam vision u mnie działa. Jakiś hint ?
+Mariusz Czabaj rozumiem że upewniłeś się że plik został
+odczytany i w base64 faktycznie coś jest sensownego?
+Na wszelki wypadek podsyłam prostszy przykład bez
+processImage, tutaj prompt trafia do system, ale zasada ta
+sama:
+const imageBase64 = fs.readFileSync(imagePath, { encoding: 'base64'
+});
+ …
+constresponse=awaitopenaichatcompletionscreate({
+JL
+Zadanie świetne, na początku oczywiście przekombinowałem i
+wszystko do LLMa. Potem powolutku cofanie się, przy wsparciu
+Cursora, i dzielenie na mniejsze akcje, krótsze i bardziej treściwe
+prompty, przykłady itp. :) Dzięki!!
+22.11.2024, 12:27 S02E04 — Połączenie wielu formatów | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e04-polaczenie-wielu-formatow 19/20
+
+===== STRONA 20 =====
+Jakub Kieryk 3d
+See more
+Like Reply 1 like
+Show more comment s
+Dobry prompt to jednak dobry prompt
+PS
+Post
+What are your thoughts?
+22.11.2024, 12:27 S02E04 — Połączenie wielu formatów | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e04-polaczenie-wielu-formatow 20/20

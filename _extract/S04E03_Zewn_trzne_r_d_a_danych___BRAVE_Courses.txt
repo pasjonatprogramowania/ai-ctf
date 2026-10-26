@@ -1,0 +1,577 @@
+
+===== STRONA 1 =====
+S04E03  Ze wnętrzne źródła danych
+overment Admin Nov 27
+I'm just curious.
+» Lekka wersja przeglądarkowa «
+📎 Pobierz treść tej lekcji w formacie markdown
+📎 Pobierz treść tej lekcji w formacie markdown (EN)
+W tej lekcji pojawia się tylko jeden przykład web, który stanowi połączenie
+przykładów omawianych we wcześniejszych lekcjach.
+Mamy już kilka gotowych elementów, które umożliwiają łączenie LLM z
+zewnętrznymi danymi w postaci plików przekazanych jako adresy URL lub ścieżki
+do plików zapisanych na dysku. Poza tym, omawialiśmy także przykład
+websearch, który pozwolił nam na proste połączenie modelu z Internetem.
+Rzecz w tym, że źródła danych mogą mieć także inny charakter. Przykładem są
+informacje z otoczenia (lokalizacja, uruchomione aplikacje na telefonie, aktualna
+pogoda czy obecnie odtwarzana muzyka). Część z nich może być pobierana w
+czasie rzeczywistym, a inne będą aktualizowane cyklicznie i wczytywane tylko w
+razie potrzeby. Mówimy więc tutaj o sytuacji w których dane nie pochodzą od
+użytkownika, lecz są pobierane programistycznie, a nasz system ma prawo je
+wczytać w razie potrzeby.
+Back to Lekcje programu AI3
+PS
+15.12.2024, 20:07 S04E03 — Zewnętrzne źródła danych | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e03-zewnetrzne-zrodla-danych 1/22
+
+===== STRONA 2 =====
+Ostatnim przykładem danych są także te dostarczane przez użytkownika bądź
+innych agentów AI w trakcie interakcji. Chociażby podczas dłuższej rozmowy,
+wskazane jest budowanie kontekstu konwersacji, który nie jest w całości
+dostarczany do systemowego promptu.
+W tym wszystkim brakuje jeszcze możliwości tworzenia treści oraz zapisywania
+plików. Tutaj także kilka przykładów widzieliśmy już w poprzednich tygodniach
+AI_devs, ale teraz połączymy je ze sobą w formę narzędzi, którymi będzie
+posługiwać się model.
+Przegląd logiki
+W tej lekcji będziemy omawiać przykład web, który łączy ze sobą logikę
+przykładów takich jak loader, summary, translate, websearch, hybrid i innych.
+Tym razem jednak, odpowiedzialność za sposób posługiwania się narzędziami, w
+dużym stopniu przejdzie w ręce modelu, aczkolwiek dostępna logika nadal będzie
+miała dość liniowy charakter i nie daje zbyt wiele przestrzeni na 'kreatywność
+modelu'.
+Poniżej widzimy wymianę wiadomości, w której poprosiłem o pobranie treści z
+trzech plików PDF zawierających faktury, wczytanie wskazanych informacji oraz
+przekazanie mi rezultatu w formie linku do pliku .csv.
+Nietrudno się domyślić, że takie polecenia można przesyłać automatycznie, np. z
+odnośnikami do załączników maili oznaczonych wybraną etykietą. Źródłem
+danych mogłyby być także zdjęcia z naszego telefonu czy pliki wgrane na
+Dropbox.
+Na tym jednak nie koniec, ponieważ różne kombinacje doboru narzędzi pozwalają
+na przesłanie długiego pliku z prośbą o przetłumaczenie z zachowaniem pełnego
+formatowania. Jak widać, tłumaczenie zostało przeprowadzone poprawnie,
+pomimo przekroczenia limitu "output tokens".
+15.12.2024, 20:07 S04E03 — Zewnętrzne źródła danych | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e03-zewnetrzne-zrodla-danych 2/22
+
+===== STRONA 3 =====
+No i ostatecznie mamy także możliwość pobierania wybranych treści stron www,
+co również może być wykonywane przez skrypty i automatyzacje działające dla
+nas w tle.
+Logika przykładu polega więc na tym, aby:
+Zrozumieć zapytanie użytkownika i ułożyć na jego podstawie plan
+Wykonać poszczególne kroki, z możliwością przekazywania kontekstu
+pomiędzy nimi. Zatem jeśli pierwszym krokiem jest 'przeglądanie Internetu', to
+jego rezultat będzie dostępny w dalszych etapach
+Wśród dostępnych akcji znajduje się także opcja wgrania pliku na serwer i
+wygenerowania dla niego bezpośredniego linku
+Po wykonaniu wszystkich kroków, model generuje ostateczną odpowiedź.
+15.12.2024, 20:07 S04E03 — Zewnętrzne źródła danych | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e03-zewnetrzne-zrodla-danych 3/22
+
+===== STRONA 4 =====
+Całość nie jest jednak gotowa na każdy z możliwych scenariuszy i w założeniu
+ma działać dla powtarzalnych zadań takich jak wspomniane przetwarzanie
+dokumentów czy cykliczne pobieranie informacji z Internetu.
+WAŻNE: Logika przykładu web potrafi obsługiwać następujące sytuacje:
+Wczytaj link_do_pliku i przetłumacz z polskiego na angielski i podrzuć mi link
+do gotowego dokumentu
+Pobierz wpisy na temat AI z https://news.ycombinator.com/newest
+Podsumuj ten dokument: link
+Wejdź na blog i pobierz artykuły z dziś (o ile jakieś są)
+Wejdź na blog, pobierz artykuły z dziś (o ile jakieś są) i je dla mnie podsumuj
+Mówimy więc tutaj o prostych wiadomościach, które mogą uwzględniać
+przetwarzanie kilku źródeł oraz przekazywanie informacji pomiędzy etapami.
+Upload i tworzenie plików
+Modele językowe nie mają większych problemów z generowaniem treści dla
+dokumentów tekstowych. Markdown, JSON czy CSV mogą być także
+programistycznie przekonwertowane na formaty binarne, takie jak PDF, docx czy
+xlsx. Natomiast samo umieszczenie pliku na dysku, a także wygenerowanie linku
+do niego, musi mieć formę narzędzia.
+W praktyce będziemy potrzebowali dwóch sposobów tworzenia plików. Jeden
+będzie dostępny dla użytkownika, a drugi dla LLM. Z tego powodu, w przykładzie
+web utworzyłem endpoint /api/upload. Co prawda nie będziemy z niego teraz
+korzystać, ale warto zwrócić w nim uwagę na kilka rzeczy:
+Plik jest wczytywany jako dokument i zapisywany w bazie danych
+Do metadanych pliku dołączany jest identyfikator konwersacji
+W odpowiedzi zwracane są informacje na temat pliku, łącznie z adresem URL,
+którym może posługiwać się LLM.
+15.12.2024, 20:07 S04E03 — Zewnętrzne źródła danych | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e03-zewnetrzne-zrodla-danych 4/22
+
+===== STRONA 5 =====
+Ważne: w przypadku produkcyjnych implementacji takich rozwiązań, należy
+upewnić się, że:
+Sprawdzamy mimeType wgrywanego pliku i odrzucamy te, które nie są
+zgodne z wspieranymi formatami
+Poza typem pliku, powinniśmy sprawdzić także jego rozmiar
+Link kierujący do pliku powinien wymagać uwierzytelnienia, np. klucza API
+bądź aktywnej sesji użytkownika
+Taki endpoint pozwala nam na przesyłanie plików do aplikacji i wykorzystywanie
+ich później w trakcie konwersacji na podstawie conversation_uuid.
+Tworzenie pliku z pomocą LLM jest bardziej złożone, ponieważ musimy
+uwzględnić także napisanie treści. W przypadku przykładu web, model może
+zapisywać pliki, których zawartość jest wpisana przez niego "ręcznie". Może się
+jednak zdarzyć, że zapisanym plikiem będzie musiało być wcześniej
+wygenerowane tłumaczenie. W takim przypadku chcemy uniknąć ponownego
+przepisywania dokumentu, zwłaszcza że ze względu na limit okna tokenów
+wyjściowych (output tokens) możemy nie mieć takiej możliwości. Stosuję więc w
+nim znany już 'trick' z [[uuid]], wskazujący na dokumenty znajdujące się w
+kontekście, które podmieniane są na właściwą treść.
+15.12.2024, 20:07 S04E03 — Zewnętrzne źródła danych | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e03-zewnetrzne-zrodla-danych 5/22
+
+===== STRONA 6 =====
+Dokładnie ta sama możliwość funkcjonuje w odpowiedziach przesyłanych
+użytkownikowi. Na obrazku poniżej widzimy fragment promptu systemowego,
+który zawiera sekcję documents, a w niej wpis z treścią wcześniejszej
+wypowiedzi w postaci listy narzędzi.
+Po stronie front-endu widzimy dokładnie tę samą treść, która w oryginale
+brzmiała: "Here is the extracted list of hardware\n\n[[ff7a079b-6299-4833-bf75-
+5e2c6fe57fba]]", natomiast placeholder został programistycznie podmieniony na
+wczytany wcześniej dokument.
+15.12.2024, 20:07 S04E03 — Zewnętrzne źródła danych | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e03-zewnetrzne-zrodla-danych 6/22
+
+===== STRONA 7 =====
+Zatem tworzenie plików w przypadku LLM polega tutaj wyłącznie na
+wygenerowaniu nazwy oraz wskazania identyfikatorów, które mają zostać
+wczytane jako treść. Opcjonalnie model ma prawo uwzględnić dodatkowe
+formatowanie tej treści i własne komentarze.
+Planowanie
+Posługiwanie się narzędziami przez LLM stanowi połączenie dwóch elementów:
+programistycznego interfejsu oraz promptów. Sama logika może mieć charakter
+bardziej liniowy, który do tej pory już wiele razy widzieliśmy, albo charakter
+agencyjny, zdolny do wychodzenia poza ustalony schemat i rozwiązywania
+problemów z kategorii "open-ended".
+Tym razem interesuje nas ten "środkowy" scenariusz, w którym model
+wyposażony w serię narzędzi ma możliwość korzystania z nich w dowolnej
+kolejności oraz ilości kroków. Nie może jednak zmienić raz ustalonego planu oraz
+wracać do wcześniejszych etapów. Poza tym sam system nie jest odporny na
+'nieprzewidziane' scenariusze, więc polecenia użytkownika powinny
+być precyzyjne. Z tego powodu nie sprawdzi się on nam w takiej formie
+produkcyjnie, ale może pracować 'w tle' i zapisywać efekty swojej pracy w bazie
+danych lub przesyłać je na maila.
+15.12.2024, 20:07 S04E03 — Zewnętrzne źródła danych | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e03-zewnetrzne-zrodla-danych 7/22
+
+===== STRONA 8 =====
+Takie ograniczenie rodzi naturalny problem ograniczonej wiedzy początkowej.
+Nie możemy zatem od razu wygenerować wszystkich parametrów potrzebnych
+do uruchomienia niezbędnych narzędzi. W zamian możemy ustalić listę kroków
+oraz zapisać przy nich notatki lub zapytania, które mają charakter poleceń, jakie
+model generuje 'samemu sobie'. Jedynym warunkiem jest tutaj zachowanie
+kolejności działań.
+Z lekcji S04E01 — Interfejs wiemy, że narzędzia muszą mieć unikatowe nazwy
+oraz instrukcję obsługi. Teraz przekonujemy się, że nie zawsze będzie to
+oczywiste, ponieważ mogą mieć różną złożoność i podkategorie. Na przykład
+file_process, odpowiedzialne za przetwarzanie dokumentów, ma obecnie 5
+różnych typów. Ich opisy nie są potrzebne na początkowym etapie planowania,
+lecz dopiero w chwili, gdy dany typ zostanie wybrany.
+Do czasu gdy LLM nie będą dysponowały większą zdolnością do zachowania
+uwagi (być może dzięki Differential Transformer), proces planowania i
+podejmowania działań musi być podzielony na małe, wyspecjalizowane prompty.
+Trudność polega tylko na tym, aby na danym etapie dostarczyć wszystkie dane
+potrzebne do podjęcia dalszych działań, bez dodawania zbędnego 'szumu'.
+Podstawy kontekstu konwersacji
+Przykład web zapisuje wszystkie treści w bazie danych, w formie dokumentów,
+które omawialiśmy w lekcji S03E01. Każdy z wpisów łączony jest z bieżącą
+konwersacją oraz opcjonalnie może być dodany do silników wyszukiwania.
+Pozwala nam to nie tylko na późniejsze wykorzystanie tych dokumentów jako
+15.12.2024, 20:07 S04E03 — Zewnętrzne źródła danych | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e03-zewnetrzne-zrodla-danych 8/22
+
+===== STRONA 9 =====
+kontekst, ale także umożliwia elastyczne posługiwanie się nimi w ramach bieżącej
+interakcji.
+Poniżej widzimy jeden z takich rekordów, którego główna treść to jedynie cena
+produktu wczytana z faktury. Natomiast w metadanych znajduje się informacja
+nadająca kontekst mówiący o tym, czym dokładnie są te liczby i skąd pochodzą.
+Informacje zapisane w ten sposób mogą zostać w każdej chwili przywołane do
+kontekstu promptu systemowego wraz z informacją o tym skąd pochodzą oraz
+gdzie możemy się dowiedzieć więcej na ich temat.
+Dokładnie w ten sposób będziemy zapisywać dane pochodzące z zewnętrznych
+źródeł, a następnie wczytywać je do konwersacji w formie "stanu", czyli obiektu
+stanowiącego "pamięć krótkoterminową" modelu. W przypadku jednego z moich
+projektów, stan uwzględnia:
+kontekst (dostępne umiejętności, informacje z otoczenia, listę podjętych akcji,
+wczytanych dokumentów, podsumowania rozmowy, omawiane słowa
+kluczowe czy wczytane wspomnienia),
+informacje związane z rozumowaniem (aktualny status, dostępne kroki,
+aktualny plan działań, refleksja na jego temat oraz aktywne narzędzie)
+informacje na temat konwersacji: identyfikator interakcji (na potrzeby
+LangFuse), identyfikator rozmowy, listę wiadomości oraz związane z
+nią ustawienia
+15.12.2024, 20:07 S04E03 — Zewnętrzne źródła danych | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e03-zewnetrzne-zrodla-danych 9/22
+
+===== STRONA 10 =====
+Inaczej mówiąc, myśląc o kontekście konwersacji, będziemy mieć na myśli
+połączenie trzech rzeczy: wiedzy z bieżącej interakcji, wiedzy z pamięci
+długoterminowej oraz zmienne kontrolujące logikę po stronie programistycznej.
+Kontekst konwersacji stanowi kluczowy element systemów agencyjnych,
+ponieważ pozwala na wykonywanie bardziej złożonych zadań. Nawet nasz
+przykład web pomimo ograniczeń wynikających z jego założeń, jest w stanie
+posługiwać się prostym kontekstem pozwalającym na przekazywanie informacji
+pomiędzy poszczególnymi etapami.
+Poniżej widzimy, że użytkownik nie dostarczył treści artykułu w postaci adresu
+URL, lecz jedynie wskazał miejsce z którego ma zostać ona pobrana.
+Asystent poprawnie rozłożył to zadanie na mniejsze kroki i poprawnie posługiwał
+się dostępnym kontekstem, przekazując go między etapami.
+15.12.2024, 20:07 S04E03 — Zewnętrzne źródła danych | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e03-zewnetrzne-zrodla-danych 10/22
+
+===== STRONA 11 =====
+Podsumowanie
+Logika przeglądania stron www w przykładzie web opiera się o wygenerowanie
+listy zapytań do wyszukiwarki oraz decyzji o tym, których stron zawartość
+należy pobrać. Ewentualnie proces ten może być skrócony do jedynie pobrania
+treści wskazanego adresu URL.
+Istnieją jednak narzędzia takie jak Code Interpreter (np. e2b), BrowserBase czy
+zapewne znany Ci Playwright lub Puppeteer. Konkretnie mówimy tutaj o
+automatyzacji polegającej na uruchamianiu generowanego kodu, a także
+połączeniu możliwości rozumienia tekstu i obrazu na potrzeby podejmowania
+dynamicznych działań.
+Choć w sieci pojawiają się przykłady pokazujące możliwości autonomicznego
+research'u i przeglądania Internetu w celu gromadzenia informacji, trudno
+obecnie mówić o wysokiej skuteczności bez narzucenia ograniczeń. Nawet sam
+web scraping nie pozwala na swobodne przeglądanie dowolnych stron i powinien
+być skonfigurowany pod dostęp do wybranych adresów lub opierać się o
+zewnętrzne rozwiązania takie jak apify.
+Przykład web pokazuje nam, że LLM wyposażony w narzędzia oraz mechanikę
+budowania i posługiwania się kontekstem, może wykonywać samodzielnie
+złożone zadania bez udziału człowieka. Jednak warunkiem koniecznym
+(przynajmniej na ten moment) jest precyzyjne określenie tego, co jest dla modelu
+dostępne, a co nie. W przeciwnym razie szybko pojawiają się problemy albo
+dotyczące możliwości samego modelu, albo barier wynikających z samej
+technologii (np. konieczności logowania na stronie www).
+NOTATKA ZYGFRYDA
+15.12.2024, 20:07 S04E03 — Zewnętrzne źródła danych | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e03-zewnetrzne-zrodla-danych 11/22
+
+===== STRONA 12 =====
+ZADANIE
+Zadanie: Wiemy już, że oprogramowanie do fabryk i magazynów robotów
+realizuje firma SoftoAI. Firm tego typu jest znacznie więcej. Centrala poprosiła Cię
+numerze piąty o przygotowanie uniwersalnego mechanizmu do poszukiwania
+informacji na takich stronach. Aby sprawdzić, czy Twój mechanizm działa
+zgodnie z oczekiwaniami, odpowiedz proszę na pytania centrali:
+15.12.2024, 20:07 S04E03 — Zewnętrzne źródła danych | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e03-zewnetrzne-zrodla-danych 12/22
+
+===== STRONA 13 =====
+https://centrala.ag3nts.org/data/TUTAJ-KLUCZ/softo.json
+Wszystkie informacje znajdziesz na stronie firmy SoftoAI:
+https://softo.ag3nts.org
+Odpowiedzi wyślij do /report, w polu ‘answerʼ, w takiej samej formie, w jakiej
+centrala udostępniła pytania. Nazwa zadania to softo.
+Oczekiwany format odpowiedzi:
+{
+ "01": "zwięzła i konkretna odpowiedź na pierwsze pytanie",
+ "02": "zwięzła i konkretna odpowiedź na drugie pytanie",
+ "03": "zwięzła i konkretna odpowiedź na trzecie pytanie"
+}
+Co należy zrobić w zadaniu?
+Pobierz listę pytań przesłanych od centrali z adresu:
+https://centrala.ag3nts.org/data/TUTAJ-KLUCZ/softo.json
+Pytania są trzy i mają one swoje numery: 01, 02 oraz 03. Z takimi samymi
+numerami musimy otrzymać odpowiedzi. Pytania się nie zmieniają.
+Napisz automat, który wejdzie na stronę https://softo.ag3nts.org i na
+podstawie pytań centrali zdecyduje, na którą podstronę serwisu należy
+się udać, po czym otworzy ją
+Jeśli na stronie docelowej znajduje się odpowiedź na pytanie otrzymane od
+centrali, zapamiętaj ją i przejdź do opracowywania odpowiedzi na kolejne
+pytanie.
+Jeśli na podstronie nie ma odpowiedzi, to zastanów się, czy znajdują się tam
+jakieś linki mogące doprowadzić Cię do znalezienia odpowiedzi.
+Niektóre z pytań wymagają wejścia w głąb na 2-3 strony. Nie wszystkie
+pytania posiadają odpowiedź dostępną po jednym kliknięciu.
+Gotowe odpowiedzi wyślij do zadania o nazwie softo
+Zadanie da się rozwiązać bez problemu ‘ręcznieʼ, ale jeśli zadanie to ma mieć
+wpływ na Twój rozwój w dziedzinie LLM-ów i ich integracji z systemami IT,
+spróbuj je w pełni zautomatyzować.
+15.12.2024, 20:07 S04E03 — Zewnętrzne źródła danych | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e03-zewnetrzne-zrodla-danych 13/22
+
+===== STRONA 14 =====
+90 likes 334 comment s
+Hubert Szewczuk 5h
+Like Reply 1 like
+Paweł Dulak (dulare) AI_Dev 1 2h
+I'm here to help
+UWAGA: 🚨  bardzo odradzamy próbę zaindeksowania całego serwisu lub
+wrzucenia wszystkich podstron do kontekstu LLM-a. Przepali Ci to OGROMNE
+ilości tokenów i może słono kosztować. Serwis celowo został zaprojektowany w
+taki sposób, że niektóre z linków prowadzą do pułapek, a niektóre linki stanowią
+pętlę nieskończoną (strona A linkuje do strony B, ona do C, a ta znów do A itd.).
+Jedyną sensowną metodą na rozwiązanie tego zadania jest podejmowanie przez
+LLM-a świadomych decyzji, w co kliknąć.
+Spoiler związany z optymalizacją kodu [zdekoduj base64]:
+MS4gWmFwYW1pxJl0dWogdyBkb3dvbG5laiBmb3JtaWUgbGlua2kganXFvMKgb2R3aWVkem9u
+ZSwgYWJ5IHVuaWtuxIXEhyB6YXDEmXRsZW5pYSBtZWNoYW5pem11CjIuIE5hIHN0cm9uaWUgb
+W9nxIXCoHBvamF3acSHwqBzacSZwqAyLTMgbGlua2ksIGt0w7NyZSBwb3RlbmNqYWxuaWUgd
+3lnbMSFZGFqxIUsIGpha2J5IG1vZ8WCeSB6YXdpZXJhxIfCoHdhcnRvxZtjaW93ZSBkYW5lLiBOa
+WUgd2Nob2TFuiB3IGthxbxkeSB6IG5pY2gsIGEgamVkeW5pZSB3IHRlbiBuYWpiYXJkemllaiBwcm
+F3ZG9wb2RvYm55LgozLiBNb8W8ZXN6IChhbGUgbmllIG11c2lzeiEpIHNwb3J6xIVkemnEh8KgbW
+FwxJkgb2R3aWVkem9ueWNoIHN0cm9uIGkgaWNoIHphd2FydG/Fm2NpLiBTenVrYWrEhWMgb2R
+wb3dpZWR6aSBuYSBweXRhbmllIG5yIDAxLCBwcmF3ZG9wb2RvYm5pZSBvZHdpZWR6aXN6IGt
+pbGthIHN0cm9uLiBDenkgc3p1a2FqxIVjIG9kcG93aWVkemkgbmEgcHl0YW5pZSAwMiBpIDAzIG5
+hcHJhd2TEmcKgbXVzaXN6IG9kd2llZHphxIcgamUgcG9ub3duaWUgaSB6bsOzdyB3eXN5xYJhxI
+cgaWNoIHRyZcWbxIfCoGRvIExMTS1hPw==
+Jak zwykle - od pracy z modelem, dużo trudniejsze jest właściwe
+korzystanie z samych bibliotek do scrapowania. Nadal nie umiem
+zrobić tego zadania z wykorzystaniem firecrawl, bez zaglądania do
+html. Moje markdowny wychodzą bez ścieżek nawigacji, a
+wyciągniecie ich przez /map albo ‘linksʼ nie działa.
+(Tak, wiem, że można też użyć /crawl ale nie o to mi chodzi)
+Hubert Szewczuk Ta strona jest lekko złośliwa (co się często
+zdarza w realnych stronach W W W). Skoro firecrawl ma
+problem, można po prostu pobrać stronę zwykłym requestem i
+przerobić na markdown, albo nawet nic nie robić i wstawić do
+kontekstu tak jak jest.
+U mnie w JS sprawdziła się ta biblioteka →
+https://www.npmjs.com/package/node-html-markdown
+15.12.2024, 20:07 S04E03 — Zewnętrzne źródła danych | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e03-zewnetrzne-zrodla-danych 14/22
+
+===== STRONA 15 =====
+Like Reply
+Tomasz R omano wski 3d
+See more
+Like Reply 1 like
+Paweł Dulak (dulare) AI_Dev 1 3d
+I'm here to help
+Like Reply 1 like
+Tomasz R omano wski 3d
+Like Reply 1 like
+Marcin Paśko 3d
+See more
+Like Reply 1 like
+Show more replies
+Tomasz R omano wski 3d
+TR
+Wczoraj OpenAI miał czkawkę więc spróbowałem innych modeli.
+Najpierw Claude (który też miał czkawkę, raz odpowiadał OK, a raz
+HTTP500), a później mistral. Ale mistral uparcie ignorował instrukcje,
+żeby zwrócić odpowiedź bez żadnych wyjaśnień, formatowania oraz
+dodatkowego tekstu, nawet, jeśli nei może znaleźć odpowiedzi. Z
+uporem maniaka odpowiadał “The page does not contain information
+on <insert question here>ˮ. Therefore the answer is an empty stringˮ.
+Próbowałem gamoniowi na 10 różnych sposobów i przykładów …
+Tomasz Romanowski To ładnie pokazuje jak możemy się
+uzależnić od zewnętrznych dostawców…
+TR
+Paweł Dulak (dulare) No właśnie. Co prawda do produkcji mi
+dalekoooooo, ale jakbym miał coś z AI “wyprodukowaćˮ to co?
+Primary model i ze 2-3 backup models?
+MP
+Tomasz Romanowski Tak, modele lokalne potrafią czasami
+odwalić figle, dlatego trzeba poświęcić więcej czasu na dobór
+odpowiedniego modelu i dopracowanie prompta. np. ten qwen
+2.5 jest super. Zrobiłem na nim to zadanie z dronem.
+Llama 3 też daje radę tylko często się buntuje jak wydaje jej się
+że chcemy zrobić coś na przekór lewicowym wartościom.
+Bielik -nie bawiłem się nim jeszcze ale ponoć dużo potrafi tylko
+też trzeba długo przysiąść nad dopracowaniem prompta.
+TR
+Dlaczego webcrawler poniższy link /czescizamienne_1 ściąga jako _1?
+15.12.2024, 20:07 S04E03 — Zewnętrzne źródła danych | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e03-zewnetrzne-zrodla-danych 15/22
+
+===== STRONA 16 =====
+Like Reply 1 like
+Adam K ęsy 3d
+See more
+Like Reply 2 likes
+Paweł Dulak (dulare) AI_Dev 1 3d
+I'm here to help
+Like Reply
+Adam K ęsy 3d
+Like Reply 1 like
+Hubert Szewczuk 3d
+Like Reply 1 like
+Show more replies
+Marta Matuszak-Dziarłowska 4d
+Rozumiem, że to strona-zmyłka ale chcę wiedzieć, czy błąd tkwi w
+webcrawler czy to jakiś celowy trick.
+<dt class="text-xl font-semibold text-gray-800 mb-2"><a
+href="/czescizamienne_1">Warzywo jasny emeryt szczoteczka okno
+śpiewać.</a></dt>
+AK
+Po zaciągnięciu najnowszych źródłem, tym razem mam następujący
+problem przy npm install. Wygląda, jakby była za nowa wersja reacta,
+ale ani go nie instalowałem, ani nie widzę go w zależnościach w
+package.json. Próbowałem odpytać model o rozwiązanie problemu,
+ale jego wskazówki nie bardzo mi pomogły. Może Wy jakieś macie?
+c:\Work\Repos\3rd-devs>npm install
+npm error code ERESOLVE
+npm error ERESOLVE could not resolve…
+npm error
+Adam Kęsy coś mi się kojarzy że trzeba było iść nie w
+najnowszą wersję Node… ale zapytamy overment czy ma jakiś
+pomysł tutaj…
+AK
+Paweł Dulak (dulare) moja wersja Node to v22.11.0.
+Adam Kęsy Bun install a nie npm i
+MD
+Czy przy zadaniach tego typu da się jakoś uzyskać od LLM żeby
+podał konkretny fragment/cytowanie skąd uzyskał odpowiedź na
+15.12.2024, 20:07 S04E03 — Zewnętrzne źródła danych | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e03-zewnetrzne-zrodla-danych 16/22
+
+===== STRONA 17 =====
+Like Reply 1 like
+Paweł Dulak (dulare) AI_Dev 1 4d
+I'm here to help
+See more
+Like Reply
+Marta Matuszak-Dziarłowska 4d
+See more
+Like Reply 1 like
+Paweł Dulak (dulare) AI_Dev 1 4d
+I'm here to help
+zadane pytanie? Kiedyś próbowałam coś takiego uzyskać i
+dostawałam bardzo ogólną odpowiedź, lub błędne cytowania, mimo
+że pracował na konkretnym pliku, który mu dostarczyłam, a nie całym
+serwisie.
+Marta Matuszak-Dziarłowska możesz spróbować
+skonstruować prompt w ten sposób, żeby najpierw LLM
+podawał swoje “przemyśleniaˮ, później fragmenty z których te
+przemyślenia pochodzą, później dopiero właściwą odpowiedź.
+Na błędne cytowania często pomaga zmniejszenie
+temperatury, ale wtedy też można spodziewać się mniej
+kreatywnego “myśleniaˮ o zagadnieniu.
+Kwestia na czym Ci zależy :) Tutaj problem jest dość prosty - …
+MD
+Dzięki :) Czyli żeby uzyskać coś takiego jak jest w notebooklm,
+że podaje dokładne cytowania musiałabym to jakość w
+prompcie dobrze zawrzeć i zmniejszyć temperaturę ale to
+może spowodować że np nie będzie znajdywał odpowiedzi bo
+będzie mniej kreatywny i będzie szukał odpowiedzi pasującej
+1:1? Zauważyłam że przy niezmieniającym się kodzie i stałym
+prompcie przy niektórych zadadanaich dostawałam
+niepowtarzajace się odpowiedzi i zastanawiam się na ile mog…
+Marta Matuszak-Dziarłowska odpowiedzi na niektóre pytania
+wymagają “bardziej kreatywnego myśleniaˮ i wtedy przydaje
+się większa temperatura. Przy tym zadaniu to raczej nie gra roli
+- informacja albo jest albo nie :)
+Praca z promptem to jedna z podstawowych rzeczy dla
+uzyskania dobrej powtarzalności. Przygotowanie danych to
+drugie - tutaj np. konwersja na Markdown i usuwanie szumu.
+15.12.2024, 20:07 S04E03 — Zewnętrzne źródła danych | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e03-zewnetrzne-zrodla-danych 17/22
+
+===== STRONA 18 =====
+Like Reply
+Mariusz Bednarz 5d
+See more
+Like Reply 1 like
+Paweł Dulak (dulare) AI_Dev 1 5d
+I'm here to help
+Like Reply 1 like
+Tomasz R omano wski Dec 8
+See more
+Like Reply 1 like
+Paweł Dulak (dulare) AI_Dev 1 7d
+I'm here to help
+MB
+To chyba najtrudniejsze zadanie do tej pory. Pytanie z możliwym
+spoilerem:
+…
+Mariusz Bednarz Do zaliczenia zadania prompt jest OK :)
+Możesz w przyszłości, mając więcej czasu, spróbować go
+zmienić tak, żeby był bardziej ogólny. Na spokojnie
+TR
+overment Testuję przykład web, żeby się rozgrzać przed zrobieniem
+zadania:
+Input:
+extract and save all information from
+https://softo.ag3nts.org/portfolio
+Output
+I do not have the information extracted from that URL available here.
+Please specify if the extraction was previously performed or rephras…
+Tomasz Romanowski Zanim Adam odpowie - czy dopisałeś
+sobie domenę softo do dozwolonych domen w WebSearch.ts?
+15.12.2024, 20:07 S04E03 — Zewnętrzne źródła danych | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e03-zewnetrzne-zrodla-danych 18/22
+
+===== STRONA 19 =====
+Like Reply
+Tomasz R omano wski 7d
+Like Reply 1 like
+overment Admin 7d
+I'm just curious.
+See more
+TR
+Paweł Dulak (dulare) Hmm… z tego co widzę to nie powinno
+mieć znaczenia, gdyżlista domen jest do web search a nie file
+process. Ale spox, już jestem rozgrzany :)
+Tomasz Romanowski
+Hmm… z tego co widzę to nie powinno mieć znaczenia,
+gdyżlista domen jest do web search a nie file process. Ale
+spox, już jestem rozgrzany
+Ta strona nie jest zaindeksowana w Google. Nie ma więc jak jej
+znaleźć.
+I w tym przypadku agent korzysta z websearch, a nie z …
+15.12.2024, 20:07 S04E03 — Zewnętrzne źródła danych | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e03-zewnetrzne-zrodla-danych 19/22
+
+===== STRONA 20 =====
+Like Reply 1 like
+Borys Majewski Dec 8
+See more
+Like Reply 1 like
+Sebastian Kuberski Dec 7
+Co-founder Sprakline.cloud
+BM
+Mój approach:
+SPOILER
+.
+.
+.
+.
+.
+.…
+15.12.2024, 20:07 S04E03 — Zewnętrzne źródła danych | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e03-zewnetrzne-zrodla-danych 20/22
+
+===== STRONA 21 =====
+See more
+Like Reply 1 like
+Sebastian Kuberski Dec 7
+Co-founder Sprakline.cloud
+Ktoś miał problemy z odpaleniem przykładu web dla instrukcji (1)
+Pobierz wpisy na temat AI z https://news.ycombinator.com/newest
+Dostaję w konsoli błąd
+Natomiast jak poproszę o informację dla pliku txt pod konkretnym URL
+to już znajduje coś
+…
+myślałem że to problem ze zmienną allowedDomain ale
+przykład z wiki też nie działa 😟
+15.12.2024, 20:07 S04E03 — Zewnętrzne źródła danych | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e03-zewnetrzne-zrodla-danych 21/22
+
+===== STRONA 22 =====
+Like Reply 1 like
+Sebastian Kuberski Dec 7
+Co-founder Sprakline.cloud
+See more
+Like Reply 1 like
+Marcin Paśko Dec 6
+Like Reply 2 likes
+Show more comment s
+ok chyba zaczynam rozumieć jak to działa bład był w foramcie
+url jaki podawałem, przy takim już poszło
+{
+ "messages": [
+ {
+ "role": "user",
+ "content": "Podaj mi wszystkie url ze strony: …
+MP
+Limity Rozgałęzienia Iteracje Pętle Ustawić.
+Zadanie zaliczyć odpoczywać sprzątać.
+PS
+Post
+What are your thoughts?
+15.12.2024, 20:07 S04E03 — Zewnętrzne źródła danych | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e03-zewnetrzne-zrodla-danych 22/22

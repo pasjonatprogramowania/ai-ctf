@@ -1,0 +1,740 @@
+
+===== STRONA 1 =====
+S00E01  Gener atywna Sztuc zna Inteligencja
+overment Admin Aug 28
+I'm just curious.
+» Lekka wersja przeglądarkowa «
+Zanim zaczniesz: W treści lekcji znajdziesz wspominane przykłady kodu, które
+pochodzą z tego repozytorium. Instrukcja pracy z nimi jest tutaj. Zapoznaj się z
+nią, zanim przejdziesz do czytania tej lekcji i rozwiązywania zadań.
+Wprowadzenie do AI_devs 3
+Generatywne AI oferuje możliwości przetwarzania i generowania treści, które
+jeszcze niedawno były bardzo trudne do osiągnięcia lub leżały poza naszym
+zasięgiem. Aktualnie najpopularniejszą formą pracy z modelami są chatboty, takie
+jak ChatGPT czy Claude.ai, które wymagają bezpośredniego zaangażowania
+człowieka.
+Andrej Karpathy w jednym ze swoich wpisów powiedział, że "Postrzeganie
+dużego modela językowego w roli chatbota, jest porównywalne z
+postrzeganiem komputera w roli kalkulatora". W tej edycji AI_devs przekonamy
+się w praktyce, co to oznacza oraz jak łączy się z programowaniem.
+Zasady działania dużych modeli językowych
+Back to Lekcje programu [preAI3]
+PS
+22.11.2024, 12:19 S00E01 — Generatywna Sztuczna Inteligencja | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e01-generatywna-sztuczna-inteligencja 1/29
+
+===== STRONA 2 =====
+Duże Modele Językowe (eng. Large Language Models, LLM) są
+wyspecjalizowane w przetwarzaniu i generowaniu języka naturalnego w formie
+tekstu. Natomiast obecnie modele są w stanie pracować także z obrazem,
+dźwiękiem czy materiałami wideo, co określa się mianem multimodalności.
+03:38
+LLM podobnie jak funkcja w programowaniu przyjmuje dane wejściowe (input) i
+zwraca dane wyjściowe (output). Jednak w przypadku modeli nasza wiedza na
+temat ich działania jest obecnie bardzo ograniczona, co niesie ze sobą szereg
+konsekwencji.
+Gdy spojrzymy na poniższą funkcję double, widzimy, że przyjmuje jako argument
+liczbę i zwraca jej wartość pomnożoną przez dwa. Rezultat ten nie zmieni się dla
+tych samych danych wejściowych, a w dodatku możemy go przewidzieć. Takie
+zachowanie jest więc deterministyczne.
+22.11.2024, 12:19 S00E01 — Generatywna Sztuczna Inteligencja | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e01-generatywna-sztuczna-inteligencja 2/29
+
+===== STRONA 3 =====
+Natomiast duże modele językowe działają na architekturze wykorzystującej sieci
+neuronowe, czyli złożone struktury wzorowane na ludzkim mózgu. Ich główne
+komponenty definiowane są przez ludzi, jednak sam sposób działania jest
+kształtowany podczas kilkuetapowego treningu. Proces ten wymaga ogromnych
+zestawów danych (np. wiedzy z Internetu, filmów czy książek), mocy
+obliczeniowej oraz zaangażowania ze strony ludzi. W rezultacie otrzymujemy sieć
+(lub sieci) wyspecjalizowane w konkretnym zadaniu.
+Poniżej mamy wizualizację bardzo prostej sieci neuronowej składającej się z 13
+neuronów, co daje w przeliczeniu 49 parametrów dla tego przykładu. Architektura
+dużych modeli językowych jest znacznie bardziej złożona i tylko dla porównania
+dodam, że skala modelu GPT-4 to według nieoficjalnych danych, około 1.77
+bilionów parametrów. Nietrudno więc sobie wyobrazić, że jej zrozumienie
+wymaga czasu. Dodatkowym utrudnieniem jest fakt, że mówimy tutaj o
+przetwarzaniu danych w formie liczb mało czytelnych dla człowieka. Pomimo
+tego wszystkiego, duży postęp w tym obszarze dokonał zespół firmy Anthropic, o
+czym możemy przeczytać w Mapping the Mind of a Large Language Model.
+22.11.2024, 12:19 S00E01 — Generatywna Sztuczna Inteligencja | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e01-generatywna-sztuczna-inteligencja 3/29
+
+===== STRONA 4 =====
+Ustawienia połączeń sieci początkowo są losowe, a podczas treningu
+dostosowują się tak, aby sieć, jak najlepiej realizowała określone zadanie. To
+właśnie wtedy LLM "zyskuje swoje umiejętności i zdobywa wiedzę". Po
+zakończeniu tego procesu sieć zostaje "zamrożona" i tym samym model nie może
+zdobywać nowych informacji i umiejętności oraz sam w sobie nie posiada
+dostępu do Internetu czy narzędzi, ale jest gotowy do przetwarzania treści.
+Dane wprowadzane do modelu są przekształcane w liczby, które przechodzą
+przez kolejne warstwy sieci, aktywując jej wybrane obszary aż do uzyskania
+rezultatu, który jest z powrotem przekształcany w formę zrozumiałą dla
+człowieka. Pomimo tego, że struktura sieci oraz ustawień połączeń pozostaje
+stała po zakończeniu treningu, w trakcie generowania treści (tzw. inferencji) do
+gry wchodzą także czynniki losowe, co czyni LLM niedeterministycznymi.
+Oznacza to, że nie jesteśmy w stanie precyzyjnie określić wyniku działania
+modelu ani też go kontrolować, nawet w sytuacji, gdy dane wejściowe
+pozostaną niezmienione.
+22.11.2024, 12:19 S00E01 — Generatywna Sztuczna Inteligencja | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e01-generatywna-sztuczna-inteligencja 4/29
+
+===== STRONA 5 =====
+Główne zadanie, pod kątem którego LLM są trenowane, polega na
+przewidywaniu kolejnego fragmentu treści i powtarzaniu tej aktywności aż do
+momentu podjęcia decyzji o zakończeniu wypowiedzi. Fragmenty o których
+mowa określa się mianem tokenów, będących zwykle częścią słów,
+pojedynczymi znakami czy nawet całymi słowami. Możesz się o tym przekonać z
+pomocą narzędzia Tiktokenizera w którym jasno widać, że sposób podziału treści
+na tokeny różni się w zależności od modelu czy też zastosowanego tokenizera.
+Tokeny mają swoje numeryczne identyfikatory, co umożliwia ich dalsze
+przetwarzanie, uwzględniając określenie ich znaczenia, zrozumienie w wybranym
+kontekście oraz podjęcie decyzji o wyborze tokenów składających się na
+wypowiedź.
+22.11.2024, 12:19 S00E01 — Generatywna Sztuczna Inteligencja | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e01-generatywna-sztuczna-inteligencja 5/29
+
+===== STRONA 6 =====
+Proces ten został dość dobrze zaprezentowany na stronie Generative AI exists
+because of the transformer natomiast on sam wykracza poza zakres naszego
+szkolenia. Dla nas istotna jest jedynie świadomość podziału treści na tokeny oraz
+to, że LLM obecnie generuje jeden token na raz. Oznacza to, że
+wypowiedź modelu wymaga powtarzania procesu dobierania kolejnych
+fragmentów co pozwala na jej stopniowe budowanie.
+Widać to wyraźnie na poniższej animacji, na której ChatGPT tworzy swoją
+wypowiedź, wyświetlając jej kolejne tokeny.
+Z technicznego punktu widzenia, podczas generowania model przetwarza
+dotychczasowy tekst w następujący sposób:
+Hey
+Hey,
+Hey, Adam
+Hey, Adam!
+Hey, Adam! How
+Hey, Adam! How's
+22.11.2024, 12:19 S00E01 — Generatywna Sztuczna Inteligencja | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e01-generatywna-sztuczna-inteligencja 6/29
+
+===== STRONA 7 =====
+Hey, Adam! How's it
+Hey, Adam! How's it going
+Hey, Adam! How's it going?
+Hey, Adam! How's it going? ☺
+Zatem każdy kolejny token jest wybierany na podstawie całej dotychczasowej
+treści, a token raz wybrany nie może zostać usunięty, a zatem mówimy tutaj o
+modelach autoregresyjnych. Podczas rozmowy na ChatGPT, Claude czy Gemini,
+jako input dla modelu trafia cała treść bieżącej konwersacji (wyłączając techniki
+związane z kompresją długich wątków).
+Jest to istotna informacja, ponieważ mówi nam o tym, że na zachowanie modelu
+ma wpływ nie tylko instrukcja systemowa, ale także wiadomości użytkownika
+oraz wypowiedzi modelu. Choć pełna kontrola nad zachowaniem LLM jest
+obecnie niemożliwa, tak mamy możliwość sterowania nim z pomocą
+przekazywanych instrukcji, czyli promptów.
+Najnowsze możliwości i ograniczenia modeli
+Od premiery ChatGPT pod koniec 2022 roku LLM nie zmieniły się znacznie u
+swoich podstaw, ale znacznie rozwinęły się pod kątem ogólnych umiejętności,
+zdolności przetwarzania różnych formatów treści, a także zwiększyły szybkość
+działania oraz stabilność. Temu wszystkiemu towarzyszy także większa
+dostępność, znaczny spadek kosztów oraz rozwój modeli Open Source, które
+można uruchomić na własnym sprzęcie. Dodatkowo w obszar AI zaangażowały
+się już wszystkie największe korporacje technologiczne, a OpenAI zyskało
+22.11.2024, 12:19 S00E01 — Generatywna Sztuczna Inteligencja | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e01-generatywna-sztuczna-inteligencja 7/29
+
+===== STRONA 8 =====
+realną konkurencję, co sprzyja rozwojowi samych modeli, związanych z nimi
+narzędzi czy obniżce cen.
+Najprostszym sposobem na doświadczenie postępu który miał miejsce, jest
+skorzystanie z trybu Completion dostępnego na stronie OpenAI Playground
+(platform.openai.com) oraz modelu davinci-002. Jest to model, który był
+dostępny zaraz po premierze ChatGPT i którego jakość działania warto porównać
+z najnowszymi modelami OpenAI czy Anthropic.
+Wzrost skuteczności LLM widoczny jest także w różnego rodzaju testach oraz
+egzaminach. Modele coraz częściej osiągają wyniki w najwyższych percentylach,
+ale nie dotyczy to wszystkich przypadków.
+22.11.2024, 12:19 S00E01 — Generatywna Sztuczna Inteligencja | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e01-generatywna-sztuczna-inteligencja 8/29
+
+===== STRONA 9 =====
+Powyższe zestawienie pochodzi z publikacji Situational Awareness, która, choć
+przez niektóre osoby uznawana jest za zbyt optymistyczną w kontekście
+przyszłości modeli, zawiera dobre podsumowanie dotychczasowych osiągnięć.
+Ostateczną skuteczność modeli widać w ich codziennych zastosowaniach,
+zarówno przy bezpośredniej interakcji z czatbotem, copilotem, jak i ich
+zastosowaniu w logice aplikacji. Możemy zatem wyróżnić:
+Ogólny wzrost możliwości modeli związany z rozumowaniem, podążaniem za
+instrukcjami, generowaniem kodu czy innego rodzaju treści
+22.11.2024, 12:19 S00E01 — Generatywna Sztuczna Inteligencja | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e01-generatywna-sztuczna-inteligencja 9/29
+
+===== STRONA 10 =====
+W zrost szybkości działania z kilku/kilkunastu tokenów na sekundę do około
+tysiąca w ramach usługi Groq
+Wzrost ilości treści możliwej do przetworzenia w ramach zapytania z ~2000
+tokenów do nawet 2 milionów
+Wzrost ilości treści możliwej do wygenerowania, która obecnie sięga
+kilkunastu tysięcy tokenów
+Spadki kosztów inferencji (w przypadku OpenAI to mniej więcej 100x niższa
+cena, a dla modeli klasy GPT-4 aż 250x), które i tak na skali produkcyjnej
+rosną szybko.
+Lepsza dostępność modeli, która obecnie uwzględnia także usługi takie jak
+Microsoft Azure czy Amazon Bedrock
+Rozwój możliwości modeli Open Source, w tym także modeli skierowanych na
+urządzenia mobilne
+Rozwój narzędzi, bibliotek oraz frameworków ułatwiających pracę z modelami
+Z drugiej strony nadal obecne są problemy obejmujące:
+Konfabulacje (określane szerzej jako halucynacje modelu) choć ich obecność
+jest zdecydowanie rzadsza to i tak z łatwością możemy je spotkać podczas
+pracy z modelem
+Long Context Prompting, czyli zdolność modelu do podążania za instrukcjami
+w przypadku przetwarzania obszernej treści, a także samo rozumienie jej
+zawartości
+Ograniczona zdolność utrzymania uwagi i podążania za instrukcjami
+Prompt Injection niezmiennie stanowi problem i wymusza ograniczanie
+kontaktu użytkownika końcowego z modelem. W jego wyniku można nadpisać
+instrukcje systemowe i tym samym zmieniać zachowanie systemu
+Jailbreaking także nie stanowi większego problemu w przypadku wszystkich
+dostępnych na rynku modeli. W jego wyniku możliwe jest omijanie
+zabezpieczeń wbudowanych w sam model
+Context W indow, czyli ilość treści, którą może jednorazowo
+przetworzyć model. Istotny jest także limit output token obejmujący
+maksymalną długość generowanej treści
+Knowledge Cutoff, czyli ograniczenia bazowej wiedzy modelu i brak dostępu
+do aktualnych informacji (o ile nie połączymy go z innymi narzędziami)
+Także od premiery ChatGPT nie doświadczyliśmy fundamentalnych zmian w
+samych LLM, jednak zwiększyły się ich możliwości oraz ekosystem narzędzi.
+Rozwinęła się także społeczność osób zaangażowanych w obszar Generative AI,
+a także ogólny sentyment wobec technologii.
+22.11.2024, 12:19 S00E01 — Generatywna Sztuczna Inteligencja | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e01-generatywna-sztuczna-inteligencja 10/29
+
+===== STRONA 11 =====
+Role LLM w programowaniu
+Generatywne AI w kontekście programowania kojarzy się z możliwością
+tworzenia kodu, ale może również pełnić rolę w logice aplikacji dzięki możliwości
+połączenia się z LLM przez API.
+Przy bezpośredniej pracy z kodem warto sięgnąć po narzędzia z kategorii
+"copilot" takie jak Cursor, GitHub Copilot, JetBrains AI Assistant czy
+Supermaven. Każde z nich ma dostęp do kontekstu w postaci kodu naszego
+projektu i generowaniu odpowiedzi dopasowanych do nas.
+Przy obecnej generacji modeli dobrą praktyką jest unikanie generowania dużych
+fragmentów kodu oraz uważne czytanie sugerowanych zmian. W przeciwnym
+razie korzyści wynikające z zastosowania LLM szybko okażą się niskie lub nawet
+kontrproduktywne. Najwięcej wartości widoczne jest wtedy, gdy poruszamy
+się w obszarze swojej kompetencji lub nieznacznie go przekraczamy.
+Integracja LLM z edytorami kodu lub IDE pozwala uwzględnić wybrane pliki,
+katalogi i dokumentację w kontekście rozmowy. To przekłada się na lepszą jakość
+generowanego kodu, otwiera możliwości analizy potencjalnych rozwiązań i
+ułatwia przegląd istniejącego kodu.
+22.11.2024, 12:19 S00E01 — Generatywna Sztuczna Inteligencja | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e01-generatywna-sztuczna-inteligencja 11/29
+
+===== STRONA 12 =====
+Pisanie kodu nie jest jedyną czynnością w której może pomóc nam generatywne
+AI. Planowanie, podejmowanie decyzji, burza mózgów, research, nauka nowych
+technologii czy praca z narzędziami do których obsługi potrzebujemy
+dokumentacji. W takich sytuacjach zwykle będzie zależało nam na pracy z
+możliwie najlepszym dostępnym na rynku modelem, który będzie podłączony do
+Internetu. Przykładem takiego narzędzia jest Perplexity lub Phind.
+Każdy z wymienionych przykładów wymaga naszego bezpośredniego
+zaangażowania w pracę z LLM, ale istnieje także wspomniana możliwość
+połączenia przez API. Pozwala to na połączenie logiki aplikacji z możliwościami
+oferowanymi przez generatywne AI, co zwykle wykorzystywane jest na potrzeby
+czatbotów oraz połączenia z własną bazą wiedzy (tzw. Retrieval-Augmented
+Generation - RAG).
+22.11.2024, 12:19 S00E01 — Generatywna Sztuczna Inteligencja | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e01-generatywna-sztuczna-inteligencja 12/29
+
+===== STRONA 13 =====
+Poziom zaangażowania LLM w logice aplikacji może się różnić i obejmować
+zarówno pojedyncze, proste zapytania do modelu (tzw. Completion),
+serię zapytań (tzw. Chain), jak i złożone działania w których LLM samodzielnie lub
+przy współpracy z człowiekiem decyduje o sposobie realizacji zadania (tzw.
+Agent). Każdym z wymienionych zastosowań będziemy zajmować się w AI_devs
+3.
+Jeżeli już teraz chcesz się przekonać, jakie możliwości posiadają agenci AI,
+zainstaluj narzędzie https://aider.chat i podłącz je do nowego repozytorium i
+wydaj jakieś stosunkowo proste polecenie związane z przygotowaniem skryptu,
+np. Node.js.
+22.11.2024, 12:19 S00E01 — Generatywna Sztuczna Inteligencja | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e01-generatywna-sztuczna-inteligencja 13/29
+
+===== STRONA 14 =====
+Tempo i kierunek rozwoju GenAI
+Trudno jednoznacznie określić kierunek i tempo rozwoju sztucznej inteligencji
+(AI). Dobrym punktem odniesienia wydaje się poniższa tabela, prezentująca wizję
+OpenAI na kolejne etapy rozwoju. Pierwszym z nich są chatboty zdolne do
+generowania treści przy współpracy z człowiekiem, np. ChatGPT czy Claude.ai.
+Drugi poziom związany jest z rozszerzoną możliwością rozumowania i
+rozwiązywania problemów przez LLM, uwzględniającego także planowanie
+działań. To z kolei dość szybko prowadzi do kolejnych poziomów,
+22.11.2024, 12:19 S00E01 — Generatywna Sztuczna Inteligencja | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e01-generatywna-sztuczna-inteligencja 14/29
+
+===== STRONA 15 =====
+uwzględniających podejmowanie działań, a dalej innowacyjność, a nawet
+zdolność do wykonywania pracy całej organizacji.
+Oczywiście nie mamy pewności, jak będzie wyglądał dalszy rozwój AI. Możemy
+jednak potraktować ten scenariusz jako punkt odniesienia, tym bardziej że
+elementy poszczególnych etapów są już teraz widoczne i znajdują praktyczne
+zastosowania. Możemy zatem założyć, że obecnie jesteśmy między pierwszym a
+drugim poziomem, co daje punkt odniesienia do określenia możliwości. Na
+przykład, wszechstronny Agent AI jest poza naszym zasięgiem, ale
+wyspecjalizowany w konkretnym obszarze już niekoniecznie.
+Uprawnienia, prywatność i bezpieczeństwo
+Dane są kluczowe dla procesu treningu i dalszego rozwoju generatywnego AI co
+stanowi wyzwanie z punktu widzenia prywatności, bo firmy tworzące LLM
+posuwają się coraz dalej w celu ich pozyskania. Problem ten jest dodatkowo
+złożony, ponieważ niesie ryzyko wycieku prywatnych informacji w odpowiedziach
+generowanych przez LLM. Przykładem tego jest poniższy fragment pozwu New
+York Times przeciwko OpenAI w którym GPT-4 rzekomo (sprawa jest w toku)
+zacytował z niemal perfekcyjną precyzją treść artykułu.
+Usługi takie jak ChatGPT czy OpenRouter w zależności od ustawień oraz
+aktywnego planu mają prawo do wykorzystywania treści naszych konwersacji na
+potrzeby dalszego trenowania modeli. Natomiast w przypadku bezpośredniego
+połączenia z modelem przez API, polityka prywatności wygląda lepiej z punktu
+22.11.2024, 12:19 S00E01 — Generatywna Sztuczna Inteligencja | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e01-generatywna-sztuczna-inteligencja 15/29
+
+===== STRONA 16 =====
+widzenia prywatności użytkownika, ale może być niewystarczająca na potrzeby
+organizacji i tam konieczne będzie skorzystanie z usług takich jak Azure OpenAI
+Service lub Amazon Bedrock.
+Poza ochroną danych przed ich przekazywaniem poza organizację należy także
+pamiętać o sposobie wykorzystania generowanych odpowiedzi, czy zakresie
+uprawnień jaki nadajemy LLM działającemu w logice aplikacji. Ostatecznie
+odpowiedzialność spoczywa na nas. Przykładowo, jeśli wykorzystamy
+wygenerowany kod zawierający błędy lub będący niezgodny z wymaganiami
+biznesowymi, sami poniesiemy konsekwencje takich działań.
+W związku z powyższym należy w pierwszej kolejności dobrze zrozumieć
+możliwości LLM i rozsądnie sięgać po nie tam, gdzie rzeczywiście mają szansę
+przynieść nam korzyści. Warto także wyznaczać jasne granice i standardy pracy
+z modelami, które pozwolą uniknąć problemów związanych z niewłaściwym
+zastosowaniem tej technologii.
+Dostępność modeli i wybór między nimi
+W przypadku generatywnego AI mamy do dyspozycji wiele modeli o różnej skali i
+umiejętnościach. W codziennych zastosowaniach będzie nam jednak zależało na
+pracy z najlepszymi z nich (tzw. SOTA, State of The Art), których jest zaledwie
+kilka. Dopiero gdy ich możliwości okażą się niewystarczające, możemy rozważyć
+przełączenie się na mniejsze, wyspecjalizowane modele lub skorzystanie z opcji
+fine-tuningu co oznacza poprawianie modelu bądź też ostatecznie trenowanie
+modelu od podstaw co daje najwięcej możliwości. W AI_devs 3 nasza uwaga
+skupi się niemal w pełni na pracy z modelami SOTA.
+Obecnie na rynku mamy cztery firmy oferujące najlepsze modele ogólnego
+zastosowania. Są to OpenAI, Anthropic, Google DeepMind oraz Meta i to na nich
+zwykle będzie skupiać się nasza uwaga.
+W praktyce nie powinniśmy jednak uzależniać architektury aplikacji wyłącznie
+od jednego dostawcy i dobrze obrazuje to sytuacja z połowy 2024 roku.
+Wówczas Anthropic oraz model Claude 3.5 Sonnet okazał się bardziej skuteczny
+niż GPT-4o. Jednocześnie w niektórych przypadkach to modele OpenAI
+sprawdzały się lepiej.
+Choć istnieją różne benchmarki, np. LMSYS Chatbot Arena, które mogą rysować
+ogólny obraz skuteczności LLM, tak zawsze powinniśmy weryfikować wybrane
+modele na własnym przykładzie oraz swoich zastosowaniach.
+22.11.2024, 12:19 S00E01 — Generatywna Sztuczna Inteligencja | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e01-generatywna-sztuczna-inteligencja 16/29
+
+===== STRONA 17 =====
+Przełączanie się pomiędzy modelami to nie tylko kwestia programistycznego
+interfejsu, ale także samych promptów. W praktyce jednak znacznie łatwiej jest
+dostosować prompt do modelu, niż całą aplikację do zupełnie innego API.
+Modele komercyjne i otwarte
+Ogromną uwagę w obszarze generatywnego AI skupiają modele Open Source,
+które można uruchomić na własnym sprzęcie, zachowując pełną prywatność.
+Należy jednak pamiętać, że utrzymanie konfiguracji sprzętowej pozwalającej na
+inferencję w aplikacji produkcyjnej może przekroczyć koszty związane z
+dostawcami chmurowymi oraz wymaga dodatkowej uwagi. Co więcej,
+skuteczność działania niemal wszystkich modeli open source w ogólnych
+zastosowaniach jest nadal bardzo niska w porównaniu do modeli SOTA.
+22.11.2024, 12:19 S00E01 — Generatywna Sztuczna Inteligencja | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e01-generatywna-sztuczna-inteligencja 17/29
+
+===== STRONA 18 =====
+Jeśli chcesz już teraz sprawdzić, jak działają takie modele, możesz przejść na
+groq.com i przetestować ich skuteczność na kilku pytaniach. Natomiast z
+pomocą narzędzi takich jak ollama czy LMStudio możesz pobrać wybrany model
+na swój komputer i rozmawiać z nim bez połączenia z Internetem (polecam
+sprawdzić na początek Gemma 2B który można uruchomić nawet na telefonie).
+Podstawowe narzędzia i biblioteki
+Niezależnie od poziomu doświadczenia w pracy z LLM warto
+poświęcić trochę czasu na konfigurację narzędzi oraz zapoznanie się z
+bibliotekami przydatnymi podczas rozwoju aplikacji. Niemal każde z nich w różnej
+formie pojawi się jeszcze w innych lekcjach AI_devs 3. Tymczasem zacznijmy od
+poniższej listy:
+Cursor: IDE oparty o Visual Studio Code, oferujący natywną integrację z LLM
+w formie edycji inline oraz czatu z opcją wskazywania plików, katalogów czy
+dokumentacji na podstawie których ma zostać udzielona odpowiedź
+Vercel AI SDK: Bardzo przydatna biblioteka do interakcji z LLM
+najpopularniejszych dostawców
+Github Copilot: Jedno z najlepszych, dostępnych obecnie narzędzi
+wspierających pisanie kodu
+Perplexity: Generatywna wyszukiwarka oferująca dostęp do odpowiedzi
+opartych o aktualne źródła danych
+AnythingLLM: Interfejs graficzny do interakcji z LLM komercyjnymi oraz Open
+Source
+PromptFoo: Narzędzie do automatycznego testowania i ewaluacji promptów
+LangFuse: Narzędzie do monitorowania aplikacji wykorzystujących LLM oraz
+wersjonowania promptów
+OpenRouter: Platforma udostępniająca wszystkie najpopularniejsze LLMy
+poprzez API
+LangFlow: Narzędzie do wizualnego (low-code) budowania aplikacji
+wykorzystujących LLM
+Qdrant: Wyszukiwarka wektorowa
+FireCrawl: Narzędzie do przeszukiwania sieci oraz stron www na potrzeby
+LLM
+Neo4J: Baza grafowa umożliwiająca przechowywanie danych
+ollama: Narzędzie ułatwiające pobranie i uruchomienie modeli open source na
+własnym komputerze z opcją połączenia się z nimi poprzez localhost
+Dodatkowo warto zarejestrować konta na platformach:
+22.11.2024, 12:19 S00E01 — Generatywna Sztuczna Inteligencja | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e01-generatywna-sztuczna-inteligencja 18/29
+
+===== STRONA 19 =====
+https://console.anthropic.com/
+https://platform.openai.com/
+https://console.groq.com/
+https://aistudio.google.com/app/
+Zanim przejdziemy dalej, warto poświęcić trochę czasu na konfigurację
+przynajmniej dwóch narzędzi: Copilota wbudowanego w edytor kodu oraz
+narzędzia umożliwiającego interakcję z LLM na komputerze i ułatwiającego
+dostęp do niego, np. poprzez globalny skrót klawiszowy.
+Praktyczne zastosowania Generative AI
+Choć może się wydawać, że LLM otwierają przed nami nieograniczone
+możliwości, rzeczywistość pokazuje coś innego. Bariery pojawiają się nie tylko w
+samych modelach, lecz także w infrastrukturze, organizacji informacji, definicjach
+procesów, aspektach prawnych czy biznesowych. Część z nich możemy
+pokonać, niektóre omijać, a inne naginać. Nie zmienia to jednak faktu, że mamy
+do czynienia z narzędziami, które sprawdzają się w wybranych sytuacjach i nie
+powinny być stosowane wszędzie. Eksplorując ich możliwości, warto wyrabiać
+sobie zdolność do oceny tego, co jest możliwe, z uwzględnieniem rozwoju samej
+technologii.
+Chociaż nazwa "Generatywne AI" sugeruje, że mamy do czynienia z
+rozwiązaniami zdolnymi do tworzenia treści, wystarczy kilka prób wygenerowania
+jakościowego wpisu na jakiś temat, aby zorientować się, że coś jest nie tak.
+Zwykle brakuje kontekstu, konkretów, aktualnych informacji, a często widoczne
+są błędy lub powtarzalne schematy. Sytuacja zmienia się, gdy zamiast tworzyć
+treść, zaczynamy ją transformować.
+Przykładowo:
+Generowanie treści (np. artykułów, wpisów social media czy maili) daje
+rezultaty niskiej jakości. Jednak korekta, zwiększenie czytelności czy
+poprawienie formatowania, ma pozytywny wpływ na jakość. Poniżej mamy
+przykład w którym Claude 3.5 Sonnet poprawił kolejny punkt tego wpisu pod
+kątem gramatyki, a rezultat został natychmiast skopiowany do schowka
+22.11.2024, 12:19 S00E01 — Generatywna Sztuczna Inteligencja | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e01-generatywna-sztuczna-inteligencja 19/29
+
+===== STRONA 20 =====
+LLM odpisujący na maile będzie popełniać błędy i narażać wizerunek nasz
+i/lub firmy. Może jednak z wysoką precyzją przekierować wiadomości do
+właściwych osób, wspierając tym samym działy obsługi klienta czy sprzedaży
+Kod generowany przez LLM zawiera błędy, bywa niezgodny z założeniami lub
+nie uwzględnia dobrych praktyk. Jednak przy współpracy z
+doświadczoną osobą, znacznie zwiększa efektywność oraz stwarza
+przestrzeń do pracy nad detalami, na które normalnie nie mielibyśmy czasu
+LLM nie jest połączony z Internetem czy zewnętrznym API. Jednak dzięki
+możliwości transformacji treści do ustrukturyzowanego formatu (np. JSON)
+może wchodzić w interakcję z serwisami i urządzeniami, pełniąc
+rolę asystenta lub częściowo autonomicznego systemu (agenta). Wówczas
+LLM sam w sobie nie generuje nowych treści, lecz transformuje zapytania
+użytkownika lub instrukcje obecne w logice aplikacji
+22.11.2024, 12:19 S00E01 — Generatywna Sztuczna Inteligencja | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e01-generatywna-sztuczna-inteligencja 20/29
+
+===== STRONA 21 =====
+LLM domyślnie nie wygeneruje treści dopasowanych do indywidualnego
+kontekstu firmy, klienta czy nas samych. Możemy jednak wyposażyć go w
+wiedzę dzięki której odpowiedzi będą spersonalizowane. Wówczas interakcja
+z LLM odbywa się poprzez transformację informacji dostępnych w kontekście
+LLM zwiększa możliwości interakcji z dokumentami (np. stronami www,
+plikami tekstowymi czy obrazami). Możemy wykorzystać ten fakt, do
+przetwarzania danych "w tle", bez aktywnego zaangażowania człowieka.
+Mowa tutaj o mechanizmach odczytywania tekstu z obrazu, opisywania
+plików, automatycznej organizacji czy zaawansowanymi przeszukiwaniu treści
+Choć interfejs czatu jest obecnie najbardziej popularny, to nie oznacza to, że
+LLM nie może wspierać klasycznych interfejsów w sposób niemal
+niezauważalny dla użytkownika końcowego. Przykładem może być lista zadań,
+która automatycznie sugeruje projekt i czas realizacji, w trakcie dodawania
+nowego wpisu.
+Na doświadczenie wyżej wymienionych scenariuszy przyjdzie jeszcze czas w
+dalszych lekcjach. Jednak już teraz rysują one perspektywę patrzenia na LLM
+przez pryzmat nieco szerszy niż interfejs czatu.
+Podsumowanie
+Poruszone w tej lekcji zagadnienia i narzędzia będą nam towarzyszyć przez
+całą trzecią edycję AI_devs. Warto więc poświęcić chwilę na zapoznanie się z
+wymienionymi źródłami i narzędziami, aby osobiście doświadczyć możliwości i
+22.11.2024, 12:19 S00E01 — Generatywna Sztuczna Inteligencja | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e01-generatywna-sztuczna-inteligencja 21/29
+
+===== STRONA 22 =====
+ograniczeń, które mamy przed sobą. Na szczególną uwagę zasługują: OpenAI
+Playground, Cursor, Perplexity i ollama, a także Tiktokenizer.
+Poligon 🎓
+Już 4 listopada czeka na Ciebie misja, do której Cię przygotowujemy. Aby łatwiej
+było Ci przećwiczyć umiejętności zdobyte w ramach lekcji wstępnych,
+przygotowaliśmy dla Ciebie “Poligon doświadczalnyˮ. Możesz na nim trenować
+tworzenie efektywnych promptów oraz zawczasu przygotować sobie fragment
+kodu do obsługi API, który przyda Ci się już w prawdziwych lekcjach i zadaniach.
+Link do poligonu:
+↳ https://poligon.aidevs.pl/
+Na poligonie znajdziesz obecnie 4 zadania z wydobywania informacji z tekstu.
+Możesz podejść do nich już teraz, aby sprawdzić, na jakim poziomie jest Twoja
+wiedza. Możesz także przeczytać wszystkie 5 lekcji, które dla Ciebie
+przygotowaliśmy na rozgrzewkę i dopiero później podjąć próbę zaliczenia
+poligonu.
+Zadania na poligonie nie są punktowane, nie mają także wpływu na to, czy
+ostatecznie zaliczysz nasze szkolenie, czy też nie. Poligon jest jedynie miejscem
+treningowym, z którego możesz skorzystać, jeśli masz taką ochotę.
+Zachęcamy jednak abyś go odwiedził, ponieważ dzięki temu:
+dowiesz się, czy Twój dostęp do Paywalla od Easycart działa jak należy
+(będziemy go używać WSZĘDZIE). Jeśli nie działa, skontaktuj się koniecznie z
+Kasia Marcyniuk lub aidevs@brave.courses (jako trenerzy nie mamy dostępu
+do systemu rozliczeń, więc nie pomożemy).
+przeczytasz mini-dokumentacje do API, z którego przyjdzie Ci korzystać
+podczas zgłaszania odpowiedzi do zadań
+sprawdzisz swoją obecną wiedzę z budowania promptów
+jest szansa, że po prostu będziesz dobrze się bawić
+Nie przejmuj się, jeśli nie uda Ci się zaliczyć zadań z poligonu. Mogą one być
+trudne dla osób początkujących.
+Pamiętaj także, że w zadaniach nie chodzi o przygotowanie ataków “Prompt
+Injectionˮ (one są mało użyteczne w codziennej pracy), a o przygotowanie
+bezpiecznego tzw. “system messageˮ dla automatu pracującego na danych, które
+to dane mogą zawierać zatrute informacje.
+Poligon domyślnie pracuje na modelu GPT-4o-mini, ale w dziale “CHATˮ w
+pierwszym akapicie, możesz przełączyć się na model GPT-4o, który przez to, że
+jest sprytniejszy, wymaga od użytkownika mniej kombinowania, aby otrzymać
+wyniki, których oczekuje. Uznajmy więc, że wersja “miniˮ jest bardziej ambitna ;)
+Powodzenia!
+22.11.2024, 12:19 S00E01 — Generatywna Sztuczna Inteligencja | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e01-generatywna-sztuczna-inteligencja 22/29
+
+===== STRONA 23 =====
+Liked by Mateusz and 293 others
+Comment 270 comment s
+Paweł Schmidt4d
+See more
+Like Reply
+Paweł Dulak (dulare) AI_Dev 4d
+I'm here to help
+Like Reply 2 likes
+overment Admin 4d
+I'm just curious.
+Like Reply 2 likes
+P.S. Pamiętaj, że zawsze możesz liczyć na pomoc ze strony społeczności i
+trenerów, tutaj na platformie. Wszelkie pytania zadaj jednak w komentarzach, a
+nie w wiadomościach prywatnych!
+MS
+Like
+PS
+Prompt Injection niezmiennie stanowi problem i wymusza
+ograniczanie kontaktu użytkownika końcowego z modelem. W jego
+wyniku można nadpisać instrukcje systemowe i tym samym
+zmieniać zachowanie systemu
+Jailbreaking także nie stanowi większego problemu w przypadku
+wszystkich dostępnych na rynku modeli. W jego wyniku możliwe
+jest omijanie zabezpieczeń wbudowanych w sam model
+…
+Paweł Schmidt ok, tutaj jeśli chodzi o jailbraking:
+“można bez problemu zrobić jailbreakeˮ, czyli dla mnie jako
+osoby od bezpieczeństwa stanowi problem, a dla atakującego
+nie stanowi problemu :)
+Faktycznie niefortunnie się składają te zdania w tekście.
+Poprosimy overment o przeformułowanie :)
+Paweł Schmidt różnica jest taka, jak zapisał Paweł.
+Prompt Injection stanowi problem z perspektywy ochrony
+aplikacji.
+Jailbreaking nie jest problemem z punktu widzenia jego
+wykonania.
+22.11.2024, 12:19 S00E01 — Generatywna Sztuczna Inteligencja | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e01-generatywna-sztuczna-inteligencja 23/29
+
+===== STRONA 24 =====
+Paweł Schmidt32m
+Like Reply
+Maciej Łastowski Nov 14
+See more
+Like Reply 1 like
+Paweł Dulak (dulare) AI_Dev Nov 14
+I'm here to help
+Like Reply
+Maciej Łastowski Nov 14
+Like Reply 1 like
+PS
+👍
+Hej
+w końcu udało mi się ogarnąć polecenie “gitˮ na windzie XD i
+rozochocony chciałem pobrać repozytorium przykładów które
+obecnie sobie obserwuję z poziomu www.
+Niestety napotykam błąd jakby wskazujący że to repo nie jest
+dostępne:
+PS C:\Users\xxxxxxxxx> git clone git@github.com:i-am-alice/3rd-
+devs.git…
+Maciej Łastowski użyj linku HTML zamiast SSH, czyli:
+git clone https://github.com/i-am-alice/3rd-devs.git
+Paweł Dulak (dulare)
+Zadziałało. Użyłem:
+ git clone https://github.com/i-am-alice/3rd-devs/
+Dzięki!!
+To z ssh jest w instrukcji repozytorium, może warto zmienić.
+Pozdrawiam,
+Maciek
+22.11.2024, 12:19 S00E01 — Generatywna Sztuczna Inteligencja | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e01-generatywna-sztuczna-inteligencja 24/29
+
+===== STRONA 25 =====
+Paweł Dulak (dulare) AI_Dev Nov 14
+I'm here to help
+Like Reply 1 like
+Marcin Nabiałek Nov 9
+PHP + Go de veloper
+Like Reply
+Paweł Dulak (dulare) AI_Dev Nov 9
+I'm here to help
+Like Reply 1 like
+Mateusz Korczyński Nov 5
+Like Reply 1 like
+Paweł Dulak (dulare) AI_Dev Nov 5
+I'm here to help
+Like Reply 1 like
+Maciej Łastowski o, tego nie zauważyłem, ale tą zmianę musi
+zrobić overment
+Dzięki!
+Czy te lekcje preAI3 da radę wrzucić też do formatu markdown?
+Marcin Nabiałek są udostępnione w lekcji S01E01 z tego co
+widzę jako “treść materiałów wdrożeniowychˮ na górze:
+https://bravecourses.circle.so/c/lekcje-programu-ai3-
+806660/s01e01-interakcja-z-duzym-modelem-jezykowym
+MK
+Hej overment miałbym prośbę czy w wolnej chwili byłbyś w stanie
+dodać do preworków wersje markdown do pobrania? Będę wdzięczny
+Mateusz Korczyński z tego co wiem jest to w planach w wolnej
+chwili
+22.11.2024, 12:19 S00E01 — Generatywna Sztuczna Inteligencja | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e01-generatywna-sztuczna-inteligencja 25/29
+
+===== STRONA 26 =====
+overment Admin Nov 5
+I'm just curious.
+Like Reply 2 likes
+Mateusz Korczyński Nov 5
+Like Reply 2 likes
+Rafał Namiński Nov 4
+Power Platform Architect/Developer
+See more
+Like Reply 1 like
+Paweł Dulak (dulare) AI_Dev Nov 4
+I'm here to help
+Like Reply
+Rafał Namiński Nov 4
+Power Platform Architect/Developer
+Like Reply 1 like
+Tomasza Mak owski Nov 4
+Like Reply 1 like
+Mateusz Korczyński Paweł Dulak (dulare) są w pierwszej lekcji
+na górze. https://bravecourses.circle.so/c/lekcje-programu-
+ai3-806660/s01e01-interakcja-z-duzym-modelem-jezykowym
+Wrzucałem je tam wczoraj rano :)
+MK
+overment Faktycznie, dzięki. Nie rozpakowałem tego pliku 🙈
+RN
+[SPOILER ALERT] Poniżej screenshot z rozwiązania do zadania nr 3
+(prework)
+Miałem chwilę zagwostki, aby ogarnąć przy drugim ćwiczeniu, że
+chodzi o wydobycie tokenu, ale przy użyciu języka angielskiego, to się
+udało ALE mocno zastanawia mnie czy zadanie nr 3 powinno być tak
+rozwiązane jak je rozwiązałem? :D Bo użyłem tego samego promptʼa
+co w zadaniu nr 2 i mam dziwne przeczucie, że nie o to w 100% …
+Rafał Namiński Taki był zamysł, jest OK :)
+RN
+Oki, dzięki za potwierdzenie, bo się głowiłem czy “dobrzeˮ to
+zrobiłem :D
+TM
+mam ten sam problem. Widzę 4 zadania z tym samym poleceniem.
+Przeglądarka chrome.
+22.11.2024, 12:19 S00E01 — Generatywna Sztuczna Inteligencja | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e01-generatywna-sztuczna-inteligencja 26/29
+
+===== STRONA 27 =====
+Paweł Dulak (dulare) AI_Dev Nov 4
+I'm here to help
+Like Reply
+KRA SUSKI ROBERT Nov 4
+Like Reply
+Michał Olesiak Nov 4
+Like Reply
+KRA SUSKI ROBERT Nov 4
+Like Reply 1 like
+KRA SUSKI ROBERT Nov 4
+Like Reply
+Michał Olesiak Nov 4
+Tomasza Makowski czy w polu “dane źródłoweˮ także są te
+same dane za każdym razem? Polecenie jest to samo, ale dane
+źródłowe się zmieniają - a przynajmniej powinny. Jeśli nie, to
+wyczyść ciasteczka przeglądarki - powinno pomóc.
+KR
+Pytanie, te 4 zadania poczatkowe maja tą samą treść? Zrobilem
+zadanie numer 0, zrobilem tech zadanie z API. Natomiast jak sie
+przelaczam na poszczegolne zadania 1,2,3 to jest to samo pytanie co
+w zadaniu nr 0.
+Hej, w oknie dane źródłowe masz różne “Przeszkadzajkiˮ co do
+otrzymanego wyniku zadania. Też chwilę rozkminiałem o co
+chodzi.
+KR
+Michał Olesiak ok dzięki. Pierszym problemem były ciasteczka,
+to dlatego widzialem to samo. Na razie jedno do przodu.
+KR
+uff
+22.11.2024, 12:19 S00E01 — Generatywna Sztuczna Inteligencja | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e01-generatywna-sztuczna-inteligencja 27/29
+
+===== STRONA 28 =====
+Like Reply 3 likes
+overment Admin Nov 4
+I'm just curious.
+Like Reply
+Grzegorz Pawlak Nov 3
+Like Reply
+Paweł Dulak (dulare) AI_Dev Nov 4
+I'm here to help
+Like Reply 1 like
+Maciej Łastowski Nov 4
+Dopiero wczoraj zdecydowałem się na zakup kursu. Ale pozdrawiam
+serdecznie :D
+Michał Olesiak pozdro! :)
+GP
+Przy zadaniu nr 3 wynik wygląda na poprawny ale nie jest zaliczone
+na zielono. W czym problem?
+Grzegorz Pawlak poprawny token ma format xxxx-xxxx-xxxx i
+jest wstawiany dynamicznie w miejsce %token%. Twój prompt
+to wiadomość systemowa, dane poniżej (dane wejściowe) to
+treść od użytkownika. Twoim zadaniem jest wydobyć
+prawidłowy token niezależnie od tego co użytkownik każe.
+Tutaj się to nie powiodło.
+Grzegorz Pawlak nie wiem czy nadal aktualne ale w 3cim
+musisz zmusić gada żeby zwrócił poprawny token. Gad
+niestety zwraca token ale fałszywy, który jest w danych
+źródłowych
+22.11.2024, 12:19 S00E01 — Generatywna Sztuczna Inteligencja | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e01-generatywna-sztuczna-inteligencja 28/29
+
+===== STRONA 29 =====
+Like Reply
+Kamil Kierzkowski Nov 3
+Like Reply
+Paweł Dulak (dulare) AI_Dev Nov 3
+I'm here to help
+Like Reply
+Show more comment s
+KK
+Poligon domyślnie pracuje na modelu GPT-4o-mini, ale w dziale
+“CHATˮ w pierwszym akapicie, możesz przełączyć się na model
+GPT-4o, który przez to, że jest sprytniejszy, wymaga od
+użytkownika mniej kombinowania, aby otrzymać wyniki, których
+oczekuje. Uznajmy więc, że wersja “miniˮ jest bardziej ambitna ;)
+Z tego co widzę, to znacznie prościej uzyskać prawidłową odpowiedź
+w GPT-4o-mini.
+Kamil Kierzkowski no, to jest kwestia gustu :) i tego jak
+sugestie z promptu zostaną “zinterpretowaneˮ przez model.
+PS
+Post
+What are your thoughts?
+22.11.2024, 12:19 S00E01 — Generatywna Sztuczna Inteligencja | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e01-generatywna-sztuczna-inteligencja 29/29

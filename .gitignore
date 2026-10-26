@@ -1,0 +1,26 @@
+# Materialy zrodlowe (kursy BRAVE) - ~303 MB, trzymane lokalnie
+*.pdf
+
+# Sekrety
+.apikey
+.apikey.*
+.env
+.env.*
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Dane generowane przez centrale (datagen.py)
+centrala/data/
+*.sqlite
+*.sqlite3
+
+# Logi / output runtime
+*.log
+*.err
+*.out
+
+# System
+.DS_Store
+Thumbs.db

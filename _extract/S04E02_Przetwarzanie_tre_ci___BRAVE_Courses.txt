@@ -1,0 +1,415 @@
+
+===== STRONA 1 =====
+S04E02  Prz etwarzanie treści
+overment Admin Nov 26
+I'm just curious.
+» Lekka wersja przeglądarkowa «
+📎 Pobierz treść tej lekcji w formacie markdown
+📎 Pobierz treść tej lekcji w formacie markdown (EN)
+Słowem wstępu:
+Dzisiejsza lekcja jest krótsza, ale zawiera obszerny przykład "docs", na który
+warto poświęcić trochę więcej czasu. Co prawda duża część jego logiki
+zawiera kod skopiowany z wcześniejszych przykładów, ale chodzi w nim o
+sposób połączenia narzędzi, które budowaliśmy do tej pory. Jeśli coś będzie
+niejasne — zachęcam do dodawania komentarzy.
+Uruchomienie przykładu docs łączy się bezpośrednio z przykładem process z
+jednej z poprzednich lekcji. Dla ułatwienia jego uruchomienia, w pliku
+FileService.ts można zakomentować lub odkomentować linię 88 (domyślnie jest
+zakomentowana), która odpowiada za inicjalizowanie Google Docs oraz
+obsługę formatów docx/xlsx/pdf.
+Pozostałe formaty będą wspierane.
+Przykład docs zawiera kilka zakomentowanych fragmentów w pliku app.ts.
+Każdy z nich pracuje na zawartości pliku, który jest wczytywany na początku.
+Ciekawostka: anglojęzyczne wersje lekcji są generowane dokładnie z pomocą
+logiki tego przykładu i sam korzystam z niej na co dzień.
+Na początek zachęcam jednak do zapoznania się z treścią lekcji.
+EDIT: 2024-11-26 06:00 CET - dodano link do filmu na temat Fine-Tunningu pod
+zadaniem
+Back to Lekcje programu AI3
+PS
+15.12.2024, 20:05 S04E02 — Przetwarzanie treści | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e02-przetwarzanie-tresci 1/13
+
+===== STRONA 2 =====
+Mamy za sobą już przynajmniej kilka przykładów operacji związanych z
+przetwarzaniem dokumentów, wczytywania różnych formatów danych i
+transformacji treści. Przeszliśmy także przez ich organizację w bazie danych oraz
+wyszukiwanie zarówno pełnotekstowe, jak i wyszukiwanie semantyczne.
+W dzisiejszej lekcji połączymy wszystko w całość, wprowadzając przy okazji kilka
+usprawnień w promptach i ich ewaluacji. Naszym głównym celem będzie
+stworzenie interfejsu, który za pomocą stosunkowo prostych funkcji umożliwi
+wczytanie dokumentu, jego podsumowanie, odpowiedź na pytania na
+podstawie treści, tłumaczenie oraz wydobycie informacji. Powodem, dla którego
+chcemy to zrobić, są agenci AI, których umiejętności będziemy chcieli możliwie
+jak najbardziej uprościć.
+W rezultacie, możliwe będzie zlecenie następujących zadań:
+Wejdź na stronę https://... i wypisz z niej wszystkie wspomniane narzędzia
+Pobierz ten dokument (link do pliku DOCX), a następnie przygotuj jego
+podsumowanie
+Przetłumacz ten dokument z polskiego na angielski
+Na podstawie plików x, y, z odpowiedz na pytania: a, b, c
+Przykład implementacji pierwszego punktu w kodzie, widoczny jest na poniższym
+screenie. Wykorzystujemy w nim funkcję process, którą budowaliśmy w lekcji
+S03E04 — Źródła danych, dzięki czemu uzyskujemy dostęp do treści podanych
+stron www, w formie listy dokumentów. Następnie pobrana treść trafia do nowej
+funkcji extract, która pozwala nam na przekazanie opisu treści, którą LLM ma dla
+nas pobrać z treści.
+Taki interfejs umożliwi nam w późniejszych lekcjach zbudowanie agenta, który
+będzie miał do dyspozycji listę umiejętności (funkcji). Będzie mógł je wywoływać
+w dowolnej kolejności z ustalonymi parametrami. Kompletna lista tych
+umiejętności znajduje się w przykładzie docs i klasie DocumentService.ts.
+Lista dostępnych metod w tej chwili uwzględnia typowe akcje dla przetwarzania
+tekstu. Nic nie stoi jednak na przeszkodzie, aby rozbudować ją o kolejne
+umiejętności, takie jak:
+Korekta dokumentu: poprawienie literówek z ewentualną korektą stylu i
+zwiększenia czytelności
+Weryfikacja dokumentu: sprawdzenie poprawności na podstawie bazowej
+wiedzy modelu oraz wyników wyszukiwania w Internecie
+15.12.2024, 20:05 S04E02 — Przetwarzanie treści | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e02-przetwarzanie-tresci 2/13
+
+===== STRONA 3 =====
+Strukturyzowanie dokumentu: może to być akcja omawiana w przykładzie
+notes, odpowiedzialnym za strukturyzowanie notatek głosowych
+...i inne.
+Kluczowe w tej układance jest jednak to, że kolejne umiejętności budujemy
+poprzez skorzystanie z istniejących już komponentów i zestawów narzędzi. Nie
+musimy więc już tworzyć wszystkiego od podstaw, a w dodatku utrzymujemy
+kontrolę nad poszczególnymi komponentami.
+Cele i zastosowania przetwarzania dokumentów
+Przetwarzanie dokumentów kojarzy się z procesami biznesowymi, ale w naszym
+przypadku zagadnienie to jest znacznie szersze, ponieważ dotyczy większości
+działań, które będą podejmować agenci. Kilka przykładów:
+Przeszukiwanie Internetu i praca z treścią stron www
+Klasyfikowanie wiadomości, zgłoszeń, plików
+Łączenie informacji z różnych źródeł
+Odsłuchiwanie wiadomości głosowych i filmów wideo
+Przetwarzanie historii konwersacji z użytkownikiem
+Organizowanie 'wspomnień' w pamięci długoterminowej
+Można więc powiedzieć, że praktycznie wszystko na czym pracuje agent, będzie
+jakąś formą dokumentu. Natomiast wszystkie akcje związane z ich
+przetwarzaniem będą miały formę narzędzia o strukturze podobnej do przykładu
+todo omawianego w poprzedniej lekcji.
+Zanim jednak je stworzymy, przyjrzyjmy się bliżej temu, jak zbudowane są
+poszczególne akcje.
+Wczytywanie dokumentu do bazy danych i indeksowanie
+Ze względu na rosnący limit okna kontekstu oraz prompt cache coraz częściej
+będziemy mieć komfort wczytania całej treści dokumentów do instrukcji
+systemowej. Nie zawsze jednak będzie to możliwe ze względu na precyzję
+zapytania, bądź pracę z modelami open source. Wówczas będziemy chcieli
+podzielić nasze treści na mniejsze fragmenty i dodać je do indeksów Qdrant oraz
+Algolia w celu późniejszego przeszukania z pomocą wyszukiwania hybrydowego
+omawianego w lekcji S03E03 — Wyszukiwanie Hybrydowe.
+Z punktu widzenia naszego interfejsu, wystarczy wczytanie dokumentów funkcją
+process (dzielącej treść na 1000 tokenów) oraz wykonanie funkcji answer.
+15.12.2024, 20:05 S04E02 — Przetwarzanie treści | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e02-przetwarzanie-tresci 3/13
+
+===== STRONA 4 =====
+Funkcja process w tym przypadku:
+Rozpoznaje rodzaj źródła: w tym przypadku jest to link kierujący do pliku,
+którego treść należy pobrać na dysk.
+Dzieli tekst na mniejsze fragmenty: konkretnie korzystając z tiktokenizera
+dzieli go na części nieprzekraczające 1000 tokenów oraz każdy z nich opisuje
+meta-danymi
+Zwraca listę dokumentów: rezultatem jej działania jest tablica obiektów
+opisujących poszczególne fragmenty
+Następnie wykonujemy pętlę, która zapisuje dokumenty w bazie danych.
+Dodatkowo ustawiamy na true parametr odpowiedzialny za dodanie dokumentów
+do indeksów silników wyszukiwania. Przykład jednego z nich widoczny w Algolia
+znajduje się poniżej.
+Przygotowane dokumenty trafiają następnie do funkcji answer w której dochodzi
+do wygenerowania zapytań zoptymalizowanych pod dwa rodzaje
+wyszukiwania. Co ciekawe, jeśli zapytanie użytkownika jest złożone, to prompt
+queriesPrompt wygeneruje serię podzapytań.
+Wszystkie pary zapytań wykorzystywane są następnie do wykonania
+równoległych zapytań z filtrem ograniczającym zakres wyszukiwania do
+dokumentów współdzielących source_uuid. Ich rezultaty są agregowane na
+podstawie rankingu RRF i łączone w kontekst dla wypowiedzi modelu.
+Mamy więc do dyspozycji narzędzie z pomocą którego możemy "odpowiedzieć
+na pytania" praktycznie dowolnych treści przekazanych przez użytkownika.
+Musimy tylko mieć na uwadze fakt, że taki rodzaj wyszukiwania pozwoli nam
+jedynie na odnajdywanie informacji znajdujących się w treści, a nie uzyskiwania
+ogólnej perspektywy i analizowania zależności w dokumencie, bo do tego
+potrzebowalibyśmy bazy grafowej.
+Przetwarzanie fragmentów dokumentu
+W lekcji S03E01 — Dokumenty mówiliśmy na temat limitu tokenów dla treści
+generowanych przez model, które wciąż są stosunkowo niskie. Dlatego dla
+transformacji wymagających przepisania całego dokumentu potrzebujemy
+przetworzenia każdego z fragmentów indywidualnie.
+15.12.2024, 20:05 S04E02 — Przetwarzanie treści | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e02-przetwarzanie-tresci 4/13
+
+===== STRONA 5 =====
+Przykładem takiej akcji jest funkcja translate, która również wymaga przekazania
+listy dokumentów, których liczba tokenów nie przekracza limitu tokenów
+wyjściowych modelu z którym pracujemy. W moim przypadku uwzględniam tutaj
+jeszcze bufor, ponieważ dla każdego z dokumentów model generuje także serię
+"przemyśleń" na temat tego, jak przeprowadzić tłumaczenie.
+W związku z tym, że tłumaczenie poszczególnych fragmentów może odbywać się
+niezależnie, proces umożliwia równoległe przetwarzanie pięciu z nich. Natomiast
+krytycznym elementem tego procesu jest upewnienie się, że model zawsze
+zwróci nam tylko i wyłącznie przetłumaczoną treść. W przeciwnym razie, gdy
+połączymy wszystkie fragmenty w całość otrzymamy dokument zawierający
+niepożądane komentarze.
+Wiemy już, że o skuteczności promptu nie możemy być pewni. Możemy jednak
+zwiększać prawdopodobieństwo poprawnej odpowiedzi poprzez serię testów,
+które zweryfikują działanie promptu. Testy muszą w tym przypadku opierać się o
+ocenę ze strony modelu, którą w PromptFoo możemy przeprowadzić z pomocą
+typu llm-rubric. Przykłady kilku z nich można znaleźć w pliku
+docs/prompts/translate.ts oraz uruchomić poleceniem bun
+docs/prompts/translate.ts.
+Poza odpowiedzią pozbawioną dodatkowych komentarzy, będzie interesowało
+nas także utrzymanie oryginalnego stylu wypowiedzi, co także adresujemy z
+pomocą promptu.
+Efektywne przekazywanie długich treści w logice agenta
+W lekcji S03E04 — Źródła danych omawialiśmy przykład context, który pozwalał
+modelowi na posługiwanie się długimi treściami stosując do tego placeholder
+[[uuid]], który programistycznie podmienialiśmy na docelową treść. Teraz na
+przykładzie docs widzimy jak duże znaczenie ma ta technika oraz dlaczego
+zawsze będzie nam zależało na tym, aby treść dokumentu przechowywać w
+bazie danych (nawet tymczasowo).
+W tym jednak przypadku nie będzie chodziło wyłącznie o sytuację w której treść
+przekazywana jest do użytkownika w odpowiedzi końcowej, ale także pomiędzy
+etapami jej przetwarzania (np. tłumaczenie → podsumowanie).
+W przykładzie docs w tej chwili przekazywanie listy dokumentów odbywa się
+poprzez kod, ale nie zawsze tak będzie, ponieważ niekiedy to LLM będzie musiał
+15.12.2024, 20:05 S04E02 — Przetwarzanie treści | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e02-przetwarzanie-tresci 5/13
+
+===== STRONA 6 =====
+zdecydować o tym, w jakie akcje uruchomić na wybranym zestawie danych.
+Nie bez powodu stosujemy tutaj uuid, którego przykładowa wartość wygląda tak:
+601595c1-8646-4408-b2da-82522604a942. Z punktu widzenia możliwości
+modelu jest to lepszy format niż id w formie liczbowej, ponieważ jeśli dojdzie tutaj
+do pomyłki w zapisie, to jesteśmy w stanie ją skutecznie wykryć. Niestety dalej
+pozostaje przestrzeń do pomylenia całego identyfikatora, ale tutaj ponownie do
+gry wchodzi zasada "weryfikacja jest prostsza, niż generowanie", czyli
+zastosowanie promptu weryfikującego podjętą decyzję. Ponownie nie mamy tutaj
+pewności o tym, że on także nie zawiedzie, lecz ryzyko takiej sytuacji znacznie
+spada.
+Podsumowanie
+Dzisiejsza lekcja pokazała nam to, do czego dążyliśmy od dłuższego czasu.
+Chodzi mianowicie o koncepcję zbudowania zestawu narzędzi, które będą
+zdolne do realizowania pojedynczych zadań, ale które będziemy w stanie ze sobą
+łączyć w różnych konfiguracjach. Co więcej, możliwość ta, będzie mogła być po
+części oddelegowana modelowi, co otwiera nam przestrzeń do budowania
+wyspecjalizowanych agentów AI.
+W przeciwieństwie do przykładu todo z poprzedniej lekcji, tutaj zamiast łączyć się
+z zewnętrznym API, opieramy się wyłącznie o możliwości modelu językowego
+oraz zestaw akcji zbudowany przez nas. Pomimo tego, nadal możemy zbudować
+na ich podstawie narzędzie dla modelu, dokładnie tak, jak zrobiliśmy to w
+przypadku Todoist.
+Dlatego, jeśli masz zabrać tylko jedną rzecz z tej lekcji, spróbuj zastanowić się
+(lub najlepiej zbudować) nad logiką umożliwiającą komunikowanie się w
+naturalnym języku z akcjami, które dziś omówiliśmy.
+Powodzenia!
+NOTATKA ZYGFRYDA
+ZADANIE
+15.12.2024, 20:05 S04E02 — Przetwarzanie treści | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e02-przetwarzanie-tresci 6/13
+
+===== STRONA 7 =====
+Pobierz próbkę wyników badań, które otrzymaliśmy i na podstawie danych
+referencyjnych (poprawnych i niepoprawnych) zdecyduj, którym wynikom
+możemy zaufać. Wyślij do centrali w standardowy sposób tylko dwucyfrowe
+identyfikatory (są na początku linii z każdą próbką) poprawnych badań. Pomiń
+te, które wykryjesz jako sfałszowane. Wierzymy, że w 2024 roku w wykryciu
+takich anomalii może pomóc Ci technika zwana fine-tuningiem modeli
+językowych. Możesz jednak to zadanie wykonać w dowolny sposób, który
+doprowadzi Cię do rozwiązania. Nazwa zadania do raportu to ‘researchʼ.
+https://centrala.ag3nts.org/dane/lab_data.zip
+Oczekiwany format raportu w polu ‘answerʼ (same dwucyfrowe wartości!).
+[
+ 'identyfikator-01',
+ 'identyfikator-02',
+ 'identyfikator-03',
+ 'identyfikator-0N',
+]
+PS: krótki film na temat Fine-Tunningu:
+15.12.2024, 20:05 S04E02 — Przetwarzanie treści | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e02-przetwarzanie-tresci 7/13
+
+===== STRONA 8 =====
+99 likes 479 comment s
+Tomasz Prasołek 2h
+.NET Developer
+See more
+Like Reply 1 like
+Konrad Mazur 3d
+WebWave AI/Automation software engineer
+See more
+Like Reply 1 like
+SSPS
+Udało się. Skorzystałem ze schemtu jsonl jak u kolegi:
+https://bravecourses.circle.so/c/lekcje-programu-ai3-
+806660/s04e02-przetwarzanie-tresci#comment_wrapper_51980149
+i za pierwszym razem zdobyłem flagę.
+Czuję się jak ostatni oszust…
+Nie mogłem się doczekać zbudowania zfine-tunowanej maszynki to
+[SPOILER]
+…
+15.12.2024, 20:05 S04E02 — Przetwarzanie treści | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e02-przetwarzanie-tresci 8/13
+
+===== STRONA 9 =====
+Zuzanna No wacka 4d
+See more
+Like Reply 1 like
+Paweł Wojcieszak 5d
+See more
+Like Reply 1 like
+Paweł Dulak (dulare) AI_Dev 1 5d
+I'm here to help
+See more
+Like Reply 1 like
+Mariusz Graczkowski 6d
+See more
+Like Reply 1 like
+Tomasz R omano wski Dec 7
+See more
+Like Reply 2 likes
+Tomasz R omano wski Dec 7
+Muszę powiedzieć że też chyba farta miałam, bo mimo braku danych
+do walidacji od razu przeszło i dało dobre odpowiedzi :) Potwierdzam
+że bardzo przyjemne zadanie!
+PW
+Z ciekawości, ile czasu wam się model trenował ?
+Paweł Wojcieszak do tego zadania trenowałem testowo w
+sumie dziewięć modeli, trwało to między 20 minut a niecałe
+dwie godziny - zależy od obłożenia serwerów OpenAI
+MG
+overment Jak wygląda flow jeśli do ANSWER QUESTION USING
+HYBRID SEARCH w projekcie docs chciałbym dodać historie
+wiadomości i kontrolować kolejne zapytania usera odnosząc sie do
+wcześniejszych wypowiedzi? Zrobiłem sobie całą obsługę historii. I
+teraz czy tak jak w projekcie agent najlepiej powinnienem stworzyć
+plan / use tool/ final_answer? Czyli dać modelowi na wstępie historie
+wiadomości oraz możliwość użycia narzędzi (przebudowy pytania
+oraz użycie rag) czy jednak są jakieś inne rozwiązania w takich …
+TR
+promptfoo… Dopiero na przykładzie z translate.ts zrozumiałem o co
+chodzi z llm-rubric i jakie są korzyści z promptfoo. Jestem pod
+wrażeniem.
+TR
+15.12.2024, 20:05 S04E02 — Przetwarzanie treści | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e02-przetwarzanie-tresci 9/13
+
+===== STRONA 10 =====
+See more
+Like Reply 1 like
+Paweł Dulak (dulare) AI_Dev 1 Dec 7
+I'm here to help
+See more
+Like Reply
+Tomasz R omano wski Dec 7
+See more
+Like Reply 1 like
+Paweł Dulak (dulare) AI_Dev 1 Dec 7
+I'm here to help
+See more
+Like Reply
+Show more replies
+Tomasz R omano wski Dec 7
+See more
+Like Reply 1 like
+“bun docsˮ wywala błąd:
+Tomasz Romanowski wygląda na to że chunk wysłany do
+algolii był za duży. Spróbujesz zmniejszyć? Poszło 13 kB, limit
+jest 10 kB
+TR
+Nie bardzo wiem gdzie to zmniejszyć.
+Tomasz Romanowski tak na szybko, bo nie mam jak do tego
+siąść teraz, w app.ts jest podział pliku na chunki. Tutaj jest
+podany wymiar w tokenach, zmniejsz na 3000 na przykład, a
+jak nie pójdzie to na 2000:
+TR
+Jak uruchomić przykład “docsˮ? W tym katalogu nie ma
+standardowego app.ts:
+15.12.2024, 20:05 S04E02 — Przetwarzanie treści | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e02-przetwarzanie-tresci 10/13
+
+===== STRONA 11 =====
+Paweł Dulak (dulare) AI_Dev 1 Dec 7
+I'm here to help
+See more
+Like Reply
+Tomasz R omano wski Dec 7
+See more
+Like Reply 1 like
+Paweł Jakimowicz Dec 7
+See more
+Like Reply
+Paweł Dulak (dulare) AI_Dev 1 Dec 7
+I'm here to help
+See more
+Tomasz Romanowski SOA#1 - u mnie działa:
+Masz pobrane aktualne repo i nie usunąłeś sobie przez
+przypadek?
+TR
+Paweł Dulak (dulare) Dzięki, sorry, kompletne zaćmienie
+umysłu
+PJ
+Mam pytanie odnośnie fine-tuningu, ponieważ wykonałem go
+trzykrotnie w różnych kombinacjach natomiast wyniki weryfikacji
+nadal są błędne.
+[SPOILER]
+…
+Paweł Jakimowicz okrojenie zakresu danych to nie jest dobry
+pomysł. Tu jest tak mała ilość przykładów, że każdy z nich się
+liczy. Podaj mu albo wszystkie, albo odetnij tylko 10-15 procent
+i dodaj w drugim pliku jako dane walidacyjne.
+Przykład pliku uczącego który załączyłeś jest bardzo dobry.
+Upewnię się tylko, czy do weryfikacji, kiedy już model jest
+wytrenowany, wysylasz pojedyncze zestawy liczb?
+Wywołujesz dziesięć osobnych zapytań? Czasem ktoś wysył…
+15.12.2024, 20:05 S04E02 — Przetwarzanie treści | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e02-przetwarzanie-tresci 11/13
+
+===== STRONA 12 =====
+Like Reply
+Paweł Jakimowicz Dec 7
+See more
+Like Reply 1 like
+Tomasz K ozłowski Dec 6
+See more
+Like Reply 1 like
+GAŁĄZKA W OJCIECH MAREK Dec 6
+See more
+Like Reply 1 like
+GAŁĄZKA W OJCIECH MAREK Dec 6
+See more
+Like Reply 1 like
+Tomasz K ozłowski Dec 6
+See more
+Like Reply 1 like
+Show more replies
+Show more comment s
+PJ
+Paweł Dulak (dulare) Tak, leci request per wiersz. Spróbuje
+zrobić dzisiaj fine tuning z załączonym zestawem
+walidacyjnym.
+TK
+Fine tuning tworzy mi jakieś pasma górskie, i nawet nie zmierza w
+granicy do prostej linii. Zadanie nie ma wielu stopni swobody, by
+rozwiązanie zależało od sposobu przygotowania danych, które to
+przecież jest banalne. Robię na 4o-mini i za żadnym razem nie
+otrzymałem prawidłowego wyniku, dla danych weryfikacyjnych. Co
+robię nie tak?
+GM
+wrzucasz w jednym pliku dane poprawne i niepoprawne ?
+GM
+opis poprawne czy niepoprawne musi być co najmniej w kilku
+znakach, nie wystarczy Y, N , może być CORRECT,
+INCORRECT, model potrafi przyciąć odpowiedź do INC, COR
+TK
+GAŁĄZKA W OJCIECH MAREK Tak
+15.12.2024, 20:05 S04E02 — Przetwarzanie treści | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e02-przetwarzanie-tresci 12/13
+
+===== STRONA 13 =====
+PS
+Post
+What are your thoughts?
+15.12.2024, 20:05 S04E02 — Przetwarzanie treści | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e02-przetwarzanie-tresci 13/13

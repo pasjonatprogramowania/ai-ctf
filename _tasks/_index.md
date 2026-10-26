@@ -1,0 +1,32 @@
+| kod | lekcja | znakow sekcji zadania |
+|---|---|---|
+| S00E01 | S00E01_Generatywna_Sztuczna_Inteligencja___BRAVE_Courses | 1946 |
+| S00E02 | S00E02_Prompt_Engineering___BRAVE_Courses | 0 |
+| S00E03 | S00E03_API___BRAVE_Courses | 0 |
+| S00E04 | S00E04_Programowanie___BRAVE_Courses | 0 |
+| S00E05 | S00E05_Rozw_j___BRAVE_Courses | 0 |
+| S01E01 | S01E01_Interakcja_z_du_ym_modelem_j_zykowym___BRAVE_Courses | 10547 |
+| S01E02 | S01E02_Przygotowanie_w_asnych_danych_dla_modelu___BRAVE_Courses | 6310 |
+| S01E03 | S01E03_Limity_Du_ych_Modeli_j_zykowych_i_API___BRAVE_Courses | 5737 |
+| S01E04 | S01E04_Techniki_optymalizacji___BRAVE_Courses | 6626 |
+| S01E05 | S01E05_Produkcja___BRAVE_Courses | 1430 |
+| S02E01 | S02E01_Audio_i_interfejs_g_osowy___BRAVE_Courses | 6480 |
+| S02E02 | S02E02_Rozumienie_obrazu_i_wideo___BRAVE_Courses | 10124 |
+| S02E03 | S02E03_Generowanie_i_modyfikacja_obraz_w___BRAVE_Courses | 2589 |
+| S02E04 | S02E04_Po_czenie_wielu_format_w___BRAVE_Courses | 5978 |
+| S02E05 | S02E05_Multimodalno_w_praktyce___BRAVE_Courses | 9988 |
+| S03E01 | S03E01_Dokumenty___BRAVE_Courses | 5977 |
+| S03E02 | S03E02_Wyszukiwanie_Semantyczne___BRAVE_Courses | 6227 |
+| S03E03 | S03E03_Wyszukiwanie_hybrydowe___BRAVE_Courses | 6263 |
+| S03E04 | S03E04_r_d_a_danych___BRAVE_Courses | 6486 |
+| S03E05 | S03E05_Bazy_Grafowe___BRAVE_Courses | 6041 |
+| S04E01 | S04E01_Interfejs___BRAVE_Courses | 11035 |
+| S04E02 | S04E02_Przetwarzanie_tre_ci___BRAVE_Courses | 10721 |
+| S04E03 | S04E03_Zewn_trzne_r_d_a_danych___BRAVE_Courses | 8176 |
+| S04E04 | S04E04_Aplikacje_i_us_ugi___BRAVE_Courses | 7207 |
+| S04E05 | S04E05_Mechaniki_obs_ugi_narz_dzi___BRAVE_Courses | 6968 |
+| S05E01 | S05E01_Agent___BRAVE_Courses | 10556 |
+| S05E02 | S05E02_Logika___BRAVE_Courses | 10146 |
+| S05E03 | S05E03_Umiej_tno_ci___BRAVE_Courses | 8334 |
+| S05E04 | S05E04_Po_czenie_ze_wiatem___BRAVE_Courses | 6347 |
+| S05E05 | S05E05_Kolejny_rozdzia___BRAVE_Courses | 6867 |

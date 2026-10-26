@@ -1,0 +1,453 @@
+
+===== STRONA 1 =====
+S03E01  Dokument y
+overment Admin 4d
+I'm just curious.
+» Lekka wersja przeglądarkowa «
+📎 Pobierz treść tej lekcji w formacie markdown
+📎 Pobierz treść tej lekcji w formacie markdown (EN)
+Przynajmniej kilkukrotnie spotkaliśmy się już z problemami dotyczącymi limitów
+tokenów wejścia/wyjścia. Pomimo tego, że obecne modele SOTA są w stanie
+przetwarzać całkiem duże ilości treści, to i tak nie pozwala to na swobodną pracę
+z obszernymi źródłami danych.
+Warto też wiedzieć, że w publikacji Leave no Context Behind możemy przeczytać
+o możliwie nieskończonym oknie kontekstu. Według autorów (Google DeepMind)
+ich podejście sprawdza się w praktyce na skali 1-2M tokenów, o czym dziś
+możemy przekonać się sami, pracując z modelami Gemini. Natomiast modele
+konkurencji utrzymują swoje limity na poziomie 100-200 tysięcy tokenów.
+Jeszcze kilka miesięcy temu można było mówić o tym, że nawet nieskończone
+okno kontekstu nie będzie użyteczne ze względu na wysokie koszty. Dziś już
+praktycznie wszyscy oferują cache'owanie promptów, co zmniejsza nie tylko
+koszty, ale także czas potrzebny na przetworzenie zapytania.
+Brakującym elementem układanki pozostają jednak limity tokenów wyjściowych, a
+także zdolność do przetwarzania innych formatów treści. Na stronie Firebase
+Back to Lekcje programu [AI3]
+PS
+22.11.2024, 12:28 S03E01 — Dokumenty | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e01-dokumenty 1/18
+
+===== STRONA 2 =====
+znajdziemy zestawienie wszystkich liczb dla modeli Gemini, które można
+potraktować w tym zakresie jako lidera.
+Limit liczby tokenów wyjściowych jest szczególnie uciążliwy w przypadku
+transformacji dokumentów takich jak korekta, tłumaczenie czy szczegółowy
+przegląd. W przypadku takich zadań konieczny jest podział całości na mniejsze
+fragmenty (tzw. Chunking), a następnie przetwarzanie ich indywidualnie.
+Techniczna zdolność do przetworzenia obszernych treści nie jest też jedynym
+elementem, który trzeba brać tutaj pod uwagę. Równie ważna jest także zdolność
+do utrzymania uwagi, co obrazują testy typu "Needle in the Haystack" (więcej o
+tym w Lost in the Middle). Chodzi więc o zdolność przywołania określonej
+informacji z dostarczonego kontekstu. Według różnych źródeł (1, 2) aktualnie
+najlepsze wyniki osiąga OpenAI i model GPT-4o. Aczkolwiek moje doświadczenia
+sugerują raczej, że nawet w jego przypadku mówimy o precyzji na poziomie 85-
+95%.
+22.11.2024, 12:28 S03E01 — Dokumenty | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e01-dokumenty 2/18
+
+===== STRONA 3 =====
+Problem w tym, że test odnajdywania pojedynczych informacji w tekście jest
+niezwykle ograniczony i nie sprawdza umiejętności związanych z podążaniem za
+instrukcjami oraz zdolnością "rozumienia" treści. Te obszary również pozostają
+wyzwaniem dla obecnych modeli.
+No i ostatecznie, dostarczanie treści do modelu to aktywność, która nie
+sprowadza się wyłącznie do dodawania kolejnych plików czy treści stron www.
+Nierzadko mówimy o dynamicznych danych oraz konieczności dostarczenia
+kontekstu, który pozwoli modelowi lepiej posługiwać się nowymi informacjami w
+praktyce. Przykładowo, jeśli powiem "dziś spędziłem sporo czasu przy
+Tech•sistence", to z perspektywy modelu nie wiadomo, czy mówię o projekcie,
+nowej grze, czy książce, ponieważ w jego bazowej wiedzy brakuje informacji na
+ten temat.
+Koncepcja dokumentów
+Sam temat przygotowywania treści na potrzeby modelu poruszaliśmy już w lekcji
+S01E02 — Kontekst. Natomiast teraz zajmiemy się nim ponownie, ale nie tylko w
+teorii, lecz także w praktyce.
+Dokument to obiekt składający się z głównej treści oraz metadanych, które
+opisują jego cechy i nadają kontekst. W kontekście LLM zwykle jest to mały
+fragment dłuższej treści z zewnętrznego źródła, który dodajemy do indeksów
+silników wyszukiwania na potrzeby Retrieval-Augmented Generation lub innych
+scenariuszy wymagających odnalezienia konkretnych zestawów informacji.
+22.11.2024, 12:28 S03E01 — Dokumenty | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e01-dokumenty 3/18
+
+===== STRONA 4 =====
+Przykład dokumentu wygenerowanego na podstawie jednego z moich wpisów
+widzimy poniżej (właściwość text została przeze mnie ucięta i domyślnie jest
+nieco dłuższa). W metadanych znajdują się więc informacje na temat źródła,
+dane pozwalające na zlokalizowanie oryginalnego miejsca pochodzenia
+dokumentu, jego unikatowy identyfikator oraz linki, które w treści zostały
+zamienione placeholderami.
+Struktura metadanych będzie zależała od konkretnego przypadku, ale ogólne
+założenie mówi o tym, aby uwzględnić tam informacje, które:
+pozwolą na wskazanie źródła i dokumentów sąsiadujących
+pozwolą nakreślić kontekst (np. z jakiego pliku pochodzi dokument)
+pozwolą skutecznie filtrować dokumenty (np. na podstawie daty, roli
+uprawnień czy kategorii) — te metadane nie są uwzględnione w powyższym
+22.11.2024, 12:28 S03E01 — Dokumenty | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e01-dokumenty 4/18
+
+===== STRONA 5 =====
+przykładzie
+pozwolą na kompresję treści dokumentu (przykładem są linki, które
+zamieniłem na placeholdery)
+Zatem warto myśleć o dokumentach tak, że gdy budujemy je na podstawie
+jakiegoś pliku czy bazy danych, to musimy wygenerować je tak, aby model
+posiadał wystarczający kontekst na ich temat oraz aby silnik wyszukiwania mógł
+skutecznie do nich dotrzeć — obie te rzeczy staną się w pełni zrozumiałe w
+dalszych lekcjach na temat wyszukiwania.
+Treść dokumentów zwykle generowana jest poprzez Text Splitting lub jest
+generowana przez model lub bezpośrednio przez człowieka. Choć frameworki
+takie jak LangChain wydają się promować dzielenie treści na podstawie długości
+lub ewentualnie kolejnych znaków specjalnych (tzw. recursive text splitting), to
+techniki te przeciętnie sprawdzają się w praktyce, aczkolwiek według niektórych
+zastosowanie dodatkowo tzw. "overlap" (nakładania się dokumentów) bywa
+skuteczne, ale wymaga to nakładania na siebie dużej części dokumentów (np.
+50%).
+Zresztą zobaczmy to w praktyce na przykładzie cytatu z Władcy Pierścieni.
+W pierwszym przykładzie, dzielimy tekst na podstawie liczby znaków, konkretnie
+250. Otrzymujemy więc pozornie dobrze wyglądające dokumenty, ale gdy
+spojrzymy na każdy z nich indywidualnie, to nawet człowiekowi momentami
+trudno byłoby wykorzystać je w praktyce.
+Widzimy, że na przykładzie zdania "Three were given to the Elves immortal,
+wisest" ... "and fairest of all beings", zastosowanie wspomnianego "overlap"
+pomogłoby utrzymać kontekst. Jednak szansa na to, że stanie się tak dla
+możliwie wszystkich dokumentów, jest niska.
+Sytuacja znacznie się poprawia w momencie, gdy tekst nie zostaje podzielony
+względem długości, lecz na podstawie akapitów lub ewentualnie zdań. To jest
+22.11.2024, 12:28 S03E01 — Dokumenty | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e01-dokumenty 5/18
+
+===== STRONA 6 =====
+tzw. recursive text splitting, w przypadku którego wykorzystujemy zestaw
+znaków specjalnych (np. podwójna nowa linia, nowa linia, kropkę/znak
+zapytania/wykrzyknik lub spację). W tym przypadku utracenie kontekstu dla
+konkretnego fragmentu tekstu jest dość niskie, choć nadal prawdopodobne.
+Wspomniałem, że tematem docierania do dokumentów (tzw. retrieval) będziemy
+zajmować się w dalszych lekcjach, jednak już teraz musimy się nad tym na
+moment zatrzymać. Powodem jest artykuł ze strony Anthropic, poruszający temat
+tzw. Contextual Retrieval.
+Aby go zrozumieć, wystarczy rzucić okiem na dwa poniższe schematy. Pierwszy
+przedstawia typowy system RAG, w przypadku którego dla zestawu danych
+(corpus) tworzymy dokumenty (chunks) i indeksujemy w klasycznej
+wyszukiwarce oraz w bazie wektorowej. Później na podstawie zapytania
+użytkownika, odwołujemy się do indeksów i pobieramy istotne dokumenty na
+potrzeby kontekstu dla LLM.
+22.11.2024, 12:28 S03E01 — Dokumenty | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e01-dokumenty 6/18
+
+===== STRONA 7 =====
+Problem w tym, że nadal dokumenty w tym przypadku mogą utracić swój
+kontekst, ale co gorsza, mogą w ogóle nie zostać odnalezione, nawet pomimo
+wyszukiwania hybrydowego.
+Sugestia Anthropic polega więc na tym, aby uwzględnić dodatkowy krok na
+etapie tworzenia dokumentów. Polega on na tym, aby każdy z nich
+przeprocesować przez LLM i prompt, który nada mu kontekst na podstawie
+całego dokumentu. Pozornie wygląda to na bardzo kosztowną operację, ale dzięki
+cache'owaniu promptu sytuacja się całkowicie zmienia. W dodatku połączenie
+tego z modelami takimi jak Gemini od Google DeepMind pozwoli
+przetworzyć całkiem duże zestawy danych.
+Prompt o którym mowa, znajduje się poniżej. Jak widać, nie jest szczególnie
+złożony, ale jego struktura nie jest przypadkowa. Fakt, że całość dokumentu
+znajduje się na początku promptu, pozwala na skorzystanie z mechanizmu
+pamięci podręcznej.
+22.11.2024, 12:28 S03E01 — Dokumenty | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e01-dokumenty 7/18
+
+===== STRONA 8 =====
+No i dla naszego przykładowego cytatu, pierwszy dokument został opisany w
+sposób widoczny poniżej. Taka treść połączona z jego treścią może zostać
+dodana do indeksów wyszukiwania.
+Zaawansowany text splitter
+W przykładzie text-splitter znajduje się klasa zawierająca logikę z której
+korzystam głównie w połączeniu z treścią zapisaną w formacie markdown (w tym
+stronami) oraz transkrypcjami filmów z YouTube. Kod, który się tam znajduje jest
+dość złożony, ponieważ jego zadaniem jest nie tylko podzielenie treści, ale
+też wykonanie tego zadania z możliwie małą liczbą przeliczeń tokenów w celu
+zwiększenia wydajności. Logika ta prawdopodobnie nie jest pozbawiona błędów,
+ale jest najlepszą do której udało mi się dojść. Zatem jeśli znajdziesz tam jakieś
+błędy, śmiało podziel się swoimi spostrzeżeniami w komentarzu.
+Sam przykład po prostu wczytuje treść trzech różnych dokumentów:
+nieustrukturyzowany tekst, transkrypcję youtube oraz artykuł w formacie
+markdown. Zdanie splittera polega więc na tym, aby przejść przez treść i
+wygenerować listę dokumentów, których długość nie przekroczy dopuszczalnego
+limitu, a jednocześnie nie będzie zbyt krótka. Wyjątek stanowią tylko dokumenty
+znajdujące się na samym końcu, które siłą rzeczy mogą znacznie odstawać od
+reszty.
+Możesz przetestować działanie tego splittera na dowolnym artykule lub tekście,
+najlepiej w formacie markdown. W dalszej części kursu będziemy z niego
+korzystać niemal na każdym kroku, więc warto się z nim zapoznać oraz z
+generowanymi wynikami.
+Praca z nieustrukturyzowanymi danymi
+22.11.2024, 12:28 S03E01 — Dokumenty | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e01-dokumenty 8/18
+
+===== STRONA 9 =====
+Techniki pracy, które poznaliśmy podczas lekcji takich jak S02E04 — Połączenie
+wielu formatów czy S02E05 — Multimodalność w praktyce, pozwalające na
+transformację treści, są przydatne również przy pracy nad dokumentami
+tworzonymi na podstawie nieustrukturyzowanych danych. Mam na myśli zarówno
+pojedyncze dokumenty, których zawartość musi zostać przetworzona, jak i
+zewnętrzne źródła informacji, z których musimy wyodrębnić tylko te dane, które
+nas faktycznie interesują.
+W przykładzie unstructured zadanie modelu polega na przygotowaniu listy
+dokumentów zawierających listę narzędzi pojawiających się w moich wpisach na
+Tech•sistence. Zwykle są to dość obszerne artykuły, więc generowanie
+dokumentów na podstawie oryginalnej treści uwzględniałoby mnóstwo treści,
+która w tym przypadku nie jest potrzebna. Dlatego korzystając z cache'owania
+promptu, w pierwszej kolejności kompresuję artykuł tak, aby skupiał się tylko na
+niezbędnych danych.
+Po splitter sięgam dopiero w drugiej kolejności, otrzymując dokumenty skupiające
+się wyłącznie na istotnej dla nas treści.
+22.11.2024, 12:28 S03E01 — Dokumenty | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e01-dokumenty 9/18
+
+===== STRONA 10 =====
+Alternatywnie może nam zależeć na wygenerowaniu dokumentów dla każdego z
+narzędzi indywidualnie. Jak widać poniżej, to również jest możliwe i co więcej,
+pozwoli nam na dalsze rozbudowywanie ich zawartości.
+Widzimy zatem, że przetwarzanie treści może opierać się na zaawansowanych
+transformacjach, których uczyliśmy się dotychczas. Teraz, korzystając z
+możliwości cache'owania promptu, możemy to robić znacznie szybciej i taniej.
+Kategoryzacja i filtrowanie
+Nasze pierwsze spotkania z Retrieval-Augmented Generation, embeddingiem i
+bazami wektorowymi sugerują, że wygenerowane powyżej dokumenty możemy
+skutecznie przeszukiwać, na podstawie jedynie zbliżonego opisu narzędzi.
+Jeszcze tylko przypomnę, że w procesie przeszukiwania zwykle ograniczamy
+liczbę zwracanych wyników. Oznacza to, że jeśli zapytam o "writing tool", to treść
+tego zapytania zostanie skojarzona z opisami narzędzi. Wyszukiwarka zwróci np.
+10 najbliższych dopasowań, z których model wybierze 4 — Notion, iA Writer,
+Paper i Obsidian.
+Inaczej mówiąc, w przypadku precyzyjnych zapytań celujących w konkretne
+dokumenty, skuteczność jaką otrzymamy, będzie wysoka o ile opisy narzędzi
+będą wystarczająco dobre.
+22.11.2024, 12:28 S03E01 — Dokumenty | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e01-dokumenty 10/18
+
+===== STRONA 11 =====
+Ale jeśli nasze zapytanie będzie bardzo ogólne, np. "wypisz wszystkie aplikacje z
+bazy danych", to powiązanie pomiędzy zapytaniem, a opisami już nie występuje
+lub jest znacznie niższe. Co gorsza, ograniczenie liczby zwracanych wyników
+sprawi, że otrzymamy max 10 rekordów.
+Z tego powodu trzeba mieć na uwadze dodatkowe kategorie i tagi, które
+pomogą w docieraniu do dokumentów nawet w sytuacji, gdy wyszukiwanie
+semantyczne będzie niewystarczające.
+Zatem w omawianym wyżej przykładzie, moglibyśmy do każdego z dokumentów
+dodać type ustawiony na tool oraz tagi łączące np. aplikacje do notowania czy
+zarządzania zadaniami. Obie te informacje pozwolą na rozbudowanie procesu
+docierania do danych oraz filtrowanie wyników.
+W praktyce będziemy się tym jeszcze zajmować, lecz wspominam o tym
+już teraz, ponieważ stanowi to niezwykle ważny element planowania struktury
+dokumentów oraz strategii przechowywania i docierania do informacji.
+Podsumowanie
+Temat tworzenia dokumentów stanowi fundament na którym będziemy budować
+praktycznie wszystkie pozostałe narzędzia. Jak widać nawet na przykładach,
+przez które przeszliśmy, kluczowe jest tutaj zaplanowanie ich struktury ze
+szczególnym uwzględnieniem procesu wyszukiwania i dostarczania do kontekstu.
+Dlatego jeśli z dzisiejszej lekcji masz zabrać ze sobą tylko jedną rzecz, to niech
+będzie to przykład text-splitter i uwzględniona w nim logika podziału treści na
+mniejsze fragmenty. Z pomocą LLM możesz łatwo przełożyć ją na swój język
+programowania lub nawet rozwinąć o nowe możliwości.
+Jako dodatkowy wątek, zwracam uwagę na wspomniany artykuł Anthropic na
+temat Contextual Retrieval, który z dużym prawdopodobieństwem będzie miał
+ogromne przełożenie na jakość rozwijanych przez Ciebie agentów AI.
+22.11.2024, 12:28 S03E01 — Dokumenty | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e01-dokumenty 11/18
+
+===== STRONA 12 =====
+NOTATKA ZYGFRYDA
+ZADANIE
+Zadanie: Twoim zadaniem jest przygotowanie metadanych do 10 raportów
+dostarczonych w formacie TXT. Dotyczą one wydarzeń związanych z
+bezpieczeństwem, które zdarzyły się w różnych sektorach wokół fabryki.
+22.11.2024, 12:28 S03E01 — Dokumenty | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e01-dokumenty 12/18
+
+===== STRONA 13 =====
+Liked by Damian and 81 others
+Comment 492 comment s
+adamr w 1m
+See more
+Metadane powinny ułatwić centrali wyszukiwanie tych raportów za pomocą
+własnych technologii. Sugerujemy, aby metadane zawierały słowa kluczowe w
+języku polskim, opisujące dany raport. Bardzo ważne jest przy generowaniu słów
+kluczowych uwzględnienie całej posiadanej przez nas wiedzy (np. folder z
+faktami, czy odwołania w innych raportach). Nazwa zadania to dokumenty.
+Dane pozyskane w poprzednich lekcjach:
+https://centrala.ag3nts.org/dane/pliki_z_fabryki.zip
+Oczekiwany format odpowiedzi w polu ‘answerʼ:
+{
+"nazwa-pliku-01.txt":"lista, słów, kluczowych 1",
+"nazwa-pliku-02.txt":"lista, słów, kluczowych 2",
+"nazwa-pliku-03.txt":"lista, słów, kluczowych 3",
+"nazwa-pliku-NN.txt":"lista, słów, kluczowych N"
+}
+Co należy zrobić w zadaniu?
+Pobierz plik ZIP i rozpakuj go
+zapoznaj się z 10-cioma plikami TXT z raportami. Na nich się skupimy
+Do każdego pliku wygeneruj słowa kluczowe w formie mianownika (czyli np.
+“sportowiecˮ, a nie “sportowcemˮ, “sportowcówˮ itp.), które pomogą ludziom z
+centrali wyszukać odpowiedni dokument
+Przy generowaniu metadanych posiłkuj się całą posiadaną wiedzą (czyli także
+folderem z faktami)
+Przygotowane dane wyślij do centrali (/report) w formacie podanym w treści
+zadania
+Jeśli pracownicy centrali potwierdzą, że ich pytania testowe zwróciły
+odpowiednie odpowiedzi, to otrzymasz flagę.
+Like
+A
+overment Lekcje w formacie md nie dają się ściągnąć
+22.11.2024, 12:28 S03E01 — Dokumenty | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e01-dokumenty 13/18
+
+===== STRONA 14 =====
+Like Reply
+Bartosz Moskwik 1h
+See more
+Like Reply 2 likes
+Paweł Dulak (dulare) AI_Dev 1h
+I'm here to help
+See more
+Like Reply
+Jakub Szczepaniak 2h
+See more
+Like Reply
+Paweł Dulak (dulare) AI_Dev 2h
+I'm here to help
+See more
+Like Reply 1 like
+Ania Kuś 3h
+See more
+BM
+Hey, trochę zgłupiałem:
+"message": "wrong number of answers (should be 5 - got: 10)"
+definitywnie json który wysyłam ma 10 kluczy. Jeszcze będę prompty
+poprawiał ale taki bład mnie dziwi.
+UWAGA SPOILER
+.
+.…
+Bartosz Moskwik 😅 klasyka ;)
+Ja jestem chyba ślepy, jaka jest nazwa zadania którą mamy przekazać
+do endpointu /raport?
+Jakub Szczepaniak nazwa to “dokumentyˮ
+Czy ktoś chce się podzielić działającymi rozwiązaniami (przede
+wszystkim promptami)? Ja nie byłam w stanie znaleźć rozwiązania,
+które generuje wszystkie potrzebne do zaliczenia słowa kluczowe,
+pomimo działania osobno na raportach, osobno na faktach i
+dodawaniu nazwy pliku do treści…
+22.11.2024, 12:28 S03E01 — Dokumenty | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e01-dokumenty 14/18
+
+===== STRONA 15 =====
+Like Reply 1 like
+Jakub Szczepaniak 10m
+See more
+Like Reply
+Krzysztof Bohaczyk 10h
+AI Detektyw @ detechtive.pl
+See more
+Like Reply 1 like
+Krzysztof Bohaczyk 12h
+AI Detektyw @ detechtive.pl
+See more
+Like Reply 1 like
+Michał Zawiślak 14h
+Ania Kuś Cześć, u mnie zadziałał jeden duży prompt który jako
+kontekst zawierał wszystkie fakty oraz raporty. (nie jest to
+oszczędne z perspektywy zużycia tokenów). Model: gpt-4o.
+[SPOILER]
+…
+Walka była nierówna, ale i tak ładnie z zużyciem poszło.
+SPOILER.
+…
+“Adam Gospodarczyk to kluczowa postać w strukturach ruchu oporu,
+wysoce biegła w programowaniu oraz w umiejętnościach
+rekrutacyjnych. Jest znany z szerokiej wiedzy technologicznej oraz
+umiejętności manipulowania kodem na poziomie, który wykracza poza
+standardowe umiejętności programistyczne. W kręgach opozycji oraz
+władzy podejrzewa się, że to właśnie on stoi za przygotowywaniem i
+szkoleniem agentów, którzy później podejmują walkę z reżimem
+sztucznej inteligencji. Działalność Adama jest niezwykle trudna do …
+22.11.2024, 12:28 S03E01 — Dokumenty | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e01-dokumenty 15/18
+
+===== STRONA 16 =====
+See more
+Like Reply 1 like
+Krzysztof Socha 14h
+See more
+Like Reply 1 like
+Paweł Dulak (dulare) AI_Dev 14h
+I'm here to help
+See more
+Like Reply
+Krzysztof Socha 13h
+See more
+Like Reply
+Paweł Dulak (dulare) AI_Dev 13h
+I'm here to help
+Udało się, ale bez podpowiedzi z komentarzy było by trudno, do tej
+pory najbardziej angażujące zadanie jak dla mnie 😄
+Hmm… Zrobiłem - nawet szybko poszło - najwięcej czasu mi zajęło
+ustalenie jak używać Claudeʼa zamiast OpenAI - bo do tej pory
+wszystko robiłem używając modeli OpenAI, a trzeba coś zmieniać ;)
+Ale wydaje mi się, że cel zadania trochę słabo opisany. Wygląda na to,
+że w założeniach chodziło o słowa kluczowe dotyczące OSÓB, ale z
+treści zadania słabo to wynika… Ja zrozumiałem, że chodzi o słowa
+kluczowe odnośnie RAPORTÓW, a te nie zawsze i nie koniecznie …
+Krzysztof Socha są sprawdzane różne słowa kluczowe, także
+te nie dotyczące osób :)
+Paweł Dulak (dulare) Okay... Dzięki! To może w miarę dobrze
+do tego podszedłem 🤔 Muszę tylko chyba poczytać o prompt
+caching u Anthropic, bo coś drogo wyszło te kilka prób (prawie
+$1 wydałem!) 😜
+Krzysztof Socha whoa, jakim modelem to robiłeś? Polecam
+tutaj gpt-4o-mini - w zupełności wystarcza…
+22.11.2024, 12:28 S03E01 — Dokumenty | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e01-dokumenty 16/18
+
+===== STRONA 17 =====
+See more
+Like Reply
+Show more replies
+Lukasz Serafin 16h
+See more
+Like Reply 1 like
+Paweł Dulak (dulare) AI_Dev 15h
+I'm here to help
+See more
+Like Reply
+Aleksander Miera 17h
+See more
+Like Reply
+Paweł Dulak (dulare) AI_Dev 17h
+I'm here to help
+LS
+To zadanie kosztowalo mnie dostep do openAI.
+ {'error': {'message': 'You exceeded your current quota, please check
+your plan and billing details. For more information on this error, read
+the docs: https://platform.openai.com/docs/guides/error-codes/api-
+errors.', 'type': 'insufficient_quota', 'param': None, 'code':
+'insufficient_quota'}}
+mam credit 24 $ a i tak nie moge openAI uzywac
+…
+Lukasz Serafin dwie sprawy:
+Pierwsza: Czy na stronie limitów nie ustawiłeś sobie limitu?
+https://platform.openai.com/settings/organization/limits
+Jeśli dobiłeś do limitu, to masz taki komunikat. Widać to też na
+stronie z użytkowaniem:
+https://platform.openai.com/settings/organization/usage
+Druga - raport 01 zawiera informację o zwierzynie, przydało b…
+AM
+To jest celowe, że wymaga słowa JavaScript, a frontend odrzuca?
+22.11.2024, 12:28 S03E01 — Dokumenty | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e01-dokumenty 17/18
+
+===== STRONA 18 =====
+See more
+Like Reply
+Show more comment s
+Aleksander Miera celowe, nie może być za łatwo :)
+PS
+Post
+What are your thoughts?
+22.11.2024, 12:28 S03E01 — Dokumenty | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e01-dokumenty 18/18

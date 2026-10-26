@@ -1,0 +1,790 @@
+
+===== STRONA 1 =====
+S00E02  Pr ompt Engineer ing
+overment Admin Aug 28
+I'm just curious.
+» Lekka wersja przeglądarkowa «
+Prompt engineering po premierze ChatGPT był uznawany za specjalizację
+"przyszłości", ale rozwój modeli szybko to zakwestionował. Faktycznie poziom
+rozumienia poleceń czy nawet posługiwania się długim kontekstem jest
+nieporównywalny z tym, co widzieliśmy wcześniej. Z drugiej strony, jako
+programiści, nie mówimy tutaj o bezpośredniej rozmowie z LLM, lecz o
+projektowaniu złożonych systemów zdolnych do częściowo autonomicznego
+realizowania zadań. Tutaj precyzyjne kształtowanie instrukcji, składających się z
+dynamicznych elementów, nadal odgrywa fundamentalną rolę.
+Zasady interakcji z LLM
+Z poprzedniej lekcji wiemy, że LLM generuje treść, przewidując kolejne tokeny, co
+można porównać do mechanizmów autouzupełniania określanego jako
+"completion". Jednak z programistycznego punktu widzenia, praca z modelem w
+takiej formie jest problematyczna. Dlatego OpenAI zasugerowało strukturę o
+nazwie ChatML, którą można uznać za nieoficjalny standard, ponieważ taka
+sama struktura pojawia się również w przypadku modeli innych firm.
+Back to Lekcje programu [preAI3]
+PS
+22.11.2024, 12:20 S00E02 — Prompt Engineering | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e02-prompt-engineering 1/34
+
+===== STRONA 2 =====
+Wiele wskazuje, że nie jest to ostateczna struktura, ponieważ potrzeba
+utrzymywania lepszej kontroli nad zachowaniem modelu prowadzi do
+wprowadzania kolejnych ról czy rodzajów treści. Pewien kierunek rysuje
+dokument Model Spec opublikowany przez OpenAI w połowie 2024 roku, jednak
+trudno powiedzieć w jakiej formie przełoży się on na praktykę.
+Tymczasem należy wiedzieć, że podział na role system, user, assistant nie
+zmienia zasady mówiącej o przewidywaniu kolejnego tokenu. Po prostu, z punktu
+widzenia LLM, przetwarzana treść zawiera dodatkowe tokeny strukturyzujące
+widoczne w Tiktokenizer.
+Rola system zwykle jest niewidoczna dla użytkownika końcowego. Zawiera
+instrukcje nadające ton konwersacji oraz określające zachowanie asystenta.
+Może również zawierać wiedzę, którą LLM wykorzystuje w swoich
+wypowiedziach. Nie można jednak zakładać, że jej treść będzie niemożliwa do
+przechwycenia, ale tak nie jest, o czym przekonamy się później.
+API dużych modeli językowych jest bezstanowe, a zatem każda kolejna
+interakcja z modelem rozpoczyna się od początku. ChatGPT może nam
+22.11.2024, 12:20 S00E02 — Prompt Engineering | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e02-prompt-engineering 2/34
+
+===== STRONA 3 =====
+sugerować, że jest inaczej, pozwalając nam na prowadzenie dyskusji. Jest to
+jednak rezultat mechaniki działającej w tle, która dba o to, aby za każdym razem
+przekazywać kompletny zestaw informacji niezbędny modelowi do "uzupełnienia
+dalszej części rozmowy".
+Idąc dalej, każdy model posiada kilka kluczowych cech, na które należy zwracać
+uwagę w pierwszej kolejności. Są to:
+Wsparcie języków: Większość modeli SOTA wspiera popularne języki, jednak
+zwykle są  one zoptymalizowane pod kątem języka angielskiego. O różnicach
+w samej skuteczności modeli można przeczytać w GPT-4 Technical Report na
+stronie ósmej
+Multimodalność: Nie wszystkie modele wspierają przetwarzanie innych
+formatów niż tekst, ale zmierzamy w kierunku w którym multimodalność staje
+się powszechna
+Format API: Większość modeli posługuje się formatem ChatML lub jego
+zbliżoną alternatywą. Dostępne są także dodatkowe opcje związane z
+przetwarzaniem obrazu czy strukturyzowaniem odpowiedzi
+Context W indow: Modele mogą przetwarzać określoną liczbę tokenów w
+ramach pojedynczego zapytania. Na ten limit składają się zarówno tokeny
+wejściowe (input), jak i tokeny wyjściowe (output)
+Max Output: Limit okna tokenów nie jest jedynym, ponieważ LLM posiadają
+ograniczoną długość wypowiedzi co utrudnia przetwarzanie długich treści
+Knowledge Cutoff: LLM są obecnie "zamrożone", a ich wiedza obejmuje dane
+treningowe z konkretnego okresu. Zazwyczaj zależy nam, aby bazowa wiedza
+modelu była jak najbardziej aktualna, nie tylko ze względu na same informacje,
+lecz także zdolność rozpoznawania słów kluczowych (np. nazw własnych)
+22.11.2024, 12:20 S00E02 — Prompt Engineering | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e02-prompt-engineering 3/34
+
+===== STRONA 4 =====
+Cena: Rozliczenia niemal zawsze zależą od liczby przetworzonych tokenów i
+różnią się dla tokenów wejściowych oraz wyjściowych, a także formatu
+przetwarzanej treści.
+Z czasem powyższe cechy stają się mniejszym problemem wraz z rozwojem
+modeli. Trzeba jednak je mieć na uwadze, ponieważ w przypadku
+programistycznych zastosowań skala ma znaczenie. Nawet niska cena
+jednostkowa za tokeny może przekładać się na istotne kwoty w aplikacji
+produkcyjnej. Z kolei duże okno kontekstu może sugerować możliwość
+jednorazowego przetworzenia dużej ilości danych, ale w zamian negatywnie
+przekłada się na czas reakcji oraz koszty.
+Zatem fundament bezpośredniej interakcji z LLM polega na tym, aby
+programistycznie dostarczyć ustrukturyzowany kontekst, który model przetwarza
+każdorazowo, w celu wygenerowania odpowiedzi zgodnej z naszymi założeniami
+(komentarz: pojawiają się jednak techniki cache'owania w celu optymalizacji
+tego procesu).
+Sterowanie zachowaniem modeli
+Praca z modelami charakteryzuje się tym, że pracując z nimi poruszamy się
+bardziej w obszarze prawdopodobieństwa i szansy uzyskania właściwej
+odpowiedzi, niż pewności jej otrzymania. Rodzi to naturalne problemy związane
+ze stabilnością aplikacji w logice których pojawia się LLM oraz (uzasadnione)
+wątpliwości dotyczące bezpieczeństwa. Sytuację dodatkowo komplikuje fakt, że
+nie posiadamy pełnej kontroli nad zachowaniem modelu, lecz możemy nim
+jedynie sterować, co może zarówno pomóc, jak i zaszkodzić.
+08:32
+W lekcji S00E01 powiedziałem, że LLM nie mogą zmodyfikować wybranego już
+tokenu. Obrazuje to poniższy przykład, w którym model ma wygenerować
+22.11.2024, 12:20 S00E02 — Prompt Engineering | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e02-prompt-engineering 4/34
+
+===== STRONA 5 =====
+odpowiedź na pytanie na podstawie posiadanej informacji. Pomimo że zadanie to
+jest proste, rezultat jest błędny, ponieważ celowo dodałem fragment, który
+rozpoczynał wypowiedź modelu, której ten nie był już w stanie naprawić. Inaczej
+mówiąc, negatywnie wpłynąłem na wypowiedź, wykorzystując swoją wiedzę na
+temat działania modelu.
+W OpenAI Playground możemy skorzystać z trybu "completion", a w nim z opcji
+"Show Probabilities", która wyróżnia poszczególne tokeny, wyświetlając te brane
+pod uwagę podczas inferencji. Daje nam to niekompletny obraz tego, jak LLM
+generuje treści. Jednocześnie jasno z niego wynika, że kolejne tokeny są
+uzależnione zarówno od mojej wypowiedzi (promptu), ale też kolejnych tokenów
+generowanych przez model.
+22.11.2024, 12:20 S00E02 — Prompt Engineering | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e02-prompt-engineering 5/34
+
+===== STRONA 6 =====
+Znacznie więcej informacji na temat generowania treści daje nam narzędzie
+Gemma Scope z którego możemy dowiedzieć się, że LLM aktywuje swoje różne
+obszary w zależności od aktualnie przetwarzanych danych.
+Przydatne informacje można znaleźć także we wspomnianej już publikacji
+Anthropic Research "Mapping the Mind of a Large Language Model". Opisuje
+ona, jak przetwarzana treść aktywuje różne "funkcjonalności" modelu związane z
+określonymi koncepcjami, co wpływa na sposób generowania odpowiedzi.
+Podobną ideę opisał David Shapiro w repozytorium "Latent Space Activation",
+gdzie mówił o tym, że różne techniki projektowania promptów mają
+wspólną cechę, polegającą na tym, aby aktywować różne obszary modelu.
+22.11.2024, 12:20 S00E02 — Prompt Engineering | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e02-prompt-engineering 6/34
+
+===== STRONA 7 =====
+Powyższe informacje sugerują nam zatem, że naszym celem jest sterowanie
+zachowaniem modelu w celu zwiększania prawdopodobieństwa uzyskania
+pożądanego rezultatu, poprzez aktywację umiejętności modelu związanych z
+konkretnym zadaniem. Należy mieć na uwadze także fakt, że na zachowanie
+modelu wpływa cała przetwarzana treść, łącznie z tokenami, które
+są generowane.
+Struktura Promptu i formatowanie
+Tworzenie instrukcji, czyli Prompt Engineering, jest bardzo otwartym
+zagadnieniem. Choć mamy do dyspozycji różne techniki projektowania, to trudno
+jednoznacznie stwierdzić, które z nich są słuszne oraz jak wiele z nich pozostaje
+nieodkryte.
+Skupmy się więc, na ogólnych zasadach, które są obecnie stosowane przy
+projektowaniu promptu, pamiętając o zachowaniu otwartości na nowe taktyki i
+dopasowanie schematów do własnych potrzeb.
+Ogólna struktura promptu systemowego uwzględnia następujące elementy:
+Zawężenie kontekstu: zwykle polega na nadaniu roli, opisie sytuacji czy
+problemu w celu uniknięcia dwuznaczności oraz nakierowania model na dany
+schemat myślenia. Np. "Jesteś programistą JavaScript" jasno sugeruje język
+w którym powinny być napisane przykłady kodu.
+Określenie celu: może uwzględniać zarówno precyzyjny rezultat lub ogólny
+kierunek interakcji z modelem. Np. "wypisz listę słów kluczowych w formacie
+JSON, zgodnie z poniższymi zasadami, strukturą oraz przykładami."
+Określenie zasad realizacji: zazwyczaj jest to forma listy (większa czytelność)
+opisująca zachowanie modelu oraz sposób wykonania zadania. Zasady
+powinny obejmować zarówno zachowanie w idealnych warunkach, jak i
+sytuacje brzegowe (np. co zrobić gdy model ma niewystarczające dane do
+realizacji celu)
+Dostarczenie informacji (RAG): niemal zawsze będzie nam zależało na tym,
+aby w prompcie systemowym znalazła się sekcja zawierająca
+dodatkową wiedzę dla modelu (np. istotne wyniki wyszukiwania). Sekcja ta
+powinna być bardzo wyraźnie oddzielona od pozostałych tak, aby model nie
+pomylił jej zawartości z instrukcjami, które ma realizować.
+Zaprezentowanie przykładów (Few-shot Prompting): LLM świetnie rozpoznają
+wzorce, więc warto poświęcić czas, aby zaprezentować oczekiwane
+zachowanie na kilku zróżnicowanych przykładach, uwzględniających także
+warunki brzegowe czy niepożądane scenariusze, które model powinien
+zaadresować według naszych zasad.
+22.11.2024, 12:20 S00E02 — Prompt Engineering | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e02-prompt-engineering 7/34
+
+===== STRONA 8 =====
+Poniżej znajduje się przykładowy prompt, podzielony na sekcje (w tym przypadku
+pominąłem dostarczanie zewnętrznych informacji), którego celem jest
+wygenerowanie odpowiedzi "tak" lub "nie". Jako separatory poszczególnych
+sekcji, zastosowałem składnię przypominającą XML. W różnych źródłach można
+spotkać także separatory takie jak "###" czy "\\\\\\`", jednak sam z nich już nie
+korzystam ze względu na konflikt w jaki wchodzą w składni markdown,
+którą domyślnie stosuję.
+Działanie powyższego promptu można przetestować w OpenAI Playground pod
+tym adresem: Prompt Yes / No. Jego celem jest jedynie zaprezentowanie ogólnej
+struktury i dość łatwo nadpisać jego zachowanie, co stanowi problem, który
+będziemy rozwiązywać na innych promptach.
+22.11.2024, 12:20 S00E02 — Prompt Engineering | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e02-prompt-engineering 8/34
+
+===== STRONA 9 =====
+Strukturę promptu prezentuje poniższy schemat, w którym widoczna jest
+instrukcja systemowa i wiadomość użytkownika (których treść stanowi dane
+wejściowe / input tokens) oraz wiadomość asystenta (których treść stanowi dane
+wyjściowe / output tokens). Całość nie może przekraczać dopuszczalnej liczby
+tokenów dla danego modelu, czyli wspominany już context window.
+Pisząc prompt, można zadać sobie następujące pytania:
+Jaki jest jego cel?
+Jakie zadanie ma wykonać model, aby ten cel zrealizować?
+Jaki jest kontekst realizowanego zadania?
+Jakie ograniczenia chcę narzucić na model?
+Jaki format odpowiedzi chcę uzyskać?
+Co powinny prezentować przykłady, aby zobrazować to, o co mi chodzi?
+Czy prompt powinien zawierać jakieś nietypowe sekcje?
+Jak będzie wykorzystana odpowiedź wygenerowana przez model? Czy trafi
+do człowieka, czy zostanie zwrócona przekazana do kolejnego promptu?
+W ten sposób możemy naszkicować pierwszą wersję promptu, a następnie
+testować go i wprowadzać kolejne usprawnienia, aż uzyskamy pożądane
+22.11.2024, 12:20 S00E02 — Prompt Engineering | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e02-prompt-engineering 9/34
+
+===== STRONA 10 =====
+rezultaty. Wówczas, zamiast kończyć pracę, możemy zastanowić się także nad
+potencjalną optymalizacją (zmniejszenie objętości i/lub zwiększenie precyzji).
+Prompt Design i Prompt Engineering
+Określenia "Prompt Design" i "Prompt Engineering" są stosowane zamiennie lub
+używane jest wyłącznie to drugie. Taki podział pozwala na odróżnienie procesu
+tworzenia samej instrukcji od sposobu jej zastosowania.
+Mówiąc konkretnie:
+Prompt Design polega na opracowaniu instrukcji, która steruje zachowaniem
+modelu w określonym celu. W tym procesie istotny jest odpowiedni dobór
+słów, struktury, formatowania czy przykładów.
+Prompt Engineering obejmuje stosowanie promptów w logice aplikacji bądź
+automatyzacji, jego ewaluację, optymalizację oraz kompozycję. Proces ten
+może obejmować łączenie promptów ze sobą oraz z kodem.
+Choć taki podział nie jest oficjalny i może nawet zostać uznany za błędny, tak w
+praktyce daje dobrą perspektywę na temat umiejętności wymaganych na różnych
+etapach pracy z LLM. Podobnie przydatną perspektywą jest określenie "Flow
+Engineering", które bardziej nawiązuje do łączenia ze sobą wielu promptów.
+22.11.2024, 12:20 S00E02 — Prompt Engineering | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e02-prompt-engineering 10/34
+
+===== STRONA 11 =====
+Najnowsze techniki projektowania promptów
+Projektowanie promptów można sprowadzić do:
+intuicyjnej aktywacji obszarów LLM mogących pomóc w rozwiązaniu danego
+problemu poprzez słowa kluczowe i/lub zewnętrzne dane. Choć obszary te nie
+są nam znane, to możemy intuicyjnie założyć, że np. przywołanie "modeli
+mentalnych" może ukierunkować model na określony sposób rozwiązania
+problemu
+zaprezentowania przykładów zawierających wzorce pożądanych zachowań
+(mówi się także o przykładach prezentujących niepożądane zachowania w
+celu wprowadzenia kontrastu. Nawiązuje do tego "Large Language Models are
+Contrastive Reasoners")
+sterowania zachowaniem modelu poprzez treści dostarczone przez nas,
+programistyczne funkcje lub sam model (lub modele), które dążą do
+zwiększenia prawdopodobieństwa na uzyskanie poprawnej odpowiedzi
+Aktualnie dostępne modele językowe mogą skutecznie pomagać przy
+projektowaniu promptów, o czym możemy przeczytać w Large Language Models
+Are Human-Level Prompt Engineers. Dodatkowo możemy je wspomagać wiedzą
+na temat technik opisanych w Prompting Guide, w publikacjach wymienionych w
+Goal-oriented Prompt Engineering, a także wykorzystać przydatne frazy lub
+przykłady promptów ze źródeł takich jak repozytorium Fabric. To wszystko w
+połączeniu z opisem własnych preferencji czy kontekstu pozwala na skuteczne
+generowanie szkiców promptów, które możemy dalej rozwijać i optymalizować.
+Aby LLM mógł nam pomagać w pisaniu promptów, musimy opracować instrukcję,
+którą możemy określić mianem "meta-promptu". Przykład jednego z nich
+dostępny jest tutaj: Snippet Prompt Generator. Wystarczy w pierwszej
+wiadomości opisać prompt, który chcemy stworzyć, a model przeprowadzi nas
+przez proces myślowy i ostatecznie naszkicuje pierwszą wersję instrukcji.
+22.11.2024, 12:20 S00E02 — Prompt Engineering | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e02-prompt-engineering 11/34
+
+===== STRONA 12 =====
+Powyższy "meta-prompt" zawiera szereg reguł, słów kluczowych oraz opisów
+technik, które częściowo napisałem samodzielnie, a część wygenerowałem na
+podstawie analizy repozytorium Fabric wspomnianego wcześniej.
+Wniosek jest więc następujący: Na każdym etapie procesu budowania instrukcji
+LLM może nas W SPIERAĆ w doborze słów kluczowych, parafrazy, przywołania
+definicji czy wygenerowania przykładów. Taką współpracę można uznać jako
+fundamentalny element procesu projektowania promptów.
+Prompt Engineering nie opiera się wyłącznie na jednym schemacie, choć możemy
+wyróżnić następujące kategorie, które można stosować w różnych
+konfiguracjach, w tym także łączyć je ze sobą:
+Zero-Shot: To prompt zawierający wyłącznie instrukcję, bez przykładów
+prezentujących oczekiwane zachowanie.
+Few-Shot: To prompt, który poza instrukcją zawiera kilka przykładów w
+których LLM może zauważyć schematy i wzorce. Istnieje także wariant "Many-
+Shot" w przypadku którego liczba przykładów może sięgać nawet kilkuset.
+Thought Generation: Czyli ciąg myśli, który może zostać dostarczony przez
+nas (few-shot CoT) lub zostać wygenerowany przez model (zero-shot CoT).
+Taki prompt prowadzi model przez pewien schemat myślowy, zwiększając
+skuteczność wypowiedzi.
+Ensembling: Polega na wykorzystaniu wielu promptów lub tego samego
+promptu wiele razy, aby następnie porównać rezultaty i zdecydować o
+najbardziej prawdopodobnym wyniku.
+Self-reflection: Polega na stworzeniu przestrzeni dla modelu na
+wygenerowanie refleksji na temat realizowanego zadania, które poprzedza
+22.11.2024, 12:20 S00E02 — Prompt Engineering | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e02-prompt-engineering 12/34
+
+===== STRONA 13 =====
+ostateczną wypowiedź.
+Self-criticism: Jak sugeruje nazwa, to technika polegająca na zastosowaniu
+LLM w celu krytyki swoich wcześniejszych wypowiedzi. W marcu 2024 roku
+została podważona w publikacji Large Language Models Cannot Self-Correct
+Reasoning Yet, która jednocześnie sugeruje, że taka zdolność może się
+rozwijać w modelach kolejnej generacji.
+Decomposition: To technika opierająca się o rozbijanie trudnych zadań na
+mniejsze kroki, realizowane zwykle przez oddzielne prompty.
+Wymienione wyżej kategorie (poza Self-Reflection) pochodzą z publikacji A
+Systematic Survey of Prompting Techniques.
+Większość z wymienionych technik wymaga czasochłonnego opracowania
+instrukcji, przykładów i nierzadko wymaga także uruchomienia wielu zapytań.
+22.11.2024, 12:20 S00E02 — Prompt Engineering | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e02-prompt-engineering 13/34
+
+===== STRONA 14 =====
+Dlatego stosuje się je w połączeniu z logiką aplikacji lub automatyzacji, gdzie
+tworzymy wspomniany już "chain" akcji wykonywanych w ustalonej kolejności
+lub agent, gdzie kolejność działań ustalana jest dynamicznie.
+Prompty modularne i ich kompozycja
+Prompty działające w logice aplikacji realizują określone cele na podstawie
+informacji, które mogą być współdzielone między nimi. Niekiedy będzie to
+wspólna sekcja (np. zestaw zasad opisujących sposób wypowiedzi modelu), a
+innym razem sekcja zawierająca rezultat innych promptów czy działania
+zewnętrznych narzędzi.
+Przykładem może być mapa wspomnień widoczna poniżej. W tym przypadku ma
+ona statyczną formę, jednak takie sekcje mogą być generowane na podstawie
+informacji z bazy danych bądź zewnętrznych źródeł.
+22.11.2024, 12:20 S00E02 — Prompt Engineering | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e02-prompt-engineering 14/34
+
+===== STRONA 15 =====
+22.11.2024, 12:20 S00E02 — Prompt Engineering | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e02-prompt-engineering 15/34
+
+===== STRONA 16 =====
+Powyższa mapa może być zastosowana jako fragment promptów, które mogą jej
+potrzebować. Choć wydaje się to oczywiste, tak w praktyce przestaje takie być,
+ponieważ prompt w kodzie aplikacji szybko zaczyna wyglądać tak:
+Szczególnie duży nacisk powinien więc być położony tutaj na wcześniejsze
+zaplanowanie ogólnej struktury promptu, separatorów sekcji oraz sposobu ich
+zapisu. Wymagana jest także precyzja oraz staranność, obejmująca, chociażby
+obsłużenie sytuacji w której zawartość danej sekcji jest niedostępna.
+Sekcje promptu pełnią różne cele, które nie powinny się wykluczać oraz powinny
+być od siebie bardzo wyraźnie oddzielone. Trzeba także zadbać o to, aby
+ograniczyć występowanie sekcji, które nie maja znaczenia w danej sytuacji.
+Choć obecnie LLM są w stanie przetwarzać duże zestawy danych, tak ich
+zdolność do podążania za bardzo złożonymi instrukcjami jest ograniczona.
+Choć projektowanie modularnych promptów będzie różniło się w zależności od
+sytuacji, warto rozważyć kilka kwestii:
+Jak wygląda ogólna struktura promptu przed podziałem na sekcje?
+22.11.2024, 12:20 S00E02 — Prompt Engineering | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e02-prompt-engineering 16/34
+
+===== STRONA 17 =====
+Które z sekcji występują wielokrotnie lub muszą być wczytane dynamicznie?
+Jaki rodzaj separatorów powinien być zastosowany, aby nie wejść w konflikt w
+samą treścią sekcji (np. stosowanie separatora "###" wchodzi w konflikt ze
+składnią markdown)
+Jaki rodzaj formatowania powinien być zastosowany w treści sekcji. Np. listy,
+zagnieżdżone listy, składnia markdown.
+W jakiej kolejności powinny zostać ułożone sekcje i czy ma to znaczenie z
+punktu widzenia modelu, o czym mówi publikacja Premise Order Matters in
+Reasoning. Choć prawdopodobnie będzie się to zmieniać w przyszłości, nadal
+można uznać, że LLM zachowuje najwięcej uwagi dla treści znajdujących
+się na początku lub na końcu instrukcji
+Jak zostaną dostarczone przykłady few-shot oraz czy muszą być dobierane
+dynamicznie, czy nie.
+Jaką rolę w logice aplikacji pełni dany prompt? Czy zależy od wyniku działania
+innych promptów, czy może być uruchomiony niezależnie (równolegle), oraz w
+jaki sposób będzie wykorzystany jego wynik (czy musi być odpowiednio
+formatowany)
+W kompozycji promptów składających się z wielu komponentów kluczową rolę
+odgrywa ich monitorowanie z możliwością edycji oraz debugowania. Do takich
+zadań zwykle będziemy wykorzystywać narzędzia takie jak LangFuse lub własne
+implementacje.
+Podstawy ewaluacji
+Wprowadzając zmiany w kodzie, jesteśmy w stanie precyzyjnie określić ich
+konsekwencje. Pomimo tego i tak łatwo jest popełnić błędy, które można
+wykryć poprzez testy manualne i automatyczne. W przypadku promptów jest
+podobnie, jednak sytuacja jest nieco bardziej złożona, ponieważ dokładnie nie
+wiemy, jak nawet najmniejsze zmiany przełożą się na działanie modelu. Dlatego
+krytyczna staje się tu ewaluacja, którą będziemy zajmować się w dalszej części
+AI_devs 3.
+Poniżej widoczny jest fragment testu wykonanego z pomocą narzędzia
+PromptFoo, które aktualnie jest jednym z najbardziej użytecznych rozwiązań w
+swojej kategorii. Dzięki niemu możemy zdefiniować testy, zestawy danych oraz
+prompty, oraz sprawdzić ich działanie na różnych modelach.
+22.11.2024, 12:20 S00E02 — Prompt Engineering | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e02-prompt-engineering 17/34
+
+===== STRONA 18 =====
+Dane testowe możemy generować przy współpracy z modelem, jednak najwięcej
+wartości dadzą nam faktyczne zapytania pochodzące z produkcyjnie działającej
+aplikacji. Instalacja PrompFoo sprowadza się do jednego polecenia opisanego w
+dokumentacji, np. npm i -g promptfoo. Następnie w katalogu, w którym chcemy
+utworzyć testy, wykonujemy polecenie promptfoo init, które wygeneruje
+podstawowy plik YAML, oraz promptfoo eval, aby uruchomić test.
+Testy mogą być deterministyczne, gdzie zależy nam na sprawdzeniu konkretnych
+wartości, weryfikowane programistycznie (np. z pomocą wyrażeń regularnych)
+lub mogą być oceniane z pomocą modelu (czyli dodatkowych promptów). Choć
+ewaluacją będziemy zajmować się w lekcji C01L04, to już teraz warto
+przynajmniej uruchomić PromptFoo i wykonać kilka prostych testów.
+Projektowanie przykładów "few-shot"
+Odpowiednio dobrane przykłady dołączane do promptu, niemal zawsze
+mają pozytywne przełożenie na działanie modelu. Jednak ich obecność może
+także mieć negatywny wpływ, ponieważ LLM generując treści, może sugerować
+się nimi zbyt mocno.
+Choć realizowane zadanie można dokładnie opisać, tak trudno jest słowami
+oddać subtelne detale czy zasady na których nam zależy. Dlatego jako część
+instrukcji wystarczy dodać sekcję zawierającą (zwykle) pary w postaci
+wiadomości użytkownika oraz odpowiedzi ze strony AI. Taka sekcja musi
+być wyraźnie oddzielona od reszty instrukcji.
+22.11.2024, 12:20 S00E02 — Prompt Engineering | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e02-prompt-engineering 18/34
+
+===== STRONA 19 =====
+Stworzenie zestawu jakościowych przykładów jest żmudne i wymagające. W
+dodatku nie możemy jednoznacznie stwierdzić, jak wiele z nich potrzebujemy
+oraz który wspiera nasz cel, a który wprost przeciwnie.
+Tworząc przykłady, można rozważyć następujące aspekty:
+Przykład typowego zapytania użytkownika i typowej odpowiedzi, które
+zobrazują ogólne założenia.
+Przykład sytuacji w której zapytanie użytkownika jest niezwiązane z zakresem
+danej instrukcji (można to porównać do bloku else w instrukcjach
+warunkowych)
+Przykłady wzmacniające ważne elementy instrukcji (np. unikanie wybranych
+zwrotów czy zachowanie kolejności wypowiedzi)
+Przykłady prezentujące sytuacje w których nasza instrukcja może być
+zrozumiana niejednoznacznie (np. klasyfikacja wpisu to-do może sugerować
+inną kategorię niż ta, na której nam zależy)
+Przykłady prezentujące ton, pisownię oraz format wypowiedzi modelu
+Przykłady prezentujące sposób przetwarzania treści, które wykraczają poza
+bazową wiedzę modelu (np. nazwy własne) czy domyślne zachowanie modelu
+Przykłady nie powinny prezentować zbyt wielu podobnych sytuacji, aby nie
+skrzywić zachowania modelu i tym samym nie wpływać negatywnie na
+generowane odpowiedzi
+Few-shot prompting nie jest jednak rozwiązaniem ostatecznym. Z jego pomocą
+nie sprawimy, że model będzie w stanie rozwiązywać złożone zadania. Poza tym,
+22.11.2024, 12:20 S00E02 — Prompt Engineering | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e02-prompt-engineering 19/34
+
+===== STRONA 20 =====
+w przypadku promptów działających w konwersacji (np. chatboty), wraz z
+rozwojem dyskusji zauważalne jest pomijanie niektórych zasad i odchodzenie od
+zachowań zaprezentowanych na przykładach. Nie stanowi to jednak zwykle
+dużego problemu, ponieważ logika którą będziemy tworzyć, będzie składać się z
+wielu promptów oraz na różne sposoby kompresować treść konwersacji.
+Pracę nad zestawami przykładów możemy bardzo ułatwić sobie z pomocą LLM.
+Nie jest to jednak zadanie, które model może zrealizować samodzielnie i nie
+powinniśmy wyłączać swojej uwagi. Każdy z wygenerowanych przykładów
+powinien być przez nas przeczytany oraz przemyślany.
+Poniżej znajduje się fragment konwersacji z przykładami wygenerowanymi przez
+model. Przynajmniej dwa z nich nie były zgodne z moimi założeniami, w tym
+jeden z nich w ogóle nie powinien pojawić się w prompcie.
+W rezultacie nie wykorzystałem praktycznie żadnego z początkowo
+wygenerowanych przykładów, lecz na ich podstawie doszedłem do nowego,
+dopasowanego do mnie zestawu.
+22.11.2024, 12:20 S00E02 — Prompt Engineering | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e02-prompt-engineering 20/34
+
+===== STRONA 21 =====
+Powyższa sytuacja jest prawdopodobnie najważniejszą lekcją z całego AI_devs 3.
+Mówi ona o tym, aby nie wyłączać swojego rozumu podczas pracy z modelem.
+Zamiast zastępować swoje umiejętności, możemy je rozwijać, wspierać i
+optymalizować. Możliwe, że z czasem granica odpowiedzialności oraz
+kompetencji będzie się coraz bardziej przesuwać, jednak obecnie podejście, w
+którym to my kontrolujemy proces, generuje lepsze rezultaty.
+Zwiększanie precyzji
+Niedeterministyczna natura LLM sprawia, że nie mamy gwarancji otrzymania
+pożądanego rezultatu nawet wtedy, gdy dane wejściowe pozostaną takie same.
+Możemy jednak zwiększać prawdopodobieństwo ich otrzymania. Z drugiej strony
+nie mamy do dyspozycji narzędzi w stylu debuggera kodu, co utrudnia
+wprowadzanie poprawek. Możemy jednak obserwować zachowanie modelu
+dzięki LangFuse lub nawet prostemu systemowi logów stworzonemu na własne
+potrzeby i obserwacja jest pierwszą rzeczą, którą możemy zrobić.
+Poniższy prompt na pierwszy rzut oka realizuje swoje zadanie poprawnie i
+tłumaczy przekazany przez użytkownika tekst na język polski. Taka instrukcja
+może być zastosowana w narzędziach ułatwiających edycję dokumentów lub
+bezpośrednio w logice przetwarzającej je automatycznie.
+22.11.2024, 12:20 S00E02 — Prompt Engineering | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e02-prompt-engineering 21/34
+
+===== STRONA 22 =====
+Może się więc zdarzyć, że przetwarzany fragment będzie wyglądał tak, jak gdyby
+był instrukcją dla modelu. Wówczas, zamiast otrzymać odpowiedź zgodną z
+początkowym założeniem, otrzymujemy zupełnie inny rezultat.
+Mamy więc do czynienia z sytuacją, w której prompt nie jest precyzyjny i bardzo
+łatwo wygeneruje problemy. Widzimy jednak, że ich źródłem jest fakt, że model
+podąża za instrukcjami użytkownika, więc musimy zmodyfikować prompt
+systemowy, aby zmniejszyć ryzyko takiego zachowania.
+22.11.2024, 12:20 S00E02 — Prompt Engineering | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e02-prompt-engineering 22/34
+
+===== STRONA 23 =====
+Nowa wersja promptu mówi więc o tym, aby model ignorował treść otrzymanej
+wiadomości i skupił się wyłącznie na przetłumaczeniu jej zawartości. Nie jest to
+jednak wystarczające.
+Na tym etapie wiemy już, że technika Few-Shot może nam w takiej sytuacji
+pomóc. Zatem ponownie zmieniam treść instrukcji sugerując podążanie za
+zaprezentowanymi przykładami oraz dodaję sekcję, która je zawiera. Co więcej,
+wybrałem je w taki sposób, aby oddać problem z którym do tej pory się
+mierzyłem.
+Jak widać poniżej, wprowadzone zmiany przyniosły efekt i tym razem
+tłumaczenie jest poprawne. Oczywiście nie oznacza to, że zaadresowaliśmy w
+ten sposób wszystkie możliwe problemy, lecz widoczny jest schemat, który
+możemy stosować. Połączenie tego z narzędziami do monitorowania i
+automatycznego testowania promptów pozwala uzyskać zadowalający poziom
+skuteczności.
+22.11.2024, 12:20 S00E02 — Prompt Engineering | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e02-prompt-engineering 23/34
+
+===== STRONA 24 =====
+Może się także okazać, że podejmowane próby naprawienia błędnie działającego
+promptu zawiodą. Wówczas konieczna jest zmiana strategii lub całkowite
+wycofanie się z zastosowania LLM w danym przypadku.
+Techniki anonimizacji i bezpieczeństwo przetwarzania danych
+Wszystkie informacje, które trafiają do interakcji z modelem, powinny być
+uznawane za dostępne dla użytkownika, nawet w przypadku Open Source LLM
+czy hostowania modeli z pomocą usług takich jak Azure OpenAI Service. Oznacza
+to dokładnie, że:
+Większość dostępnych usług generative AI dąży do zachowania danych w
+celu dalszego trenowania modeli. Należy więc zwracać uwagę na polityki
+prywatności oraz zachować ograniczone zaufanie wobec nich
+Każdy prompt systemowy można przechwycić technikami Prompt Injection
+Zachowanie modelu można w dowolny sposób nadpisać poprzez Jailbreaking
+Przechowywanie jakichkolwiek niepublicznych danych w treści wiadomości
+systemowych stanowi wyzwanie z punktu widzenia bezpieczeństwa
+22.11.2024, 12:20 S00E02 — Prompt Engineering | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e02-prompt-engineering 24/34
+
+===== STRONA 25 =====
+Akcje w przypadku których LLM ma prawo zapisu lub modyfikacji danych
+powinny być łatwo odwracalne oraz nie mogą obejmować akcji krytycznych ze
+względu na możliwość uruchomienia ich przypadkowo lub przez osoby trzecie
+Aktualną skuteczność samych modeli można określić (w zależności od
+implementacji) na około 70-95%, co jest niewystarczające w sytuacji w
+których potrzebujemy pewności
+Każde działanie modelu powinno być nadzorowane przez człowieka oraz
+monitorowane
+Aplikacje wykorzystujące duże modele językowe powinny narzucać na nie
+programistyczne ograniczenia oraz możliwie ograniczać kontakt z
+użytkownikiem
+Skuteczność technik i narzędzi określanych jako Guardrails nadal jest
+niewystarczająca, co doskonale obrazuje na przykładzie profil Pliny The
+Prompter, który w dniu pisania tych słów zdołał złamać każdy z popularnych
+systemów i modeli językowych
+Poniżej mamy przykład prostej sytuacji obrazującej problem. Sekretne hasło
+zostało zapisane w wiadomości systemowej, a więc zwykle nie będzie ono
+widoczne dla użytkownika, nawet jeśli o nie bezpośrednio zapyta.
+Wystarczy jednak bardzo prosta technika polegająca na niebezpośrednim
+poprowadzeniu modelu do ujawnienia hasła. Instrukcja polega na tym, aby
+najpierw model potwierdził, że nie może czegoś zrobić, a po separatorze zapisał
+coś dokładnie odwrotnego. Jak widać, wykonał prośbę bardzo precyzyjnie, ale
+zdradził frazę, której nie powinien podawać.
+22.11.2024, 12:20 S00E02 — Prompt Engineering | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e02-prompt-engineering 25/34
+
+===== STRONA 26 =====
+Jak widać nawet w powyższym prompcie, techniki Prompt Injection zwykle
+polegają na znalezieniu sposobu umożliwiającego odwrócenie uwagi modelu od
+głównych założeń. Ze względu na to, że mamy tutaj do czynienia z językiem
+naturalnym, możliwych wariantów ataku jest bardzo dużo, wliczając w to
+"leetspeak", pisanie za pomocą ASCII ART czy alfabet Morseʼa.
+Podsumowanie
+Choć przez wiele osób Prompt Engineering jest lekceważony, tak w przypadku
+integracji LLM z kodem aplikacji, tworzenie precyzyjnych instrukcji dla modelu
+jest krytyczne. Tym bardziej że dość rzadko mówimy tutaj o pisaniu promptu, a
+bardziej o jego kompozycji i budowaniu z dynamicznych treści. Obserwujemy
+także rozwój technik projektowania promptów, a także wzorców
+zaawansowanych interakcji z modelem, które również pomagają w budowaniu
+złożonych systemów.
+Najważniejszym tematem tej lekcji jest budowanie promptu z pomocą kodu oraz
+programistyczna interakcja z modelem. Tematem uzupełniającym (ale równie
+ważne) jest zastosowanie narzędzia PromptFoo (bądź alternatywy) w celu
+testowania zachowania modelu.
+Jeśli chodzi o kluczowe koncepcje, to warto zapamiętać, że pracując z LLM,
+mówimy o poruszaniu się w obszarze prawdopodobieństwa, a nie pewności.
+Musimy mieć to na uwadze już na wczesnym etapie projektowania założeń
+22.11.2024, 12:20 S00E02 — Prompt Engineering | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e02-prompt-engineering 26/34
+
+===== STRONA 27 =====
+Liked by Mateusz and 226 others
+Comment 141 comment s
+Maciej Dołęga 3d
+Like Reply
+overment Admin 3d
+I'm just curious.
+Like Reply 2 likes
+Kamil Minkowski 🥷 501 Nov 10
+aplikacji, aby uniknąć korzystania z modelu do zadań, w których zwyczajnie
+się nie sprawdzi.
+Poligon 🎓
+Hej! Pamiętasz o istnieniu Poligonu? To idealna chwila na to, aby
+przetestować budowanie promptów zero-shot i few-shot na realnych
+przykładach.
+↳ https://poligon.aidevs.pl/
+W razie jakichkolwiek problemów jesteśmy do Twojej dyspozycji w komentarzach
+do lekcji. Pytaj, o co zechcesz.
+ŁB
+Like
+MD
+overment co to za przeglądarka? 🙂
+Maciej Dołęga https://arc.net/
+KM
+overment dlaczego podczas testów Promptu YES/NO model na “noˮ
+odpowiedział mi “yesˮ? 😀
+22.11.2024, 12:20 S00E02 — Prompt Engineering | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e02-prompt-engineering 27/34
+
+===== STRONA 28 =====
+Like Reply
+Tomasz W olny Nov 10
+22.11.2024, 12:20 S00E02 — Prompt Engineering | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e02-prompt-engineering 28/34
+
+===== STRONA 29 =====
+See more
+Like Reply 1 like
+Tomasz W olny Nov 10
+Like Reply 1 like
+Tomasz Mar kuszewski Nov 10
+Like Reply
+Tomasz W olny Nov 11
+Albom ślepy, albo nikt nie miał takiego problemu.
+Dotyczy przykładu `bun use_search`
+1. Mam deprecation warning dot. punnycode
+2. Mam error “Could not locate the bindings fileˮ
+…
+ok, jeśli zainstaluję PromptFoo globalnie, a potem wywołam
+komendę `promptfoo eval -c use_search/use_search.yaml` (bez
+bunʼa) to działa.
+TM
+Tomasz Wolny Tomaszu jesteś wielki :) a czy wiesz jak sprawić
+żeby potem komenda “bun use_search“ zadziałała - mam ten
+problem co Ty, Twój sposób zadziałał ale jeszcze nie rozumiem
+z czego wynika błąd i jak sprawić żeby to działało w
+przyszłości. Jeżeli poległem na 1. lekcji to co będzie dalej :(
+22.11.2024, 12:20 S00E02 — Prompt Engineering | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e02-prompt-engineering 29/34
+
+===== STRONA 30 =====
+See more
+Like Reply
+Krystian Klimek Nov 9
+Like Reply 1 like
+Paweł Dulak (dulare) AI_Dev Nov 9
+I'm here to help
+Like Reply
+Arkadiusz Kazanecki Nov 5
+Like Reply
+Tomasz T rzcińskiNov 5
+Tomasz Markuszewski Hmm, jeszcze nie wiem dlaczego tak
+się dzieje. To znaczy, wnioskuję, że wpisując komendę z `bun
+promptfoo …` w projekcie, korzystam z lokalnie zainstalowanej
+wersji promptfoo, zamiast z globalnej i być może jest jakiś błąd
+- któraś z bibliotek nie potrafi odnaleźć better_sqlite3 (???)
+Lecz z drugiej strony, czy jest to nam potrzebne?
+Jak rozumiem - chyba, że się mylę ( overment ?) - promptfoo …
+Temperatura powyżej 1,65-1,7 to ciekawe efekty daje 🤨
+Krystian Klimek Dostał gorączki biedaczek
+AK
+Jeśli powyższy materiał jest streszczeniem z poprzednich edycji
+AI_devs, czy w tym punkcie odnosi się do tego co było, czy co będzie
+omawiane w Devs3?
+22.11.2024, 12:20 S00E02 — Prompt Engineering | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e02-prompt-engineering 30/34
+
+===== STRONA 31 =====
+Like Reply 3 likes
+Paweł Dulak (dulare) AI_Dev Nov 5
+I'm here to help
+Like Reply 2 likes
+overment Admin Nov 5
+I'm just curious.
+Like Reply 3 likes
+Tomasz Miller Nov 5
+System De veloper
+Like Reply 2 likes
+Paweł Dulak (dulare) AI_Dev Nov 5
+I'm here to help
+Like Reply
+Tomasz Miller Nov 5
+System De veloper
+Arkadiusz Kazanecki ja to rozumiem tak, że “jeśli masz
+wynieść z tego kursu tylko jedną rzecz to niech to będzie
+zasada nie wyłączania rozumuˮ :D. Chyba chodzi po prostu o to
+że nie ma teraz takiej technologii która zadziała sama
+Arkadiusz Kazanecki tutaj jest niefortunne przeniesienie.
+Chodzi o “prawdopodobnie najważniejszą lekcję z całego
+AI_devs_3ˮ (sklejam żeby tutaj też nie przeniosło). Ta lekcja
+mówi o tym, żeby nie wyłączać swojego rozumu przy pracy z
+LLM.
+Arkadiusz Kazanecki materiał jest “streszczeniemˮ, ale
+napisałem go od zera. Więc pisałem go już tak, jakby była to
+trzecia edycja AI_devs. No bo w sumie jest :)
+W filmie powyżej, w piątej minucie, jest mowa o modyfikacji
+parametru Top P. Przy ustawieniu na 0.1 mają być wybierane tokeny o
+wartości prawdopodobieństwa ponad 10% i autor mówi, że tylko jeden
+z nich (“Helloˮ) spełnia ten warunek, ale token “Hiˮ też ma ponad 10%,
+bo ma wartość nieco ponad 20%. Czy jest tu jakieś przejęzyczenie,
+czy chodzi o coś więcej?
+Tomasz Miller zapytamy overment
+Paweł Dulak (dulare) doczytałem, że tutaj chodzi o tzw.
+“Independent Probability Calculationsˮ dla każdego tokena, a
+22.11.2024, 12:20 S00E02 — Prompt Engineering | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e02-prompt-engineering 31/34
+
+===== STRONA 32 =====
+Like Reply 1 like
+Paweł Dulak (dulare) AI_Dev Nov 5
+I'm here to help
+Like Reply 1 like
+Show more replies
+Dawid Winiecki Nov 4
+Like Reply 5 likes
+Tomasz T rzcińskiNov 4
+Like Reply 2 likes
+Krzysztof Socha Nov 4
+Like Reply 1 like
+シムライ Nov 4
+Like Reply
+overment Admin Nov 5
+I'm just curious.
+nie o sumowanie tychże wartości dla całej odpowiedzi, co ma
+sens.
+Tomasz Miller O widzisz, super że sam do tego dotarłeś!
+DW
+Trzeba było się do tego zabrać w sobote a nie wczoraj po F1…
+Bardzo fajnie to drapie mózg z każdej strony xd
+Dawid W iniecki ja dopiero teraz nadrabiam 😅 . Ale za to
+wyścig był dobry :D
+Tomasz Trzciński 😜
+シ
+overment W tekście jest napisane, że równie dobrze działają anty
+przykłady. Czy mógłbyś podać jakiś przykład anty przykładów.
+Załóżmy, że moim caseam jest podanie struktury wraz z treścią sekcji
+blog postu i chcę żeby model mi ją sparafrazował. Natomiast w
+momencie kiedy podaję przykład tej struktury z treścią - model
+bardzo podąża za tym przykładem w rezultacie parafraza jest
+nieznaczna
+22.11.2024, 12:20 S00E02 — Prompt Engineering | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e02-prompt-engineering 32/34
+
+===== STRONA 33 =====
+See more
+Like Reply 2 likes
+Bartłomiej Marek Nov 4
+Like Reply
+Paweł Dulak (dulare) AI_Dev Nov 4
+I'm here to help
+Like Reply 1 like
+Paweł Tutak Nov 3
+Like Reply
+Paweł Dulak (dulare) AI_Dev Nov 3
+I'm here to help
+シム ラ イ jasne, masz przykład poniżej. Czyli dwie sekcje z
+różnymi zachowaniami.
+<good_examples>
+ User: Tell me how to…
+ AI: Simply do this…
+</good_examples>
+<bad_examples>
+ User: Tell me how to……
+“Wszystkie informacje, które trafiają do interakcji z modelem, powinny
+być uznawane za dostępne dla użytkownika, nawet w przypadku
+Open Source LLM czy hostowania modeli z pomocą usług takich jak
+Azure OpenAI Service.ˮ - z tym zdaniem się bardzo nie zgodzę. Są
+techniki gwarantujące prywatność nawet w przypadku modeli z
+dostępem BlackBox jak i (tym bardziej do modeli) white-box.
+(https://arxiv.org/pdf/2312.03724, czy PATE)
+Bartłomiej Marek Mam wrażenie że tutaj overment miał na
+myśli pojedynczą interakcję z API a nie przecieki między
+różnymi wywołaniami API. Czyli że np. coś tajnego co
+wstawimy do wiadomości systemowej, może zostać wydobyte
+przez użytkownika w ramach danego wywołania API.
+PT
+Nie rozumiem zdania `Nie można jednak zakładać, że jej treść będzie
+niemożliwa do przechwycenia, ale tak nie jest, o czym przekonamy
+się później.` Znaczy co nie jest?
+Paweł Tutak spróbuję przeformułować: Możesz mieć wrażenie,
+że instrukcji systemowej nie da się przechwycić (wyciągnąć
+promptem użytkownika), ale w praktyce tak nie jest - są
+22.11.2024, 12:20 S00E02 — Prompt Engineering | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e02-prompt-engineering 33/34
+
+===== STRONA 34 =====
+Like Reply
+Show more comment s
+metody które potrafią wyciągnąć dane z instrukcji systemowej
+lub całą instrukcję systemową. Krótko: instrukcja systemowa
+nie jest bezpieczna :)
+PS
+Post
+What are your thoughts?
+22.11.2024, 12:20 S00E02 — Prompt Engineering | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e02-prompt-engineering 34/34

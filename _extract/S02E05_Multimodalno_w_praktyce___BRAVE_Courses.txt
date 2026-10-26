@@ -1,0 +1,430 @@
+
+===== STRONA 1 =====
+S02E05  Mul timodalność w praktyce
+overment Admin Nov 15
+I'm just curious.
+» Lekka wersja przeglądarkowa «
+📎 Pobierz treść tej lekcji w formacie markdown
+📎 Pobierz treść tej lekcji w formacie markdown (EN)
+W poprzedniej lekcji S02E04 — Połączenie wielu formatów zobaczyliśmy
+wartość wynikającą z jednoczesnego zastosowania wielu modeli, szczególnie w
+kontekście multimodalności. Natomiast teraz, przyjrzymy się kilku przykładom
+przełożenia tej wartości na praktyczne, codzienne zastosowania.
+Naszym celem nie jest jedynie zbudowanie kilku kolejnych narzędzi, ale
+spojrzenie z szerszej perspektywy na schemat ich powstawania. To pozwoli nam
+przenosić je na inne obszary i rozwiązywać różne problemy. Przekonamy
+się także, że niektóre, nierzadko bardzo użyteczne produkty AI, są bardzo proste
+do odwzorowania.
+Strukturyzowanie tekstu na potrzeby audio
+Przynajmniej kilkukrotnie wspominałem, że LLM znacznie lepiej radzą sobie z
+transformacją treści niż jej generowaniem. Może to sugerować, że zadanie takie
+jak zamiana artykułu na formę audio dzięki Text to Speech powinno być prostym
+Back to Lekcje programu [AI3]
+PS
+22.11.2024, 12:28 S02E05 — Multimodalność w praktyce | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e05-multimodalnosc-w-praktyce 1/19
+
+===== STRONA 2 =====
+zadaniem. Okazuje się jednak, że nie do końca tak jest, ponieważ musimy
+uwzględnić przynajmniej kilka istotnych elementów.
+Przede wszystkim w zależności od wykorzystanych modeli, będą obowiązywać
+nas limity zarówno dla danych wejściowych jak i wyjściowych, którym bliżej
+przyjrzymy się w trzecim tygodniu AI_devs.
+Poniżej mamy limit długości treści dla modelu TTS.
+Dodatkowym problemem będą obrazy i zewnętrzne odnośniki, które
+wymagają wygenerowanych opisów, o czym mieliśmy okazję przekonać się w
+przykładzie captions i pracy z VLM.
+Ostatecznie wyzwaniem jest także odpowiednie stworzenie promptu, który
+poradzi sobie z dopasowaniem stylu wypowiedzi modelu tak, abyśmy nie
+skończyli z "fascynującym i ekscytującym doświadczeniem" (są to frazy często
+stosowane przez model przy transformacji treści) ani odnoszeniem się do
+"poniższego obrazka", który trudno jest zobaczyć na nagraniu.
+W przykładzie read znajduje się kod zdolny do zamiany treści naszych lekcji, na
+przystępną do przesłuchania formę audio, z zachowaniem oryginalnego stylu
+wypowiedzi. W pliku demo.wav znajduje się wygenerowane z pomocą
+ElevenLabs nagranie. Jego logika podzielona jest w tym przypadku na trzy kroki:
+mapowanie stylu, przekonwertowanie oryginalnego artykułu oraz wygenerowanie
+pliku audio (dla uproszczenia pominąłem logikę przykładu caption do opisywania
+obrazów).
+22.11.2024, 12:28 S02E05 — Multimodalność w praktyce | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e05-multimodalnosc-w-praktyce 2/19
+
+===== STRONA 3 =====
+Kluczową rolę w takich transformacjach odgrywa prompt, który nie powinien
+wskazywać na generowanie nowej treści na podstawie obecnej (np. "wygeneruj
+podcast na podstawie poniższego dokumentu"), lecz na jej transformację według
+określonych zasad.
+22.11.2024, 12:28 S02E05 — Multimodalność w praktyce | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e05-multimodalnosc-w-praktyce 3/19
+
+===== STRONA 4 =====
+22.11.2024, 12:28 S02E05 — Multimodalność w praktyce | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e05-multimodalnosc-w-praktyce 4/19
+
+===== STRONA 5 =====
+W tym wszystkim chcemy uwzględnić jeszcze jeden, bardzo istotny detal,
+związany z tłumaczeniem na język polski — odmiany słów. Przykład typowego dla
+modeli błędu widzimy poniżej i jest on zwykle związany z próbą przetłumaczenia
+wyrażeń z języka angielskiego, bez zadbania o ich odpowiednią formę.
+Tutaj również możemy w dużym stopniu to naprawić, wprowadzając zmiany w
+oryginalnej instrukcji, które podkreślą konieczność dbania o właściwe formy, lub
+poprzez dodatkowy prompt, zajmujący się wyłącznie korektą tłumaczenia.
+Rozmowa z mapą myśli
+W lekcji S02E04 — Połączenie wielu formatów wspomniałem o przykładzie
+"rozmowy z mapą myśli", które podstawowa implementacja znajduje się w
+katalogu mindmap. Pozwala to nam na zamianę notatki głosowej na mapę myśli
+widoczną poniżej. Pomimo tego, że nagranie było bardzo chaotyczne i
+momentami trudne do zrozumienia, model poprawnie rozpoznał wszystkie
+wymienione koncepcje i przełożył je na wizualizację.
+Sama logika przykładu jest bardzo prosta i nie zawiera w sobie żadnych nowych
+rzeczy, poza zastosowaniem markmap-cli do wygenerowania mapy myśli w
+formie Markdown i HTML. Jak zwykle nic nie stoi na przeszkodzie, aby
+przetwarzanie było bardziej rozbudowane i uwzględniało nawet połączenie z
+Internetem w celu wzbogacania naszej wizualizacji.
+22.11.2024, 12:28 S02E05 — Multimodalność w praktyce | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e05-multimodalnosc-w-praktyce 5/19
+
+===== STRONA 6 =====
+Alternatywnie moglibyśmy skorzystać z interfejsu przykładu audio (nową wersję
+umieściłem w katalogu audio-map oraz audio-map-frontend), aby
+"porozmawiać z mapą myśli" dokładnie tak, jak widzimy to na poniższym filmie.
+01:56
+Powyższy film został nieco przyspieszony, natomiast czas reakcji i tak jest dość
+niski. Mamy także przestrzeń do optymalizacji poprzez skorzystanie z Whisper
+Turbo oraz ElevenLabs Turbo. Ewentualną korektę mogą przejść jeszcze prompty
+odpowiedzialne za budowanie mapy myśli, co w przypadku zaawansowanej
+implementacji moglibyśmy uwzględnić jakiś rodzaj mechanizmu "diff". Wówczas
+nie byłoby potrzeby aktualizowania całej mapy, lecz tylko jej fragmentów.
+Logikę "voice to mind map" można przełożyć na interfejs działający w czasie
+rzeczywistym, co jest możliwe szczególnie z zastosowaniem platform takich jak
+Groq, które charakteryzuje szybka inferencja. Dobrym przykładem jest wpis z
+profilu @Mlearning_ai, który przedstawia nagranie z rozmowy z strukturą tabeli
+prezentującej plan wycieczki.
+22.11.2024, 12:28 S02E05 — Multimodalność w praktyce | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e05-multimodalnosc-w-praktyce 6/19
+
+===== STRONA 7 =====
+Strukturyzowanie i formatowanie tekstu z audio
+Widzimy już dość dokładnie, jak multimodalność radzi sobie w praktyce, zarówno
+w tym pozytywnym jak i negatywnym sensie. Ostatecznie pomimo tych
+wszystkich ograniczeń, nadal śmiało możemy mówić o budowaniu rozwiązań
+wnoszących wartość. Aczkolwiek obecnie często w poszukiwaniu jakości,
+musimy poświęcić czas reakcji. Nie zawsze jednak czas musi być istotny i może
+wynikać to bezpośrednio z naszych założeń projektowych.
+Pierwszym z brzegu przykładem, mogą być notatki głosowe z których już teraz
+korzysta część osób, aczkolwiek wymaga to ich ręcznego przepisania lub
+ewentualnie pracy z transkrypcją, która nie zawsze jest doskonała.
+Problem ten zauważył twórca narzędzia Audiopen, które skupia się wyłącznie na
+formatowaniu podyktowanej notatki, dając przy tym możliwość dopasowania
+długości czy stylu. Choć nie można zaprzeczyć skuteczności wdrożenia tego
+pomysłu, tak na tym etapie jasne jest dla nas to, że główna logika działająca pod
+spodem, jest dość prosta do odwzorowania.
+22.11.2024, 12:28 S02E05 — Multimodalność w praktyce | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e05-multimodalnosc-w-praktyce 7/19
+
+===== STRONA 8 =====
+Co więcej, dzięki własnej implementacji, możemy pójść krok dalej i w pełni
+dopasować sposób transformacji nagrania audio. Jak się później przekonamy,
+będzie to także stanowić potencjalny element współpracującego z nami Agenta
+AI.
+Największa wartość z wdrożenia powyższego schematu pochodzi z możliwości
+dopasowania go do swoich preferencji oraz nadanie mu naszego własnego
+kontekstu. W końcu każdy z nas może w inny sposób podchodzić do planowania
+zadań, zakupów czy prowadzenia notatek na spotkaniu. Poza tym z takim
+22.11.2024, 12:28 S02E05 — Multimodalność w praktyce | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e05-multimodalnosc-w-praktyce 8/19
+
+===== STRONA 9 =====
+schematem można wyjść nieco dalej, np. w stronę prowadzenia dziennika czy
+planu treningowego.
+Poniższy fragment notatki został zbudowany na podstawie krótkiej wiadomości
+opisującej spotkanie z Grzegorzem na temat projektu Alice.
+Rzecz w tym, że w treści tej notatki nazwa ta nie padła ani razu, ale można było ją
+wywnioskować z kontekstu. Jej treść można zobaczyć w przykładzie notes
+wśród jednej z przykładowych wiadomości.
+Możliwość wnioskowania na podstawie kontekstu jest możliwa, ponieważ
+kontekst ten został wczytany po określeniu typu notatki (zadania/notatka ze
+spotkania/lista zakupów). Podobne scenariusze realizowaliśmy w przykładzie
+linear z lekcji S01E02 — Kontekst, gdzie zwracaliśmy uwagę na to, aby opisy
+poszczególnych kategorii były jasne lub abyśmy mogli poprowadzić model przez
+wykrycie dwuznaczności.
+22.11.2024, 12:28 S02E05 — Multimodalność w praktyce | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e05-multimodalnosc-w-praktyce 9/19
+
+===== STRONA 10 =====
+Dodatkowo, fakt, że zastosowaliśmy etap rozpoznania typu wiadomości, pozwala
+nam na wczytanie pasującego kontekstu oraz preferencji związanych z
+formatowaniem. Przekłada się to także na jeszcze jedną wartość w postaci
+jednego punktu wejścia. Oznacza to, że każda notatka głosowa lub tekstowa
+przekierowana do tego narzędzia umożliwi jej właściwe formatowanie i
+ewentualne umieszczenie w odpowiedniej kategorii w notatniku.
+Łączenie źródeł informacji z różnych formatów
+Modele Vision coraz lepiej radzą sobie z rozpoznawaniem detali oraz
+wnioskowaniem na podstawie obrazu. W związku z tym, możemy je wykorzystać
+nawet w kontekście notowania jako źródło danych, lub nadanie kontekstu. Sam
+kontekst może być także nadawany poprzez dane pochodzące z urządzenia z
+pomocą którego tworzymy notatkę (np. lokalizacja telefonu). Zatem
+zaktualizowany schemat interakcji, wygląda następująco:
+22.11.2024, 12:28 S02E05 — Multimodalność w praktyce | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e05-multimodalnosc-w-praktyce 10/19
+
+===== STRONA 11 =====
+Uwzględniamy w nim połączenie nagrania audio (lub wiadomości tekstowej),
+zdjęcia oraz metadanych z urządzenia. To wszystko może zostać przekazane do
+modelu, a następnie skojarzone z właściwą kategorią czy pamięcią
+długoterminową modelu.
+Warto przypomnieć zdolność VLM do dopasowywania opisów do obrazu, co
+widać poniżej, w wiadomości która poprawnie rozpoznaje moje biuro. Dokładnie
+w ten sam sposób możemy kojarzyć miejsca czy przedmioty (np. paragony).
+22.11.2024, 12:28 S02E05 — Multimodalność w praktyce | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e05-multimodalnosc-w-praktyce 11/19
+
+===== STRONA 12 =====
+Faktyczną implementacją łączenia obrazu i metadanych urządzenia nie będziemy
+się już zajmować, ponieważ będzie ona zależała od systemu operacyjnego i
+samego urządzenia. Przykładowo w przypadku iPhone do dyspozycji mamy
+aplikację Shortcuts, która umożliwia stworzenie makra pozwalającego na
+zrobienie zdjęcia, nagrania wiadomości głosowej i wysłania tych danych na
+wskazany adres. Jak widać poniżej, jest to niesamowicie proste.
+Podsumowanie
+Przykłady omówione w tej lekcji miały na celu przede wszystkim pokazanie
+schematu myślenia, który dąży do kreatywnego, a jednocześnie użytecznego
+łączenia umiejętności modeli językowych oraz funkcjonalności otaczających nas
+urządzeń.
+Nawet jeśli żaden z nich nie wpisuje się w Twoją codzienność lub Twój kontekst
+zawodowy, to zastanów się jakie narzędzie możesz opracować na własne
+potrzeby. Jest to o tyle ważne, że pozwoli na praktyczne doświadczanie
+możliwości obecnych modeli. Dodatkowo tak proste rozwiązania zwykle
+umożliwiają także dość proste przełączenie się na nowe wersje modeli.
+22.11.2024, 12:28 S02E05 — Multimodalność w praktyce | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e05-multimodalnosc-w-praktyce 12/19
+
+===== STRONA 13 =====
+Największą wartością z powyższych możliwości, a jednocześnie pewną
+generalizacją tego, o czym mówimy, jest transformacja treści pomiędzy różnymi
+formatami. Nierzadko w praktyce spotykamy sytuacje w których
+jakieś dokumenty (w tym wiadomości e-mail) muszą być uspójnione (np. do
+formatu CSV) czy kompleksowo opisane. Wówczas rola dużych modeli
+językowych okazuje się znacząca, nawet pomimo potencjalnych błędów, które
+popełniają. Czas potrzebny na weryfikację jakiejś treści, jest zawsze zwykle
+mniejszy, niż jej stworzenie od podstaw.
+Jeśli z tej lekcji masz wynieść tylko jedną rzecz, to po prostu rozejrzyj się wokół i
+wskaż jeden przykład, jak multimodalne modele mogą Ci pomóc w codziennym
+życiu. Podziel się swoim pomysłem w komentarzu.
+NOTATKA ZYGFRYDA
+ZADANIA
+22.11.2024, 12:28 S02E05 — Multimodalność w praktyce | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e05-multimodalnosc-w-praktyce 13/19
+
+===== STRONA 14 =====
+Zadanie: Z przechwyconych materiałów interesuje nas tylko jedna z publikacji
+profesora Maja. Nasza centrala chce pozyskać odpowiedzi na dostarczone przez
+nią pytania. Zwróć proszę uwagę, że podlinkowana notatka zawiera treści
+tekstowe, graficzne i dźwiękowe. Istnieje ogromne prawdopodobieństwo, że
+konieczne będzie wzięcie pod uwagę informacji podanych w każdym formacie.
+Zadanie, do którego raportujesz odpowiedź nazywa się “arxivˮ.
+Link do artykułu: https://centrala.ag3nts.org/dane/arxiv-draft.html
+Pytania centrali: https://centrala.ag3nts.org/data/KLUCZ-API/arxiv.txt
+Oczekiwany format odpowiedzi:
+{
+ "ID-pytania-01": "krótka odpowiedź w 1 zdaniu",
+ "ID-pytania-02": "krótka odpowiedź w 1 zdaniu",
+ "ID-pytania-03": "krótka odpowiedź w 1 zdaniu",
+ "ID-pytania-NN": "krótka odpowiedź w 1 zdaniu"
+}
+Co należy zrobić w zadaniu?
+Zaindeksuj (w wybrany przez siebie sposób) cały dokument od profesora
+Andrzeja Maja. Pisząc CAŁY, mamy na myśli teksty, grafiki, dźwięki.
+Warto pamiętać o kontekstowości materiałów. Dźwięki i obrazy występują w
+konkretnym kontekście, który może zmieniać ich odbiór.
+22.11.2024, 12:28 S02E05 — Multimodalność w praktyce | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e05-multimodalnosc-w-praktyce 14/19
+
+===== STRONA 15 =====
+Liked by Damian and 92 others
+Comment 464 comment s
+Borys Majewski 10h
+See more
+Like Reply
+Piotr Słomczyński 12h
+Wistak
+Korzystając z prostego rozwiązania opartego na modelu LLM, odpowiedz na
+pytania centrali. W ramach realizacji zadania nie musisz korzystać z typowego
+RAG z bazą wektorową. Możesz oprzeć swoje rozwiązanie na jednym pliku
+(np. Markdown), który zawiera wszystkie potrzebne informacje do
+generowania odpowiedzi.
+Gdy odpowiedzi na wszystkie pytania centrali będą poprawne, otrzymasz
+flagę.
+🚩 Sekretna flaga jest w notatce od Zygfryda.
+Like
+BM
+Moje podejście:
+— spoiler—
+.
+.
+.
+.
+.
+.…
+PS
+Dość długo walczę z tym zadaniem.
+Jak do tej pory:
+ Podzieliłem dokument na sekcje podziałem na nagłówki, zamiast
+obrazków wstawiam opisy, zamiast audio transkrypcje.
+Niestety dostaje odpowiedź na maks 3 pytania. Zastanawiam się nad
+tym czy to przez wysyłanie 5 pytań na raz, czy nie powinienem ich
+22.11.2024, 12:28 S02E05 — Multimodalność w praktyce | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e05-multimodalnosc-w-praktyce 15/19
+
+===== STRONA 16 =====
+Like Reply
+Paweł Dulak (dulare) AI_Dev 4h
+I'm here to help
+Like Reply
+Piotr Słomczyński 3h
+Wistak
+Like Reply
+Paweł Dulak (dulare) AI_Dev 3h
+I'm here to help
+Like Reply
+Patryk Góral12h
+Like Reply 1 like
+Remigiusz Pelica 19h
+Like Reply
+Paweł Dulak (dulare) AI_Dev 17h
+I'm here to help
+rozdzielić , wrzucając do tablicy i jeśli jest już odpowiedź na jakieś
+pytanie to je z niej wyrzucać.
+Piotr Słomczyński akurat ten dokument, nawet wzbogacony,
+powinien zmieścić się w całości w kontekst gpt-4o -
+próbowałeś tak? Można wtedy zadać wszystkie pytania na raz.
+PS
+Właśnie spróbowałem, udało się i to szybko. :)
+Czyli przy takich pracach najlepiej sprawdzać czy wszystko
+mieści się w kontekst, i dopiero gdy się nie mieści, to zacząć
+myśleć o podziale na kawałki?
+Piotr Słomczyński warto od tego zacząć, natomiast też teraz
+możesz się zastanowić dlaczego wcześniej to trzecie pytanie
+nie chciało pójść :)
+Flaga i sekrecik odblokowane! Widzimy się o 5 rano 😅
+RP
+Pomóżcie co mu dolega. Za długo już na to patrzę i mgła na oczach.
+jsonlint - ok, utf-8 zrobione.
+22.11.2024, 12:28 S02E05 — Multimodalność w praktyce | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e05-multimodalnosc-w-praktyce 16/19
+
+===== STRONA 17 =====
+Like Reply
+Remigiusz Pelica 17h
+Like Reply 1 like
+Paweł Dulak (dulare) AI_Dev 17h
+I'm here to help
+Like Reply
+Show more replies
+Bartosz Moskwik 21h
+See more
+Like Reply 1 like
+Borys Kuśmierski 1d
+Remigiusz Pelica spróbuj tymczasowo w każdej odpowiedzi
+dać tylko jedną spację i nic więcej. Testowo. Czy wtedy też nie
+przejdzie?
+RP
+Paweł Dulak (dulare) on ma tutaj ze składnią problem,
+podkreśla te dwukropki jako syntax error. Chyba coś z
+postmanem, z terminala poszło. Dzięki. Flaga do zeszytu.
+Remigiusz Pelica jak teraz patrzę na Twój screenshot z
+Postmana, to widzę że ten JSON był w zakładce Scripts
+zamiast Body - możesz jeszcze spróbować to przenieść? Tak
+dla testu :) Wiem że już zrobiłeś zadanie.
+BM
+Ale się zakopałem w tej lekcji. Bezmyślne print debuging nabiło mi
+1,40$, a finalnie okazało się, że regex którym wyciągałem obrazy z
+markdowna działa poprawnie we wszystkich regexowych
+validatorach, ale nie w pythonie, gdzie zgubił jeden z obrazów. Dobre
+zadanie, dużo się nauczyłem. Dużo zrozumiałem.
+Nie pokochałem się z LangFusem, ale już widzę jak bardzo potrzebne
+jest mieć narzędzie tej klasy. Można zrobić to ręcznie na lokalnym …
+BK
+Wreszcie mi się udało.
+Zawsze mówiło się, że komputery są głupie i trzeba im wszystko
+podać na tacy, żeby były w stanie rozwiązać problem.
+Ja chyba podświadomie “uwierzyłemˮ, że AI to sztuczna “inteligencjaˮ
+i z początku tak ją potraktowałem, dostarczając jej dane z tego
+zadania
+ …
+22.11.2024, 12:28 S02E05 — Multimodalność w praktyce | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e05-multimodalnosc-w-praktyce 17/19
+
+===== STRONA 18 =====
+See more
+Like Reply 2 likes
+overment Admin 1d
+I'm just curious.
+See more
+Like Reply 3 likes
+Adam Strojek 2d
+See more
+Like Reply
+Paweł Dulak (dulare) AI_Dev 1d
+I'm here to help
+Like Reply 1 like
+Paweł Dulak (dulare) AI_Dev 2h
+I'm here to help
+Borys Kuśmierski gratulacje :)
+Okazuje się, że to jednak “bardzo sztucznaˮ inteligencja i jak
+na razie AI nie zmieniła niczego w kwestii programowania, a
+jedynie pozwala na nieco innego rodzaju pracę z danymi, niż
+w programowaniu tradycyjnym. Czyli to po prostu nowe
+narzędzie.
+Dobry wniosek. Tak rzeczywiście jest i cieszy mnie to, że w ten
+sposób na to patrzysz. …
+AS
+No i już nie wiem gdzie jest tutaj błąd. Otrzymuję ciągle “ wrong
+answer for question 04“
+<spoiler>
+…
+Adam Strojek cóż, to nie jest “jakieś ciastoˮ - przy opisie tego
+zdjęcia pomaga dodanie kontekstu - podpisu pod zdjęciem na
+przykład - model vision ma wtedy łatwiej zrozumieć że chodzi
+o okrągły placek z różnymi dodatkami, który przywędrował do
+nas z Włoch.
+22.11.2024, 12:28 S02E05 — Multimodalność w praktyce | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e05-multimodalnosc-w-praktyce 18/19
+
+===== STRONA 19 =====
+Like Reply
+Adam Strojek 2h
+Like Reply 1 like
+Jeremiasz Grzesiuk 2d
+Mobile developer
+Like Reply 2 likes
+Łukasz Kiełczykowski 2d
+See more
+Like Reply 4 likes
+Krzysztof Branecki 2d
+Like Reply
+Show more comment s
+Adam Strojek tutaj wystarczy tak właściwie jedno słowo, ważne
+żeby było prawidłowe… Nie musi być długa odpowiedź.
+AS
+Dzięki, niby podpis powinien pomóc LLM, ale jednak to też
+wprowadzało go trochę w błąd. W sumie już zrozumiałem o co
+ci chodziło z tymi Włochami ;)
+JG
+Chat może odpowiedzieć na wszystkie pytania za jednym promptem,
+jeśli będzie dobrze skonfigurowany. Oszczędzi to trochę tokenów;)
+Całość z cachem i różnymi próbami ~0,3$
+Zadania stają się co raz bardziej złożone programistycznie 😀 Co raz
+więcej swoich "narzędzieˮ trzeba dodawać i je ze sobą łączyć, a
+zapowiada się tylko trudniej 😛
+Ciekawostka jest taka, że to zadanie fajnie pokazuje jak 4o może być
+drogi 😅 Jak prompt caching troche ratuje przed pomnożeniem tych
+kosztów 😀
+Super zadanko!
+(spoiler)…
+https://langfuse.com/docs/tracing-features/multi-modality
+PS
+Post
+What are your thoughts?
+22.11.2024, 12:28 S02E05 — Multimodalność w praktyce | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e05-multimodalnosc-w-praktyce 19/19

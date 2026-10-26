@@ -1,0 +1,818 @@
+
+===== STRONA 1 =====
+S00E03  API
+overment Admin Aug 28
+I'm just curious.
+» Lekka wersja przeglądarkowa «
+Dostęp do LLM przez API pozwala nie tylko na dostosowanie interakcji z
+modelem, ale także budowanie złożonej logiki dzięki której LLM może połączyć
+się z narzędziami czy pamięcią długoterminową. Taka interakcja nierzadko składa
+się z kilkunastu czy nawet kilkudziesięciu zapytań do modelu, co może przełożyć
+się także na znaczny wzrost jakości generowanej treści.
+Poniższy screen pochodzi ze strony DeepLearning.ai i przedstawia porównanie
+modeli GPT-3.5 oraz GPT-4 w połączeniu z technikami budowania interakcji
+będących częścią Agentic Workflow.
+Back to Lekcje programu [preAI3]
+PS
+22.11.2024, 12:20 S00E03 — API | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e03-api 1/35
+
+===== STRONA 2 =====
+To wszystko możemy połączyć z faktem, że dzięki API dane mogą
+być przetwarzane przez LLM bez aktywnego zaangażowania użytkownika w
+każdy z etapów. To otwiera możliwość tworzenia automatyzacji czy też tworzenia
+narzędzi zdolnych do zaawansowanego przetwarzania treści.
+Parametry API
+Część platform i narzędzi dostosowuje swoje API tak, aby było spójne z API
+OpenAI, co w praktyce ułatwia przełączanie się pomiędzy nimi. Widoczne
+są jednak różnice we wsparciu funkcjonalności (np. JSON Mode) w przypadku
+usług takich jak Groq czy narzędzia ollama. Z kolei przykład Anthropic pokazuje
+bardzo duże rozbieżności, co utrudnia korzystanie z obu platform po stronie
+kodu.
+Zastosowanie wielu modeli jest częstą praktyką ze względu na
+kwestie optymalizacji kosztów, wydajności, prywatności lub dopasowania do
+własnych potrzeb (fine-tuning). Poza tym dobrze jest utrzymywać możliwość
+przełączenia się pomiędzy różnymi dostawcami ze względu na rozwój modeli lub
+samych usług.
+Niezbędne parametry niemal każdego API to model oraz messages. Model
+wskazuje na nazwę LLM, który ma wygenerować odpowiedź. Z kolei lista
+wiadomości zawiera treść całej interakcji, dzieląc ją na role takie jak system,
+user, assistant oraz tool. Ze względu na rozwój modeli multimodalnych, treść
+wiadomości może być zarówno ciągiem znaków, jak i tablicą zawierającą różne
+formaty treści, które omówimy w późniejszych lekcjach.
+Zatem interakcja z LLM przez API polega w uproszczeniu na budowaniu listy
+wiadomości, których całą treść każdorazowo przetwarza model. Oczywiście nic
+22.11.2024, 12:20 S00E03 — API | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e03-api 2/35
+
+===== STRONA 3 =====
+nie stoi na przeszkodzie, aby programistycznie na nią wpływać, zmieniając tym
+samym zachowanie modelu. Przykładem takiej modyfikacji może być unikanie
+dostarczania wszystkich wiadomości na rzecz podsumowania umieszczanego w
+wiadomości systemowej.
+Choć interakcja z modelem może odbywać się bezpośrednio poprzez zapytania
+HTTP, tak obecnie lepiej jest korzystać z oficjalnych SDK OpenAI lub Anthropic .
+Interesującym rozwiązaniem jest także Vercel AI SDK (TypeScript) lub LiteLLM
+(Python) ze względu na wsparcie różnych platform.
+W poprzedniej lekcji w nagraniu na temat Playground omówiłem ustawienia, które
+występują także jako dodatkowe parametry API:
+22.11.2024, 12:20 S00E03 — API | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e03-api 3/35
+
+===== STRONA 4 =====
+max_tokens — określa maksymalną liczbę tokenów wygenerowanych przez
+model. Wartość ta, dodana do liczby tokenów w prompcie, nie może przekraczać
+dopuszczalnej wartości Context Window. Jeśli model posiada limit 4096 tokenów,
+a max_tokens ustawiony jest na 1000, to prompt może zawierać maksymalnie
+3096 tokenów. W przeciwnym razie otrzymamy błąd.
+temperature — określa się ją jako "poziom kreatywności" modelu. Jest to
+wskaźnik losowości, którego wartość ustawiona na 0 sprawia, że wybierane są
+tylko najbardziej prawdopodobne tokeny, a odpowiedź jest mniej zróżnicowana.
+Widać to na animacjach poniżej
+22.11.2024, 12:20 S00E03 — API | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e03-api 4/35
+
+===== STRONA 5 =====
+top_p — Działa podobnie jak temperature, lecz zamiast wpływać na losowość,
+wpływa na ilość rozpatrywanych tokenów. Jego wartość 0 - 1 odnosi się do sumy
+prawdopodobieństwa poszczególnych tokenów. Jeśli zatem w sytuacji z
+poniższego zrzutu ekranu top_p ustawilibyśmy na 0.5, to tylko token crisp —
+54.20% byłby brany pod uwagę, ponieważ on sam przekracza
+sumę prawdopodobieństwa określoną przez top_p
+frequency_penalty — obniża prawdopodobieństwo wystąpienia danego tokenu,
+poprzez nakładanie na niego kary uzależnionej od tego, ile razu został już
+wybrany w dotychczas generowanej treści.
+presence_penalty — podobnie jak frequency_penalty obniża
+prawdopodobieństwo wybrania tokenu, ale kara jest uzależniona od samej
+obecności tokenu, a nie tego, ile razy się pojawił.
+logit_bias — umożliwia podanie ID tokenu oraz wartości z zakresu -100 - 100.
+Wartość -100 wyklucza token, a 100 niemal wymusza jego użycie. Identyfikatory
+tokenów można znaleźć dzięki Tiktokenizer i będą się one różnić w zależności od
+tokenizera wykorzystywanego przez model.
+stop — to lista maksymalnie czterech sekwencji, które zatrzymają dalsze
+generowanie wypowiedzi
+n — określa liczbę generowanych odpowiedzi dla tego samego promptu. To
+użyteczny parametr w przypadku Self-Consistency (technika polegająca na
+22.11.2024, 12:20 S00E03 — API | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e03-api 5/35
+
+===== STRONA 6 =====
+wybieraniu najlepszego rezultatu spośród kilku wariantów)
+user — to ID użytkownika z naszej bazy, które pozwoli na zidentyfikowanie
+zapytań pochodzących od niego. To jedno z zaleceń dobrych praktyk na
+produkcji, rekomendowanych przez OpenAI.
+Poza nimi mamy także parametry związane ze strukturyzowaniem odpowiedzi
+(JSON) oraz wykorzystywaniem narzędzi (Tool), ale wrócimy do nich w dalszych
+lekcjach. Dodatkowo wymienione parametry te mogą różnić się w zależności od
+API.
+Bezpośrednie połączenie z API, SDK i frameworki
+Decyzja o sposobie połączenia z modelem jest ważna z punktu widzenia
+elastyczności aplikacji. Przykładowo, w OpenAI istnieje Assistant API, ułatwiające
+pracę z dokumentami i narzędziami. Z kolei frameworki takie jak LangChain czy
+CrewAI oferują warstwę abstrakcji, pozwalającą na szybkie tworzenie projektów.
+Jednak każde z wymienionych narzędzi ma ograniczenia związane z
+dopasowaniem implementacji do indywidualnych potrzeb. Poza tym, ze względu
+na ich wczesny etap rozwoju, ich zastosowanie na produkcji jest problematyczne
+z powodu częstych zmian API i niepełnych dokumentacji.
+Choć przełączanie się pomiędzy różnymi modelami czy nawet ich wersjami nie
+jest oczywiste, to warto na tym etapie zostawić sobie przestrzeń na
+łatwą zmianę usługi bądź połączenie innego API.
+Wniosek jest zatem następujący:
+Frameworki warto mieć na uwadze i monitorować ich rozwój. W niektórych
+przypadkach mogą sprawdzić się w komponentach aplikacji i z czasem
+mogą stać się w pełni użyteczne
+Bezpośrednie połączenie z API daje najwięcej kontroli, ale też wymaga
+dodatkowego nakładu pracy. API popularnych usług oferujących dostęp do
+LLM nadal się rozwija i pojawiają się w nim nowe opcje, co utrudnia
+utrzymanie samodzielnej integracji
+SDK dla popularnych języków, rozwijane jest bezpośrednio przez firmy
+tworzące dane modele lub narzędzia. Nowe wersje zawierające wsparcie dla
+nowych funkcji pojawiają się szybko, a samo SDK zwykle nie jest zbyt
+skomplikowane, co pozwala skupić się na rozwoju własnej logiki wokół niego
+Oczywiście są scenariusze, gdzie np. Assistant API może sprawdzić się lepiej
+niż własna integracja. Przykładem może być tworzenie PoC (Proof of Concept)
+lub MVP (Minimum Viable Product), które wymagają szybkich iteracji.
+Prosty przykład połączenia z modelem poprzez SDK (w tym przypadku OpenAI)
+znajduje się w przykładzie sdk, po uruchomieniu którego włączony zostanie
+22.11.2024, 12:20 S00E03 — API | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e03-api 6/35
+
+===== STRONA 7 =====
+serwer Node.js do którego możemy kierować następujące zapytania:
+curl -X POST http://localhost:3000/api/chat \
+-H "Content-Type: application/json" \
+-d '{"messages":[{"role":"user","content":"Hello"}]}'
+Przesłana lista wiadomości zostaje połączona z wiadomością systemową, a
+następnie przekazana do modelu. W rezultacie otrzymujemy odpowiedź
+zawierającą minimalną liczbę słów, ponieważ o tym właśnie mówi nasz główny
+prompt.
+Połączenie z modelami Open Source
+W lekcji S00E01 wspomniałem o ollama jako prostym sposobie na połączenie z
+modelami Open Source na własnym komputerze, aczkolwiek musi on spełniać
+minimalne wymagania, które głównie ukierunkowane są na pamięć RAM oraz
+GPU. Z modeli tych można także skorzystać poprzez API za pośrednictwem
+platform Groq, Replicate czy OpenRouter. Po ukończeniu AI_devs 3 warto
+zapoznać się także z MLX, llama.cpp i bezpośrednio biblioteką Transformers (ma
+także swój odpowiednik Transformers.js).
+22.11.2024, 12:20 S00E03 — API | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e03-api 7/35
+
+===== STRONA 8 =====
+Choć może się wydawać, że korzystanie z Open Source LLM jest bezpłatne (i tak
+może być w przypadku prywatnych zastosowań), to w praktyce koszty zakupu
+lub wynajęcia sprzętu oraz jego utrzymanie, osiągają podobny lub nawet większy
+poziom niż w przypadku modeli komercyjnych. Z drugiej strony mamy nad nimi
+pełną kontrolę, ale też musimy liczyć się z tym, że jakość generowanych
+odpowiedzi jest znacznie niższa (choć wystarczająca do wielu zadań, a same
+modele Open Source nieustannie się rozwijają).
+Dodatkowo rozwijają się także modele określane jako SLM (Small Language
+Model), które w swoim założeniu mają działać na urządzeniu użytkownika (np.
+smartphone). Chociażby z tego powodu warto obserwować rozwój modeli z tej
+kategorii.
+Dzięki ollama możemy sprawdzić działanie małego modelu na własnym
+komputerze, bez ponoszenia dodatkowych kosztów. Wystarczy, że po instalacji
+ollama w terminalu uruchomimy polecenie ollama run gemma2:2b. Spowoduje to
+pobranie modelu na nasz komputer, a następnie możliwość poprowadzenia z nim
+rozmowy, co widać na poniższym zrzucie ekranu:
+22.11.2024, 12:20 S00E03 — API | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e03-api 8/35
+
+===== STRONA 9 =====
+Ollama umożliwia także znacznie wygodniejszą interakcję z modelem, poprzez
+zapytania HTTP na adres localhost:11434/api/chat w formacie zgodnym z
+OpenAI API.
+Ważne: Pierwsze zapytanie do modelu Open Source trwa dłużej ze względu na
+konieczność wczytania go do pamięci. Kolejne interakcje są już znacznie
+szybsze, ale zależą od wykorzystywanego modelu, jego wielkości oraz
+konfiguracji sprzętowej.
+Na temat modeli Open Source dostępnych na ollama należy wiedzieć przede
+wszystkim, że:
+Końcówki :2b, :8b, :27b itd. oznaczają liczbę parametrów modelu. Im więcej
+parametrów, tym większe wymagania sprzętowe, ale też większe możliwości
+samego modelu (choć nie zawsze).
+Modele mogą być aktualizowane przez ollama, co zwykle obejmuje poprawki
+błędów związanych z inferencją
+Modele zwykle poddawane są także kwantyzacji, czyli optymalizacji w celu
+przyspieszenia inferencji oraz zmniejszenia wymagań sprzętowych. Wersje
+Q4_K_M, Q5_K_S oraz Q5_K_M są obecnie uznawane jako rekomendowane.
+Modele Open Source mogą zostać dopasowane do naszych potrzeb poprzez
+Fine-tuning. Proces ten ułatwiają rozwiązania takie jak Unsloth
+Modele Open Source nierzadko wymagają większych umiejętności prompt
+engineeringu ze względu na bardziej ograniczoną zdolność do podążania za
+instrukcjami
+Modele na które warto zwrócić uwagę to llama 3.1, gemma 2, qwen2, phi3,
+mistral, deepseek coder, llava (vision), MiniCPM (vision) i whisper (speech to
+text), ChatTTS (text to speech)
+W AI_devs 3 mała część naszego czasu będzie poświęcona modelom Open
+Source, ponieważ projektowane przez nas interakcje będą wymagały
+22.11.2024, 12:20 S00E03 — API | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e03-api 9/35
+
+===== STRONA 10 =====
+realizowania wielu zapytań, często równolegle. Z drugiej strony techniki pracy z
+modelami komercyjnymi można później przełożyć na modele lokalne i
+ukierunkować dalszy rozwój właśnie na ten obszar.
+Do pracy z modelami Open Source warto także skorzystać z graficznego
+interfejsu, np. AnythingLLM.
+Podstawy prowadzenia interakcji z modelem
+LLM w kodzie aplikacji pozwala nam na znacznie więcej niż w ChatGPT czy
+Claude.ai. Możemy swobodnie wpływać zarówno na przetwarzaną treść, ale
+też wykonywać serię różnych akcji, przed wygenerowaniem ostatecznej
+odpowiedzi. Z drugiej strony musimy samodzielnie zadbać o rzeczy, które
+wspomniane usługi oferują nam domyślnie.
+Wiemy już, że interakcja z obecnymi modelami odbywa się poprzez API i format
+ChatML. Zatem to do nas należy zbudowanie promptów, wczytanie dynamicznych
+danych, historii konwersacji oraz dostarczenie odpowiedzi użytkownikowi.
+Poniżej znajduje się schemat logiki, uwzględniającej:
+Wiadomość użytkownika, która początkowo trafia do dwóch oddzielnych
+promptów.
+Pierwszy prompt generuje odpowiedź na podstawie informacji z bazy danych
+(np. pamięci długoterminowej i danych zapisanych na temat użytkownika)
+Drugi prompt generuje odpowiedź na podstawie wyników wyszukiwania z
+Internetu
+Pierwszy i drugi prompt wykonuje się równolegle w celu zmniejszenia czasu
+potrzebnego na wykonanie całego schematu
+Treść wygenerowana przez te prompty przekazywana jest do trzeciego,
+którego zadaniem jest wygenerowanie odpowiedzi przesyłanej do
+użytkownika
+W rezultacie taka logika pozwala na wygenerowanie spersonalizowanej
+odpowiedzi, uwzględniającej aktualne dane, mogące wykraczać poza
+bazową wiedzę modelu
+22.11.2024, 12:20 S00E03 — API | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e03-api 10/35
+
+===== STRONA 11 =====
+Choć logika prezentowana przez powyższy schemat może sugerować wprost
+nieograniczone zastosowania LLM, to wiąże się z nią szereg wyzwań, które
+musimy zaadresować na poziomie aplikacji. Przykładowo sama konfabulacja
+stanowi tutaj jeszcze większy problem niż w ChatGPT, ponieważ jeśli pojawi
+się nawet na jednym z etapów, to może negatywnie wpłynąć na kolejne. To samo
+dotyczy błędów, także tych w kodzie aplikacji, niemających nic wspólnego z
+modelem.
+Do projektowania zaawansowanej logiki jeszcze wrócimy i na ten moment
+wystarczy świadomość tego, że projektowane interakcje będą znacznie
+wykraczać poza wymianę informacji bezpośrednio z modelem.
+W folderze sdk repozytorium AI_devs znajduje się przykład prostego serwera
+HTTP, którego zadaniem jest wygenerowanie odpowiedzi przez model OpenAI za
+pośrednictwem oficjalnego SDK dla Node.js. Interakcja jest dodatkowo
+wzbogacona o systemowy prompt sprawiający, że model będzie używał
+minimalnej liczby słów. Treść tej wiadomości jest niemożliwa do nadpisania przez
+użytkownika, ale wiemy z S00E02, że dzięki Prompt Injection może on uzyskać jej
+treść.
+22.11.2024, 12:20 S00E03 — API | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e03-api 11/35
+
+===== STRONA 12 =====
+Testowe zapytanie potwierdza wpływ instrukcji systemowej na LLM. Teraz także
+jasne jest, że kompletna lista wiadomości musi zostać przesłana w każdym
+zapytaniu. W przeciwnym wypadku konwersacja wciąż będzie zaczynać się od
+nowa, a model nie będzie mieć wiedzy o poprzednich wiadomościach.
+Zatem jeśli chcielibyśmy kontynuować konwersację, to musimy zadbać o
+przekazanie zarówno wiadomości użytkownika, jak i dotychczasowych
+odpowiedzi LLM.
+22.11.2024, 12:20 S00E03 — API | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e03-api 12/35
+
+===== STRONA 13 =====
+Naturalnie, nic nie stoi na przeszkodzie, aby zmienić powyższy schemat. Zamiast
+przesyłać całą listę wiadomości, moglibyśmy zapisać podsumowanie konwersacji
+w bazie danych, a następnie wczytać je do promptu systemowego. Choć mówimy
+tutaj o kompresji (i część danych zostanie pominięta), to pozwoli nam to
+zredukować koszty oraz uniknąć przekroczenia context window. Dobrze
+poprowadzone podsumowanie może zwiększyć skuteczność promptu, ponieważ
+uwaga modelu pozostanie skupiona na instrukcji systemowej.
+Wniosek jest zatem następujący:
+22.11.2024, 12:20 S00E03 — API | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e03-api 13/35
+
+===== STRONA 14 =====
+Choć ChatML sugeruje, że wymiana wiadomości odbywa się pomiędzy
+użytkownikiem, a asystentem, to w praktyce nie musi tak być. Treść
+wiadomości użytkownika może być zamieniona dowolnymi innymi danymi
+wejściowymi
+Treść wiadomości może być modyfikowana i nadpisywana w trakcie interakcji
+z modelem
+Ze względu na Prompt Injection i Jailbreaking będzie nam zwykle zależało na
+ograniczeniu interakcji LLM z użytkownikiem
+Logika realizowana przez LLM musi być wspierana przez kod
+Model powinien odpowiadać wyłącznie za zadania, w których sprawdza
+się najlepiej. Pozostałe powinny pozostać po stronie kodu
+Niezależnie od tego, czy będziemy budować chatboty, czy nie, interakcje z LLM
+warto zapisywać w bazie danych. Przykładowa struktura tabeli, powinna
+zawierać identyfikator wiadomości, wątku, nazwę użytkownika, asystenta bądź
+narzędzia, a także rolę, zapytanie oraz wygenerowaną odpowiedź. W niektórych
+sytuacjach może przydać się także źródło czy kontekst wykorzystany do
+generowania odpowiedzi.
+O pracach z bazami danych na potrzeby aplikacji korzystających z LLM będziemy
+jeszcze mówić, ponieważ temat ten łączy się z silnikami wyszukiwania, w tym
+także z bazami wektorowymi. Całość stanowi niemal niezbędny element pracy z
+LLM.
+Routing i połączenie wielu modeli
+Choć najlepszych LLM jest zaledwie kilka, tak praca z Generatywnym AI może
+wymagać skorzystania z różnych modeli, w tym także modeli poddanych
+procesowi fine-tuningu. Powodów może być kilka:
+22.11.2024, 12:20 S00E03 — API | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e03-api 14/35
+
+===== STRONA 15 =====
+Redukcja kosztów (mniejsze modele są zwykle tańsze)
+Redukcja czasu reakcji (mniejsze modele są zwykle szybsze)
+Zachowanie prywatności (część danych może być przetwarzana lokalnie)
+Lepsze dopasowanie (modele wyspecjalizowane w danym zadaniu
+uzyskują lepszą skuteczność)
+Zwiększenie precyzji (niektóre zadania mogą być realizowane przez kilka
+modeli, a następnie oceniane i wykorzystywane do wygenerowania
+ostatecznej odpowiedzi)
+Zmniejszenie wymagań (niektóre operacje mogą być wykonane na urządzeniu
+użytkownika)
+Do dyspozycji mamy przynajmniej kilka platform, oferujących łatwy dostęp do
+wielu modeli. Są to m.in. Replicate czy OpenRouter lub usługi takie jak Amazon
+Bedrock czy Vertex AI. Oczywiście możemy także pracować bezpośrednio z
+OpenAI czy Anthropic, jednak będzie to zależało od naszych potrzeb i kwestii
+prawnych. Należy zwracać przede wszystkim uwagę na sposób przetwarzania
+danych, ceny oraz stabilność i przepustowość API.
+Wiemy już, że aktualnie każdy framework oraz narzędzia takie jak Vercel AI SDK
+oferują integrację z różnymi usługami i tym samym modelami. Natomiast mówimy
+tutaj nie tylko o samym interfejsie, lecz sposobie jego zastosowania, czego
+świetnym przykładem jest projekt Route LLM. Dzięki niemu możemy ocenić który
+z dostępnych modeli powinien obsłużyć dane zapytanie.
+Poniżej mamy wykres twórców Route LLM sugerujący, że przełączanie
+się pomiędzy modelami pozwoliło zredukować koszty (-85%), przy zachowaniu
+niemal pełnej skuteczności (95%). Należy jednak pamiętać, że obecnie koszt
+inferencji znacznie spada i może się okazać, że optymalizacja akurat w tym
+kierunku, będzie mieć mniejszy sens.
+22.11.2024, 12:20 S00E03 — API | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e03-api 15/35
+
+===== STRONA 16 =====
+
+===== STRONA 17 =====
+
+===== STRONA 18 =====
+Strumieniowanie najlepiej jest obsługiwać przez oficjalne SDK danej usługi, ale
+nie zawsze będzie to możliwe ze względu na potrzebę dopasowania formatu
+odpowiedzi i/lub przesyłanych danych
+Strukturyzowanie odpowiedzi (JSON)
+Zastosowanie LLM w kodzie niemal zawsze wymaga ustrukturyzowanej
+odpowiedzi, np. w formacie JSON lub YAML i mówimy tutaj o JSON Mode oraz
+Structured Output. Choć JSON jest znacznie bardziej popularny, to w filmie "Let's
+build the GPT Tokenizer" Andrej Karpathy wyjaśnia wpływ tokenizacji na lepszą
+wydajność dla formatu YAML). Dodatkowo pojawiły się sygnały o tym, że
+strukturyzowana odpowiedź ma negatywny wpływ na jakość działania modelu, o
+czym możemy przeczytać w Let Me Speak Freely? (prawdopodobnie ma to
+związek z częściowym odwróceniem uwagi modelu od zadania, na rzecz
+strukturyzowania wypowiedzi).
+Zatem w praktyce, mówimy tutaj o sytuacji, gdy:
+Instrukcja systemowa zawiera polecenie o wygenerowaniu JSON lub YAML o
+ustalonej strukturze na podstawie określonych danych
+LLM generuje odpowiedź, która zostaje parsowana, a poszczególne
+właściwości mogą zostać wykorzystane w dalszej części logiki aplikacji
+Choć obecnie większość LLM doskonale radzi sobie z generowaniem prostych
+obiektów JSON, mniejsze modele Open Source nadal mają z tym problem.
+Przykładowo, Llama 3.1 8B zamiast wygenerować obiekt JSON na podstawie
+prostego polecenia, zwróciła odpowiedź informującą o niewystarczającej wiedzy.
+W takim przypadku aplikacja zwróci błąd, ponieważ dane nie zostały poprawnie
+przetworzone.
+22.11.2024, 12:20 S00E03 — API | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e03-api 18/35
+
+===== STRONA 19 =====
+Co więcej, nawet jeśli skupimy się na pracy wyłącznie z najlepszymi dostępnymi
+modelami, to nadal może zdarzyć się sytuacja w której albo nie otrzymamy
+poprawnego obiektu JSON, albo jego struktura nie będzie zgodna z
+oczekiwaniem. W obu przypadkach zakończy się to błędem, który może nawet
+nie być jawny, ponieważ LLM może zwrócić poprawną właściwość, której wartość
+będzie niepoprawna.
+Obecnie do dyspozycji mamy dwa rozwiązania, dzięki którym LLM będzie
+generować obiekt JSON. Są to wspomniany JSON Mode i Structured Output. Nie
+są one jednak wspierane przez wszystkie platformy oraz nie gwarantują nam
+tego, że wygenerowany obiekt będzie poprawny.
+JSON Mode został przedstawiony przez OpenAI i jest implementowany przez
+kilka platform, np. Groq czy ollama. Jest to dodatkowy parametr obiektu żądania,
+określający format wypowiedzi.
+Choć w takiej sytuacji wymuszamy zwrócenie obiektu JSON, to i tak nasz prompt
+musi zawierać jasną instrukcję, która poprowadzi LLM do wygenerowania
+poprawnej struktury. Nie jest to jednak gwarantowane i może okazać się, że w
+22.11.2024, 12:20 S00E03 — API | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e03-api 19/35
+
+===== STRONA 20 =====
+obiekcie pojawią się dodatkowe właściwości, innych będzie brakować, a inne
+będą mieć niepoprawne wartości. Na skuteczność generowania wpływa więc
+tutaj nasz prompt, przetwarzane dane, jak i sam model.
+Poniżej widzimy przykład OpenAI Playground z aktywnym JSON mode,
+instrukcją wyraźnie mówiącą o odpowiedzi w ustalonym formacie oraz
+parametrem temperature ustawionym na 0, ponieważ w tym przypadku nie zależy
+nam na "kreatywności" modelu. Przykład można przetestować tutaj.
+Należy tutaj pamiętać o Prompt Injection i przykładach omawianych w S00E02 —
+Prompt Engineering. Choć w tym przypadku odpowiedź modelu będzie w
+formacie JSON, tak może wyglądać następująco:
+Jest to kolejny powód do tego, aby nie korzystać z LLM w przypadku
+oprogramowania odpowiadającego za krytyczne procesy oraz unikania
+zaangażowania człowieka w dodatkową weryfikację, przynajmniej do czasu
+pojawienia się rozwiązań tego problemu, co może zostac rozwiązane przez
+kolejną generacją modeli językowych.
+22.11.2024, 12:20 S00E03 — API | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e03-api 20/35
+
+===== STRONA 21 =====
+Poza JSON Mode, do dyspozycji mamy także Structured Output, który w
+przypadku OpenAI zapewnia 100% pewności (w trybie strict), że wygenerowany
+obiekt JSON będzie posiadał oczekiwane właściwości. Niestety nie daje nam to
+pewności, że uwzględnione w nim wartości będą poprawne i na to nadal wpływa
+sam model.
+Structured Output wspierany jest przez wybrane modele OpenAI i można go
+aktywować zarówno w trybie normalnym, jak i strict poprzez dodanie parametru
+żądania widocznego poniżej. Jeśli chodzi o sam schemat, to mówimy tutaj o
+zastosowaniu JSON Schema, a konkretnie jego obsługiwanego podzbioru, z
+którym można zapoznać się w dokumentacji OpenAI "Supported schemas".
+Przykładowy prompt w Playground wymaga zatem przekazania schematu w oknie
+dialogowym dostępnym po aktywowaniu ustawienia Response format.
+22.11.2024, 12:20 S00E03 — API | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e03-api 21/35
+
+===== STRONA 22 =====
+Co ciekawe, w przeciwieństwie do JSON Mode, w tym przypadku Structured
+Output pozwoliło na wygenerowanie obiektu JSON, który dokładnie zgadza się z
+naszymi założeniami. Choć instrukcja systemowa nie jest tutaj niezbędna, nadal
+odgrywa istotną rolę, ponieważ to, co "widzi" LLM, to nadal ustrukturyzowany
+ciąg tokenów, na podstawie których generowana jest odpowiedź.
+W poniższym przykładzie widzimy Structured Output pobierający datę
+wspomnianą przez użytkownika w formacie YYYY-MM-DD. Mimo że użytkownik
+wspomniał jedynie słowo "jutro / tomorrow", model poprawnie określił docelową
+datę, korzystając z kontekstu dostępnego w instrukcji systemowej.
+22.11.2024, 12:20 S00E03 — API | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e03-api 22/35
+
+===== STRONA 23 =====
+Obiekt zawierający odpowiedź asystenta może zawierać dodatkowy parametr
+refusal, który zostanie ustawiony na true w przypadku braku możliwości
+wygenerowania oczekiwanego formatu JSON. Dzięki niemu możemy obsłużyć
+takie sytuacje w logice aplikacji.
+Podsumowując, Structured Output:
+Strukturyzowane odpowiedzi są wspierane przede wszystkim przez OpenAI,
+natomiast pozostałe platformy i narzędzia stopniowo również je wprowadzają
+OpenAI wspiera tylko część opcji dostępnych w JSON Schema i dodatkowo
+zawiera ograniczenia opisane w dokumentacji OpenAI związane ze
+strukturą obiektu czy niektórymi ustawieniami
+Nazwy (name) i opisy (description) właściwości opisanych w JSON Schema
+powinny być napisane z myślą o LLM, który na ich podstawie będzie określać
+ich wartości
+Structured Output w trybie strict będzie miało zwiększony czas reakcji dla
+danego schematu, ale tylko za pierwszym razem. Jest to uzasadnione
+koniecznością przetworzenia struktury przez serwery OpenAI
+W sytuacjach gdy struktura obiektów JSON nie jest nam dokładnie znana lub
+musi być bardziej elastyczna niż pozwala na to Structured Output, lepszą
+opcją będzie skorzystanie z JSON Mode
+22.11.2024, 12:20 S00E03 — API | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e03-api 23/35
+
+===== STRONA 24 =====
+Odpowiedzi w formacie JSON są niezbędnym elementem integrowania LLM z
+logiką aplikacji.
+Formatowanie odpowiedzi po stronie front-endu
+LLM może generować odpowiedzi ustrukturyzowane nie tylko w formacie JSON
+czy YAML, ale także Markdown. To umożliwia łatwą konwersję do HTML i
+poprawne wyświetlenie po stronie interfejsu użytkownika. Samo konwertowanie
+tych formatów nie jest czymś nowym, jednak w połączeniu ze strumieniowaniem,
+interfejsem czatu oraz możliwościami modelu, temat ten się komplikuje. Mowa
+tutaj konkretnie o między innymi:
+Tempo strumieniowania odpowiedzi sięgające nawet kilkuset tokenów na
+sekundę oraz uruchamianie funkcji formatujących tekst przy każdym tokenie
+negatywnie wpływa na responsywność interfejsu. Dlatego należy dbać o to,
+aby przetwarzać możliwie małe zestawy danych (np. ostatnią wiadomość na
+czacie lub jej wyodrębniony fragment)
+Model może generować zaawansowane formaty treści, np. kod źródłowy,
+tabele czy składnię LaTeX, które wymagają dodatkowego formatowania po
+stronie front-endu
+W przypadku składni Markdown konwertowanie na HTML może być
+realizowane przez bibliotekę Marked, remark, commonmark lub markdown-it
+W przypadku kodu źródłowego przydatna jest biblioteka highlight.js
+LLM może generować także diagramy dzięki narzędziom takim jak Mermaid
+czy Markmap
+LLM może generować także dynamiczne komponenty dzięki Vercel AI SDK
+oraz dostępnej w nim opcji Generative UI
+Strumieniowanie wypowiedzi modelu utrudnia pracę z tagami takimi jak
+markdown block, czyli ```\n …\n```. Problem polega na tym, że tag ten w
+trakcie strumieniowania musi być zamknięty, lecz kolejne tokeny muszą być
+zapisane wewnątrz niego
+Strumieniowanie treści może trwać nawet kilkadziesiąt sekund, a jej
+aktualizowanie po stronie front-endu może powodować ponowne
+renderowanie komponentu, co uniemożliwia jej zaznaczenie czy skopiowanie
+Strumieniowanie odpowiedzi powinno być możliwe do przerwania z poziomu
+interfejsu użytkownika, co powinno zatrzymać żądanie po stronie serwera.
+Jest to możliwe dzięki AbortController
+22.11.2024, 12:20 S00E03 — API | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e03-api 24/35
+
+===== STRONA 25 =====
+Choć implementacja renderowania treści generowanych przez LLM będzie
+się różnić w zależności od aplikacji, zastosowania i narzędzi, to ogólny schemat
+prezentuje się następująco:
+22.11.2024, 12:20 S00E03 — API | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e03-api 25/35
+
+===== STRONA 26 =====
+A więc kontakt z LLM zawsze odbywa się po stronie serwera, ponieważ
+wymagane jest uwierzytelnienie z pomocą klucza API, który nie może być
+przechowywany po stronie klienta. Następnie po stronie aplikacji front-endowej
+treść generowana przez model musi być przechowywana zarówno w swojej
+oryginalnej formie (plain text / markdown), oraz sparsowanej (HTML & CSS).
+Dobre praktyki bezpieczeństwa
+Niedeterministyczna natura LLM, wczesny etap rozwoju modeli oraz fakt, że
+pracując z nimi mamy do czynienia z naturalnym językiem, który jest mniej
+precyzyjny niż języki programowania, musimy pamiętać o istotnych kwestiach
+bezpieczeństwa.
+Prywatność danych: Pracując z komercyjnymi modelami, musimy dbać o
+prywatność danych, w czym mogą pomóc plany Enterprise oraz usługi
+oferujące dostęp do modeli w chmurze (np. Amazon Bedrock czy Vertex AI)
+Prompt Injection Wszystkie informacje trafiające do promptu powinny być
+uznawane za publicznie dostępne
+Limity kluczy API: Klucze API wykorzystywane w aplikacji powinny
+mieć ustawiony twardy limit budżetu na wypadek uruchomienia zapytań do
+modelu w pętli
+Limity API Produkcyjna aplikacja powinna narzucać limity zapytań dla
+użytkownika oraz chronić API przed atakami DDOS
+Weryfikacja: Działanie modelu i generowane treści powinny być nadzorowane
+i weryfikowane przez człowieka
+22.11.2024, 12:20 S00E03 — API | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e03-api 26/35
+
+===== STRONA 27 =====
+Liked by Mateusz and 203 others
+Comment 170 comment s
+Przemysław Wywigac z Nov 5
+E-commer ce Product Manager
+Like Reply 1 like
+overment Admin Nov 8
+I'm just curious.
+Ograniczenia: LLM połączony z logiką aplikacji powinien mieć narzucone
+programistyczne ograniczenia, uniemożliwiające usuwanie i nadpisywanie
+informacji
+Kopie zapasowe: W przypadku konieczności nadania uprawnień związanych z
+modyfikacją danych (np. integracja z systemem CRM), konieczne jest
+prowadzenie pełnej historii zmian na potrzeby ewentualnego przywrócenia
+danych
+Moderacja danych wejściowych: W przypadku pracy z OpenAI wszystkie
+treści przekazywane przez użytkownika powinny być filtrowane przez
+Moderation API
+Moderacja danych wyjściowych: Moderacji mogą podlegać zarówno treści
+trafiające do LLM, jak i przez niego zwracane (w tej sytuacji rezygnujemy ze
+strumieniowania)
+Inaczej mówiąc: LLM powinny mieć ograniczone uprawnienia dostępu do danych,
+akcji oraz być chronione przed nieautoryzowanym dostępem bądź niewłaściwym
+zastosowaniem ze strony użytkownika.
+Podsumowanie
+Integracja LLM z aplikacją otwiera scenariusze, które trudno osiągnąć pisząc kod
+samodzielnie. Jednak oddawanie im zbyt dużej odpowiedzialności jest nie tylko
+mało efektywne i kosztowne, ale może generować problemy, czy nawet narażać
+na utratę danych. Z tego powodu powinniśmy rozwijać umiejętność oceny tego,
+do jakiego stopnia chcemy wykorzystywać modele w naszej aplikacji lub czy w
+ogóle chcemy to robić.
+Z tej lekcji kluczową umiejętnością jest zdolność do wieloetapowej interakcji z
+LLM poprzez SDK lub bezpośrednie zapytania do API, a także generowanie
+ustrukturyzowanych odpowiedzi z pomocą JSON Mode i/lub Structured Output z
+uwzględnieniem możliwości korzystania z kilku modeli.
+DZ
+Like
+ overment, literówka: “poddonaych“.
+22.11.2024, 12:20 S00E03 — API | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e03-api 27/35
+
+===== STRONA 28 =====
+Like Reply 1 like
+Marcin Wojtynka Nov 5
+Like Reply 1 like
+Maciej Łastowski Nov 5
+See more
+Przemysław W ywigacz fixed
+MW
+Hej, pytanie o JSONa. Chciałem zrobić zadanie z preworka z
+pobieraniem i wysyłaniem danych, zdaje mi się że jest dobrze,
+JSONLint tez mówi, ze jest dobrze, ale dostaję odpowiedź, ze JSON
+jest zły. Mógłby ktoś naprowadzić co jest nie tak?
+Marcin Wojtynka nie jestem doświadczony w te tematy (to
+moja pierwsza styczność z JS i API) ale u mnie zadziałało
+to:const response = await fetch(apiURL, {
+ method: 'POST',
+ headers: {
+ 'Content-Type': 'application/json'
+ },
+ body: JSON.stringify(inputJSON)…
+22.11.2024, 12:20 S00E03 — API | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e03-api 28/35
+
+===== STRONA 29 =====
+Like Reply
+Maciej Łastowski Nov 5
+Like Reply
+Marcin Wojtynka Nov 5
+Like Reply
+Show more replies
+Marcin Wojtynka Nov 4
+Like Reply 1 like
+Paweł Dulak (dulare) AI_Dev Nov 4
+I'm here to help
+Like Reply 1 like
+Marcin Wojtynka Nov 4
+oczywiście apiURL to url poligonu 🙂
+MW
+Maciej Łastowski Kusi by sprawdzić ale już pora na sen :)
+MW
+Cześć, pytanie o - “Przykładowy prompt w Playground wymaga zatem
+przekazania schematu w oknie dialogowym dostępnym po
+aktywowaniu ustawienia Response format.ˮ W którym miejscu można
+to edytować Response format, nie mogę tego znaleźć :)
+Marcin Wojtynka zerknij tutaj:
+MW
+Paweł Dulak (dulare) Dzięki, nie pomyślałem żeby sprawdzić tą
+opcję. 👍
+22.11.2024, 12:20 S00E03 — API | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e03-api 29/35
+
+===== STRONA 30 =====
+Like Reply 2 likes
+Urszula Dwojak Nov 4
+Like Reply 3 likes
+overment Admin Nov 4
+I'm just curious.
+Like Reply 1 like
+Urszula Dwojak Nov 5
+Like Reply 1 like
+overment Admin Nov 8
+I'm just curious.
+Like Reply
+Show more replies
+Robert Zdanowski Nov 3
+Bardzo fajne szkolenie – szkoda tylko, że przez niepoprawną
+interpunkcję niektóre zdania czytam po kilka razy, żeby je zrozumieć.
+Przed przyszłą edycją warto by było zatrudnić korektora 😄
+Urszula Dwojak 🙈 no kurczę, ja już nie wiem! Pracuję non stop
+z narzędziami, które "poprawiają interpunkcję". Niektóre
+przeczą sobie nawzajem. Tekst też czytało kilka osób
+No nic, cieszę się, że udało Ci się przez to przejść :)
+:D A to ciekawe! No właśnie miałam wrażenie, że interpunkcja
+w tych tekstach jest jakby kalką z j. angielskiego (w j. polskim
+interpunkcja jest zależna głównie od składni, mniej od intonacji,
+a angielskim odwrotnie). Być może narzędzia nie są jeszcze
+zbyt dobrze dostosowane do zasad j. polskiego lub są
+trenowane na tekstach, w których popełniano tego typu błędy –
+niestety coraz częściej się je dziś spotyka.
+Urszula Dwojak kurczę :) Na co dzień korzystam już wyłącznie
+z języka angielskiego (w części zawodowej), więc może stąd
+ten efekt. W ogóle nie byłem tego świadomy.
+Dzięki :)
+RZ
+22.11.2024, 12:20 S00E03 — API | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e03-api 30/35
+
+===== STRONA 31 =====
+See more
+Like Reply
+Paweł Dulak (dulare) AI_Dev Nov 3
+I'm here to help
+Like Reply 2 likes
+Dawid Polak Nov 4
+Like Reply 1 like
+Robert Zdanowski Nov 4
+Like Reply
+Show more replies
+Dawid Ostrowski Nov 3
+Like Reply 1 like
+Mam pytanie do tego punktu:
+Prompt Injection Wszystkie informacje trafiające do promptu
+powinny być uznawane za publicznie dostępne
+Czy w przypadku gdy korzystamy z prywatnego LLMa (nie wiem, np.
+ollama) postawionego na naszym serwerze i używając w promptcie
+prywatnych danych usera “uczymyˮ AI i dane te mogą później wyciec
+do zupełnie innego użytkownika? Czy jednak “wiedzaˮ z promptu nie
+jest wykorzystywana przez model w przyszłych zapytaniach i służy …
+Robert Zdanowski model nie uczy się sam z siebie na
+promptach do niego przekazanych. Douczanie modelu to
+osobne zagadnienie. W związku z tym, jeśli masz swojego LLM
+postawionego na swoim serwerze, to jego stan jest zamrożony
+i nic między promptami nie powinno przeciekać.
+co nie zmienia faktu, że cała treść promtu potencjalnie może
+zostać odczytana przez użytkownika z niego korzystającego
+To raczej o tym pisał autor - a nie o wpływie na przyszłe
+zapytania i zmianę modelu
+RZ
+Tak, ta kwestia była dla mnie jasna, zastanawiałem się tylko czy
+mogę wykorzystywać poufne dane na temat usera (co w moim
+rozumieniu wykracza poza stwierdzenie “publicznie dostępneˮ,
+ale nadal są to dane, do których ten konkretny user jest
+uprawniony) bez ryzyka ich wycieku do innych userów.
+Czesc, ktos gdzies wspominal o discordzie absolwentow poprzednich
+edycji. Moge prosic o zaproszenie ?
+22.11.2024, 12:20 S00E03 — API | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e03-api 31/35
+
+===== STRONA 32 =====
+Paweł Dulak (dulare) AI_Dev Nov 3
+I'm here to help
+Like Reply
+Miłosz Borkowski Nov 3
+Like Reply
+Paweł Dulak (dulare) AI_Dev Nov 3
+I'm here to help
+Like Reply 1 like
+Andrzej Jackiewicz Nov 3
+Like Reply 1 like
+Paweł Dulak (dulare) AI_Dev Nov 3
+I'm here to help
+Like Reply
+Show more replies
+Dawid Ostrowski z tego co widzę jest jedno świeże dostępne
+tutaj: https://bravecourses.circle.so/c/informacje-
+preai3/gotowi-na-skok-w-
+czasie#comment_wrapper_48997393
+Panowie, jakaś sugestia?
+{'code': -15, 'message': 'Pierwszy kod nie jest poprawny.
+Prawdopodobnie wygasł.'}
+Wysyłane kody są skopiowane z pliku.
+Miłosz Borkowski podeślij to jak wygląda JSON który wysyłasz,
+może jest tam jakiś problem…
+Miłosz Borkowski Ale plik pobierasz w aplikacji/skrypcie,
+obrabiasz i wysyłasz odpowiedź, czy może robisz to “ręcznieˮ
+(otwierasz plik, kopiujesz, wklejasz - odpalasz wysyłkę
+odpowiedzi)?
+Miłosz Borkowski tak jak pisze Andrzej Jackiewicz - nie
+pomyślałem że możesz obrabiać to zadanie “ręcznieˮ - plik z
+danymi zmienia się co jakiś czas. Jeśli robisz to ręcznie,
+możesz nie zdążyć. Jeśli skryptem, to mogłeś trafić akurat w
+momencie wymiany pliku - kolejne uruchomienie powinno
+rozwiązać sprawę (ponowne pobranie danych i wysłanie
+aktualnych).
+22.11.2024, 12:20 S00E03 — API | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e03-api 32/35
+
+===== STRONA 33 =====
+Maciek Sitkowski Nov 2
+Like Reply
+Paweł Dulak (dulare) AI_Dev Nov 3
+I'm here to help
+Like Reply 1 like
+overment Admin Nov 3
+I'm just curious.
+Like Reply
+Kamil Siepka Nov 2
+Like Reply
+overment Admin Nov 2
+I'm just curious.
+Like Reply 1 like
+A co to za diabelski syntax highlighting? Przez te czerwone nawiasy
+aż szukałem czy któryś tam jest niedomknięty xd
+Maciek Sitkowski tak to jest jak się używa dodatku Rainbow
+Brackets :)
+Maciek Sitkowski 😅 nigdy na to nie spojrzałem w ten sposób.
+KS
+“W folderze sdk repozytorium AI_devs znajduje się przykład prostego
+serwera HTTPˮ
+Moze gdzies przegapiłem.. ale nie wiem gdzie jest to repo
+Moglbym prosic o link?
+Kamil Siepka proszę: https://github.com/i-am-alice/3rd-
+devs/tree/main/sdk
+22.11.2024, 12:20 S00E03 — API | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e03-api 33/35
+
+===== STRONA 34 =====
+Wojciech Niedźwiedź Nov 1
+Like Reply
+Kordian Zadrożny Nov 1
+Like Reply
+Wojciech Niedźwiedź Nov 2
+See more
+Like Reply 1 like
+Kuba Nov 2
+Like Reply 2 likes
+Show more replies
+Show more comment s
+WN
+Cześć. Mam problem z wykonaniem zadania. Otrzymuję odpowiedź:
+{
+ "code": -6,
+ "message": "Nieprawid\u0142owy klucz API"
+}
+mimo, iż podaje prawidłowy klucz.
+skąd bierzesz klucz? ew pokaz kod który wysyłasz z
+zamazanym kluczem
+WN
+Poprawność klucza zweryfikowałem, używając biblioteki
+OpenAI. Do wysłania używam fetchʼa nodeʼowego, w ten
+sposób:
+ const payload = {
+    task: "POLIGON",
+    apikey: config.apiKey,
+    answer,
+  };…
+Wojciech Niedźwiedź to chodzi o klucz z poligonu a nie z
+openai
+22.11.2024, 12:20 S00E03 — API | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e03-api 34/35
+
+===== STRONA 35 =====
+PS
+Post
+What are your thoughts?
+22.11.2024, 12:20 S00E03 — API | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e03-api 35/35

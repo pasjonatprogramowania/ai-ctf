@@ -1,0 +1,494 @@
+
+===== STRONA 1 =====
+S02E01  Audio i int erfejs głosowy
+overment Admin Nov 11
+I'm just curious.
+» Lekka wersja przeglądarkowa «
+📎 Pobierz treść tej lekcji w formacie markdown
+📎 Pobierz treść tej lekcji w formacie markdown (EN)
+16:05
+Back to Lekcje programu [AI3]
+PS
+22.11.2024, 12:26 S02E01 — Audio i interfejs głosowy | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e01-audio-i-interfejs-glosowy 1/19
+
+===== STRONA 2 =====
+Duże modele językowe umożliwiają swobodne przetwarzanie języka naturalnego.
+W połączeniu z modelami Text to Speech i Speech to Text, możemy projektować
+zaawansowane interfejsy głosowe, które jeszcze kilka lat temu były poza
+zasięgiem technologii. Otwiera to kolejny rozdział rozwoju interfejsów głosowych
+oraz narzędzi zdolnych do przetwarzania nagrań audio i wideo.
+Na rynku pojawiają się narzędzia oferujące zarówno dostęp do modeli TTS/STT,
+jak i kompletne rozwiązania dla wybranych zastosowań. Przykładowo,
+Happyscribe to świetne rozwiązanie dla transkrypcji, które dodatkowo udostępnia
+API. W tym przypadku, zamiast tworzyć własne rozwiązanie do przetwarzania
+długich materiałów audio/wideo od podstaw, znacznie lepiej jest skorzystać z
+gotowego narzędzia.
+Natomiast w przypadku platform takich jak ChatGPT i świetnego "Voice Mode",
+możliwości personalizacji doświadczeń są bardzo ograniczone. Wówczas
+uzasadnione może być zbudowanie własnej integracji od podstaw, wykorzystując
+przy tym naszą wiedzę na temat generatywnego AI oraz programistyczne
+umiejętności. Teraz do dyspozycji mamy także Realtime API, a modele
+mogą przyjmować także pliki audio w ramach zapytania użytkownika. Obecnie
+jednak koszty takich interakcji są niezwykle wysokie oraz ograniczają nas do
+korzystania z modeli OpenAI (aczkolwiek pliki audio mogą przyjmować także inne
+modele, np. Gemini)
+W tej lekcji skupimy się na zbudowaniu własnej integracji, w której połączymy
+modele Text to Speech, Speech to Text oraz LLM. Celem jest stworzenie
+interfejsu umożliwiającego głosową rozmowę z modelem, bez konieczności
+używania klawiatury czy przycisków.
+22.11.2024, 12:26 S02E01 — Audio i interfejs głosowy | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e01-audio-i-interfejs-glosowy 2/19
+
+===== STRONA 3 =====
+Audio od strony programistycznej
+W tej lekcji omówimy przykład audio składający się także z interfejsu dostępnego
+w katalogu audio-frontend. Znajduje się w nich dość złożona logika związana z
+obsługą mikrofonu, odtwarzania audio, animacji z HTML cavas czy komunikacji z
+back-endem. Jeśli nie pracujesz w JavaScript lub obszar front-endu czy back-
+endu nie są Ci znane, to w tej lekcji skup się na mechanikach, które będziemy
+omawiać, a nie na szczegółach implementacji.
+W przypadku, gdy będziesz chciał bliżej eksplorować wymienione przykłady, a
+temat przetwarzania audio jest dla Ciebie nowy, skorzystaj z pomocy modeli (w
+szczególności Sonnet 3.5 oraz o1) oraz dokumentacji API przeglądarek na stronie
+MDN.
+Obecne możliwości TTS, STT oraz generatywnego audio
+Modele Text to Speech i Speech to Text rozwijają się dość szybko, ale u ich
+podstaw leżą podobne koncepcje jak w przypadku modeli językowych, co
+przekłada się także na podobne ograniczenia (np. konfabulacje, ograniczona
+sterowność czy limit okna tokenów), o których za chwilę się przekonamy.
+Budowanie interfejsu audio składa się z trzech głównych komponentów:
+Wejście: źródło dźwięku - mikrofon lub plik audio
+Logika: przetwarzanie - transkrypcja i generowanie odpowiedzi
+W yjście: efekt końcowy - strumieniowane audio lub plik dźwiękowy
+22.11.2024, 12:26 S02E01 — Audio i interfejs głosowy | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e01-audio-i-interfejs-glosowy 3/19
+
+===== STRONA 4 =====
+Zatem zwykle będziemy potrzebować tutaj trzech modeli:
+Speech to Text: np. Whisper, Deepgram lub AssemblyAI (wspiera
+rozpoznawanie rozmówców, czyli tzw. diaryzację)
+Text to Text: czyli duże modele językowe od OpenAI, Anthropic czy innych
+Text to Speech: np. OpenAI TTS, ElevenLabs czy Neets.ai
+Już teraz skuteczność generowanych transkrypcji jest wysoka, lecz nie
+perfekcyjna. Można się o tym przekonać samodzielnie dzięki platformie Groq na
+której mamy dostęp do Whisper Large v3. Widzimy tam od razu, że Whisper
+wspiera formaty takie jak flac, mp3, mp4, mpeg, mpga, m4a, ogg, wav i webm, a
+rozmiar pliku ograniczony jest do 25MB. Oznacza to, że w przypadku dłuższych
+plików, konieczne będzie przeprowadzenie kompresji lub podziału na mniejsze
+fragmenty.
+Transkrypcja bardzo często musi uwzględniać nazwy własne lub słowa kluczowe
+charakterystyczne dla przetwarzanej treści. Dlatego, aby zwiększyć
+prawdopodobieństwo poprawnej transkrypcji, możemy skorzystać z promptu
+systemowego, który może zawierać nasz własny słownik. W przeciwieństwie do
+LLM, nie mówimy tutaj o instrukcjach, za którymi model ma podążać, lecz
+bardziej o fragmencie treści, który po prostu poprzedza treść transkrypcji.
+Nierzadko w przypadku automatyzacji, treść promptu systemowego ustawia się
+na transkrypcję z poprzedniego fragmentu nagrania. Tutaj limit tokenów
+ograniczony jest do 224 (encodowanych z pomocą Multilingual W hisper
+tokenizer). Więcej na temat promptów dla modelu Whisper można przeczytać w
+OpenAI Cookbook: W hisper Prompting Guide.
+22.11.2024, 12:26 S02E01 — Audio i interfejs głosowy | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e01-audio-i-interfejs-glosowy 4/19
+
+===== STRONA 5 =====
+Whisper posiada także bardzo wyraźny problem związany z przetwarzaniem
+ciszy oraz bardzo krótkich fragmentów tekstu (np. poleceń). Dla poniższego, 5-
+sekundowego nagrania ciszy, zwrócona transkrypcja zawiera tekst "Thank you".
+Czasem może być to tekst w innym języku, lub określenia charakterystyczne dla
+końcówki filmu YouTube (np. dzięki za oglądanie). Oznacza to, że powinniśmy
+unikać przetwarzania fragmentów audio, które nie zawierają wypowiedzi.
+Warto także wiedzieć, że model Whisper można z powodzeniem uruchomić na
+swoim komputerze, a dzięki projektom takim jak Insanely Fast W hisper może
+okazać się bardzo skutecznym rozwiązaniem.
+Tymczasem, jeśli chodzi o modele Text to Speech, to na przestrzeni 2023-2024
+roku obserwowaliśmy ich znaczący rozwój nie tylko pod kątem jakości
+wypowiedzi, ale także klonowania głosów oraz symulowania emocji, a także
+dźwięków takich jak śmiech, oddech, czy nawet śpiew (tutaj przykładem jest
+suno.ai).
+W naszym przypadku zazwyczaj będziemy zamieniać tekst na głos, głównie na
+potrzeby nowych treści (np. odpowiedzi bota czy prywatny podcast). Powodem
+jest fakt, że nadal dużym wyzwaniem pozostaje przetwarzanie istniejących treści,
+takich jak tłumaczenie filmów, ze względu na potrzebę synchronizacji dźwięku z
+22.11.2024, 12:26 S02E01 — Audio i interfejs głosowy | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e01-audio-i-interfejs-glosowy 5/19
+
+===== STRONA 6 =====
+oryginalną ścieżką. Drugie wyzwanie dotyczy możliwości sterowania sposobem
+wypowiedzi. Przykładowo, wpływ na intonację czy sposób wymowy określonych
+fraz jest niemal zerowy.
+Warto także dodać, że na rynku pojawiają się modele Speech to Speech (lub
+voice to voice), takie jak Hume.ai, który potrafi rozpoznawać emocje rozmówcy.
+Oznacza to, że dane wejściowe mają znacznie większy wpływ na generowane
+audio. Z drugiej strony, nadal konieczne jest uwzględnienie logiki pozwalającej na
+połączenie modelu z zewnętrznymi narzędziami oraz źródłami wiedzy. W takiej
+sytuacji będzie zależało nam na przetworzeniu audio tak, abyśmy mogli podjąć
+wszystkie wymagane kroki przed wygenerowaniem odpowiedzi.
+Za chwilę przejdziemy do zaimplementowania tej logiki w praktyce, jednak już
+teraz powinno być oczywiste to, jak możemy wykorzystać omawiane przykłady
+takie jak memory czy linear z interfejsem audio.
+Przechwytywanie źródeł dźwięku i formaty audio
+W przykładzie audio-frontend, w pliku app.ts znajduje się funkcja startRecording,
+która odpowiada za połączenie z mikrofonem oraz analizę ścieżki dźwiękowej na
+potrzeby wizualizacji, wykrywania ciszy oraz transkrypcji. Mając do dyspozycji
+takie dane, jesteśmy w stanie budować bufor z nagraniem audio i stopniowo
+przesyłać go do OpenAI lub Groq w celu transkrypcji. Natomiast gdy użytkownik
+przestanie mówić, przesyłamy treść wiadomości do czatu z dużym modelem
+językowym.
+22.11.2024, 12:26 S02E01 — Audio i interfejs głosowy | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e01-audio-i-interfejs-glosowy 6/19
+
+===== STRONA 7 =====
+Zatem ogólny schemat wygląda następująco:
+Mikrofon: Łączymy się z mikrofonem i podłączamy monitorowanie
+ścieżki dźwiękowej
+W ykrywanie ciszy: Na podstawie aktualnego poziomu audio wykrywamy to,
+czy użytkownik w danej chwili coś mówi. Jeśli cisza zostaje przerwana,
+rozpoczyna się rejestrowanie nagrania.
+Transkrypcja: Transkrypcja aktualizowana jest co 1 sekundę, na podstawie
+dotychczasowego nagrania.
+Odpowiedź: Gdy nastąpi cisza na przynajmniej 1 sekundę, rejestracja zostaje
+wstrzymana i rozpoczyna się generowanie odpowiedzi asystenta, a następnie
+odtworzenie jej
+Kolejna tura: Po zakończeniu wypowiedzi asystenta, bufor z nagraniem
+zostaje zresetowany i rozpoczyna się kolejna tura wypowiedzi użytkownika
+Pętla: Proces jest powtarzany aż do zakończenia połączenia
+W tym przypadku posługujemy się formatem .wav, który pozwala nam na podział
+nagrania na fragmenty i przetwarzania ich niezależnie. Alternatywnie moglibyśmy
+skorzystać z formatu .ogg, który dzięki kompresji pozwoliłby nam na zmniejszenie
+rozmiaru przesyłanych danych, natomiast zdecydowałem się na redukcję
+częstotliwości próbkowania do 16,000 Hz mono.
+22.11.2024, 12:26 S02E01 — Audio i interfejs głosowy | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e01-audio-i-interfejs-glosowy 7/19
+
+===== STRONA 8 =====
+W przykładzie audio-frontend unikam stosowania zewnętrznych bibliotek, lecz
+produkcyjnie jest to wskazane ze względu na wsparcie przeglądarek czy
+łatwiejsze wykrywanie ciszy w nagraniu. Jednak wybór samych narzędzi będzie
+różnił się w zależności od projektu oraz technologii, z którą pracujemy.
+Generowanie transkrypcji i rozpoznawanie rozmówcy
+Wspomniałem, że narzędzia takie jak Happyscribe czy AssemblyAI
+sprawdzają się znacznie lepiej w przypadku transkrypcji dłuższych formatów
+treści (np. podcastów, filmów czy nagrań ze spotkań). I choć w niektórych
+przypadkach zastosowanie modelu Whisper czy podobnej alternatywy może być
+wskazane (np. ze względu na koszty), tak chociażby poniższy interfejs zwykle
+będzie wystarczającym powodem do tego, aby skorzystać z gotowych rozwiązań.
+Dostępność API obu wymienionych narzędzi dodatkowo uzasadnia ich wybór,
+ponieważ nadal możemy mieć korzyść wynikającą z częściowej automatyzacji
+procesu.
+Jeśli jednak zdecydujesz się na pracę z modelem Whisper, to najwięcej uwagi
+będzie wymagać podział nagrania na fragmenty, co widzimy w przykładzie audio
+oraz audio-frontend, więc nie będziemy tego dodatkowo omawiać.
+Interfejs użytkownika i interakcja w czasie rzeczywistym
+Przykłady audio oraz audio-frontend należy uruchomić jednocześnie, aby
+uzyskać dostęp do wizualnego interfejsu umożliwiającego rozmowę z LLM w
+czasie rzeczywistym. Serwer aplikacji będzie zatem działać pod adresem
+localhost:3000, natomiast front-end będzie dostępny w przeglądarce pod
+adresem http://localhost:5173. Zobaczmy więc, jak działa cały ten mechanizm na
+poniższym filmie.
+22.11.2024, 12:26 S02E01 — Audio i interfejs głosowy | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e01-audio-i-interfejs-glosowy 8/19
+
+===== STRONA 9 =====
+Wizualizując logikę przykładu audio widzimy, że nie ma w niej szczególnie
+zaskakujących elementów, ale musimy pamiętać o kilku detalach wpływających
+na jakość interakcji.
+Mowa tutaj o:
+Jakość audio: Umożliwieniu użytkownikowi wcześniejsze zweryfikowanie
+jakości nagrania audio, w celu uniknięcia generowania niepoprawnej
+transkrypcji
+Cisza: Dynamicznego wykrywania poziomu ciszy, na podstawie którego
+system rozpozna moment w którym użytkownik przestaje mówić. Potencjalnie
+mechanika ta może być wykorzystana także w celu przerywania wypowiedzi
+asystenta.
+Kontekst: Jakość transkrypcji zależy nie tylko od nagrania audio, ale także od
+nadanego kontekstu, ze szczególnym uwzględnieniem słów kluczowych
+charakterystycznych dla użytkownika (np. imię).
+Potwierdzenie: W przypadku interfejsu zdolnego do posługiwania
+się narzędziami, warto rozważyć także konieczność potwierdzenia wykonania
+akcji, np. z pomocą przycisków bądź głosu.
+Korekta: Wygenerowana transkrypcja może być dodatkowo przetworzona
+przez model językowy w celu formatowania i poprawy błędów.
+22.11.2024, 12:26 S02E01 — Audio i interfejs głosowy | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e01-audio-i-interfejs-glosowy 9/19
+
+===== STRONA 10 =====
+Patrząc na interfejs głosowy, możemy wziąć pod uwagę także wszystko to, czego
+nauczyliśmy się do tej pory w temacie interakcji z LLM, a także łączenia go z
+zewnętrznymi narzędziami czy pamięcią długoterminową.
+Poza tym, nic nie stoi na przeszkodzie, aby interakcja głosowa odbywała się nie z
+człowiekiem, lecz pomiędzy dwoma agentami AI, podobnie jak ma to miejsce w
+przypadku NotebookLM, gdzie możemy wygenerować rozmowę na temat
+naszych dokumentów.
+Techniki optymalizacji generowania audio
+W przykładzie audio możliwe jest zmniejszenie czasu reakcji poprzez
+przełączenie transkrypcji na usługę Groq oraz generowania odpowiedzi asystenta
+przez usługę ElevenLabs z modelem "turbo". Nie jest to jednak koniec
+optymalizacji, ponieważ możemy popracować jeszcze nad zmianą formatu wav
+na ogg, a także nad zastosowaniem strumieniowania.
+Konkretnie odpowiedź generowana przez asystenta może być zwracana
+fragmentami i w ten sposób przesyłana do ElevenLabs, które umożliwia także
+strumieniowania generowanego nagrania. Oznacza to, że:
+Pierwszy fragment wypowiedzi asystenta (np. pierwsze zdanie, lub
+wypowiedź do pierwszego przecinka) jest wystarczająca do rozpoczęcia
+22.11.2024, 12:26 S02E01 — Audio i interfejs głosowy | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e01-audio-i-interfejs-glosowy 10/19
+
+===== STRONA 11 =====
+generowania audio.
+Sama odpowiedź audio, również może trafić do kolejki odtwarzania
+W ten sposób możemy zredukować czas reakcji, osiągając wyniki nawet poniżej
+jednej sekundy. Jednak w praktyce zaoszczędzony czas będzie nam potrzebny
+na logikę odpowiedzialną za zbudowanie kontekstu lub podjęcie decyzji o
+wyborze narzędzi. Utrzymanie interakcji w czasie rzeczywistym staje się dużym
+wyzwaniem i wymaga zastosowania technik optymalizacji generowania treści, o
+których już rozmawialiśmy. Konkretnie mam na myśli:
+Zastosowanie strumieniowania tam, gdzie jest to możliwe
+Równoległe wykonanie tych akcji, które nie są od siebie zależne
+Zastosowanie mniejszych modeli i/lub skorzystanie z platform oferujących
+szybką inferencję
+Skrócenie wypowiedzi modelu
+Zastosowanie platform takich jak Hume.ai czy Bland.ai w sytuacji gdy zależy
+nam na budowaniu interfejsów umożliwiających rozmowy z LLM
+Podsumowanie
+Powszechnie wiadomo, że użyteczność interfejsów głosowych w ostatnich latach
+była bardzo niska lub pozwalała jedynie na bardzo proste interakcje z
+urządzeniami. Teraz nawet na przykładzie audio widzimy, że dość dużo w tym
+obszarze się zmienia, ale nadal trudno jest mówić o 100% skuteczności.
+Choć interakcje w czasie rzeczywistym sprawdzą się tylko w wybranych
+scenariuszach, sama możliwość przetwarzania nagrań audio może okazać się
+przydatna zarówno w kontekście prostych poleceń, jak i automatyzacji
+działających "w tle".
+Z programistycznej perspektywy widać, że na znaczeniu zyskują Web API
+umożliwiające interakcję z mikrofonem oraz odtwarzaniem audio i wideo, a także
+przesyłaniem plików między klientem a serwerem.
+Jeśli z tej lekcji masz zapamiętać tylko jedną rzecz, to zapoznaj się z przykładem
+audio i spróbuj odwzorować swój własny interfejs umożliwiający rozmowę z
+modelem językowym, pomijając mechanizmy związane z wykrywaniem ciszy czy
+strumieniowaniem audio. W zbudowaniu takiego interfejsu może pomóc Ci LLM i
+edytor Cursor.
+NOTATKA ZYGFRYDA
+22.11.2024, 12:26 S02E01 — Audio i interfejs głosowy | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e01-audio-i-interfejs-glosowy 11/19
+
+===== STRONA 12 =====
+ZADANIE
+Zadanie: Pobierz nagrania z przesłuchań świadków oskarżonych o kontakty z
+profesorem Majem. Zeznania mogą się wzajemnie wykluczać lub uzupełniać.
+Materiału jest sporo, więc sugerujemy przetworzyć te dane w sposób
+automatyczny. Centrala warunkowo dopuściła do analizy nagranie Rafała,
+ponieważ jego stan od pewnego czasu jest bardzo niestabilny, ale to jedyna
+osoba, co do której jesteśmy pewni, że utrzymywała bliskie kontakty z
+profesorem. Podaj nam proszę nazwę ulicy, na której znajduje się uczelnia
+(konkretny instytut!), gdzie wykłada profesor. Wyślij odpowiedź w standardowym
+formacie (nazwa taska do: mp3) https://centrala.ag3nts.org/report
+Nagrania z przesłuchań: https://centrala.ag3nts.org/dane/przesluchania.zip
+Co należy zrobić w zadaniu?
+Pobierz archiwum ZIP i rozpakuj je. W środku znajdziesz pliki audio z
+nagraniami kilku przesłuchań
+Za pomocą dowolnego modelu zamieniającego audio na tekst, wygeneruj
+transkrypcję każdego z nagrań.
+Z otrzymanych transkryptów zbuduj wspólny kontekst dla swojego prompta
+22.11.2024, 12:26 S02E01 — Audio i interfejs głosowy | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e01-audio-i-interfejs-glosowy 12/19
+
+===== STRONA 13 =====
+Liked by Damian and 143 others
+Comment 473 comment s
+Paweł Hulek 15h
+Like Reply 1 like
+Paweł Grzybek 2d
+See more
+Like Reply
+Kacper Nadst oga 3d
+Like Reply
+Znajdź odpowiedź na pytanie, na jakiej ulicy znajduje się uczelnia, na której
+wykłada Andrzej Maj
+Pamiętaj, że zeznania świadków mogą być sprzeczne, niektórzy z nich
+mogą się mylić, a inni odpowiadać w dość dziwaczny sposób.
+Nazwa ulicy nie pada w treści transkrypcji. Musisz użyć wiedzy wewnętrznej
+modelu, aby uzyskać odpowiedź.
+Uzyskaną odpowiedź wyślij do centrali (/report) jako zadanie o nazwie ‘mp3ʼ
+Podpowiedź: zamiast prosić model o udzielenie natychmiastowej odpowiedzi,
+pozwól mu trochę pomyśleń na głos. Zwróć uwagę czy i jak poprawia to
+zdolności wnioskowania modelu.
+Like
+PH
+Musze przyznac ze w tym zadaniu cursor pokazał swoją moc. Trochę
+kodu było do naklepania - a mając juz kontekst po tych kilka
+zadaniach - poradził sobie wzorowo.
+Fajne zadanko, na którym można zobaczyć jak model myśli.
+Ja sobie je nieco utrudniłem niepotrzebnie, bo nie wiedzieć czemu,
+chciałem dodać prompta, w którym
+.
+.
+.
+.
+.…
+Czy komuś też wysłanie odpowiedzi do centrali zwraca 403
+forbidden? 🤨 🤔 (klucz do centrali mam prawidłowy, dla reszty zadań
+działa). Jeśli to oznaczenie niepoprawnej odpowiedzi, to nie jest to do
+końca jasne w zwrotce.
+22.11.2024, 12:26 S02E01 — Audio i interfejs głosowy | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e01-audio-i-interfejs-glosowy 13/19
+
+===== STRONA 14 =====
+Paweł Dulak (dulare) AI_Dev 3d
+I'm here to help
+Like Reply
+Kacper Nadst oga 3d
+See more
+Like Reply
+Paweł Dulak (dulare) AI_Dev 3d
+I'm here to help
+Like Reply
+Show more replies
+Maciej Podkowa 3d
+Java Game De veloper
+Kacper Nadstoga próbowałeś wysłać któreś ze starszych
+zadań? Wszędzie ta sama zwrotka, czy tylko przy tym
+konkretnym? Druga sprawa - to może być zwrot z CloudFlare
+zamiast z samego serwera - zerkniesz w headery tego co
+zwracane?
+Paweł Dulak (dulare) Tak wysyłałem inne i było prawidłowo. Ta
+zwrotka jest właśnie przy tym zadaniu i faktycznie z
+CloudFlare. Headery:
+```
+{
+date": "Tue, 19 Nov 2024 21:18:29 GMT",
+ "content-type": "application/json; charset=utf-8",
+ "transfer-encoding": "chunked",…
+Kacper Nadstoga a próbowałeś wysłać na webhook
+wygenerowany na webhook.cool? Wtedy na tej stronie
+zobaczysz co faktycznie przyszło. Daj znać czy tam widać coś
+niepokojącego…
+Druga możliwość - udostępnij sobie na chwilę net z telefonu i
+spróbuj wysłać stamtąd (z innego IP/sieci)
+22.11.2024, 12:26 S02E01 — Audio i interfejs głosowy | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e01-audio-i-interfejs-glosowy 14/19
+
+===== STRONA 15 =====
+See more
+Like Reply 2 likes
+Paweł Dulak (dulare) AI_Dev 3d
+I'm here to help
+Like Reply
+Maciej Podkowa 3d
+Java Game De veloper
+Like Reply
+Paweł Dulak (dulare) AI_Dev 3d
+I'm here to help
+Like Reply 1 like
+Show more replies
+Maciej Ciszek 5d
+C++/Py thon Application Architect & Lead Developer
+Like Reply 4 likes
+No po tym zadaniu jestem serio pod wrażeniem potencjału modeli
+językowych i Cursor IDE (w zasadzie bardziej Claude 3.5 Sonnet),
+nawet śmiem powiedzieć, że aż mnie ciarki przeszły😲 Kilka prób z
+błędnym podejściem analizy pojedynczej transkrypcji na gpt-3.5
+turbo, ale po przejrzeniu transkrypcji zrozumiałem, że to bardziej
+kwestia przeanalizowania wszystkich transkrypcji i wyciągnięcia z
+nich informacji. Jak tylko to zrozumiałem, poprosiłem Claude o
+przeróbki w projekcie we wskazany sposób, z informacją by nie bał …
+Maciej Podkowa mam tylko pytanie - czemu gpt-3.5 turbo?
+Modele z serii gpt-4o, gpt-4o-mini są lepsze…
+Paweł Dulak (dulare) Rozwiązanie oczywiście w 4o, na 3.5
+turbo były pierwsze testy aplikacji 😅 Szybko się okazało, że
+nie jest wystarczający, a przynajmniej przy pierwszych
+promptach
+Maciej Podkowa a w dodatku jest drogi. Nie aż tak jak gpt-4,
+jest trochę tańszy niż gpt-4o, ale sporo droższy od gpt-4o-
+mini.
+Poszło, najpierw dosyć sporo się namęczyłem na 4o (za 7 razem
+dopiero zadziałało), a później po 3 próbie i dodaniu na początku “take
+a deep breathˮ zadziałało nawet na 4o-mini 😁
+Całkowity koszt rozwiązania zadania: ~$0.05 (20gr) 🙂
+22.11.2024, 12:26 S02E01 — Audio i interfejs głosowy | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e01-audio-i-interfejs-glosowy 15/19
+
+===== STRONA 16 =====
+
+===== STRONA 17 =====
+Like Reply 3 likes
+overment Admin 5d
+I'm just curious.
+See more
+Like Reply 2 likes
+Show more replies
+Marcin Matysek 6d
+See more
+Like Reply 1 like
+Paweł Dulak (dulare) AI_Dev 6d
+I'm here to help
+Like Reply
+Marcin Matysek 6d
+Like Reply 1 like
+Marcin Matysek 6d
+Marcin Matysek mega :) dzięki za to. No właśnie to jest fajny
+przykład tego, jak można wchodzić głębiej w temat i
+optymalizować każdy wątek.
+Sam nie mogę się doczekać jak to będzie w miarę
+ustandaryzowane i właśnie tego oczekiwałbym od
+frameworków i bibliotek.
+Kurcze…nie wiedziałem że Alice umie rysować takie
+diagramy, WOW 🙂 …
+Jakub 'unknow' Mrugalski Bardzo fajne zadanko 🙂
+- model gpt-4o
+- prompt 135 tokenów (plus załączony context)
+- prompt in english ale _thinking in Polish
+- Jedno zdanie opisujące główne zadanie modelu
+- Dwie reguły
+- Trzy kroki Chain of thougth
+- Reponse json z dwoma polami…
+Marcin Matysek elegancko, próbowałeś na gpt-4o-mini? na
+zasadzie redukcji kosztów :)
+Paweł Dulak (dulare) Właśnie sprawdziłem , prompt działa
+również na mini 🙂
+22.11.2024, 12:26 S02E01 — Audio i interfejs głosowy | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e01-audio-i-interfejs-glosowy 17/19
+
+===== STRONA 18 =====
+Like Reply 1 like
+Show more replies
+Mateusz Janowski 6d
+Like Reply 2 likes
+Patryk Kleszyński Nov 15
+Like Reply
+Maciek Maz gaj Nov 14
+Like Reply 3 likes
+overment Admin Nov 15
+I'm just curious.
+Like Reply 3 likes
+Maciek Maz gaj Nov 15
+Like Reply 2 likes
+Mateusz Chrobok Nov 15
+Paweł Dulak (dulare) Będę musiał jeszcze na czasie dorobić
+rozpakowywanie zipa w locie w pythonie do osiągnięcia pełnej
+automatyzacji zadania… 🙂 Bo teraz automat bazuje na plikach
+m4a umieszczonych w katalogu.
+MJ
+Easter egg zrobił mi dzień 🎶
+overment Mam problemy z przykładem audio-frontend. Transkrypcja
+leci w pętli w nieskończoność i nie przechodzi dalej. Wystarczy, że
+raz się odezwę.
+overment Jakub 'unknow' Mrugalski z ciekawości - pliki mp3 też w
+czymś generowaliście?
+Maciek Mazgaj to chyba Mateusz Chrobok maczał w tym palec
+:P
+overment Mateusz Chrobok czyżby interfejsy białkowe? :D
+Maciek Mazgaj Niczego mi nie udowodnicie!
+Ale tak. To ręczna robota
+22.11.2024, 12:26 S02E01 — Audio i interfejs głosowy | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e01-audio-i-interfejs-glosowy 18/19
+
+===== STRONA 19 =====
+Like Reply 4 likes
+Show more replies
+Show more comment s
+Edit: a niektóre osoby da się nawet rozpoznać!
+PS
+Post
+What are your thoughts?
+22.11.2024, 12:26 S02E01 — Audio i interfejs głosowy | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e01-audio-i-interfejs-glosowy 19/19

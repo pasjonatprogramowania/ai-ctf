@@ -1,0 +1,497 @@
+
+===== STRONA 1 =====
+S03E02  Wyszukiw anie Semant yczne
+overment Admin 3d
+I'm just curious.
+» Lekka wersja przeglądarkowa «
+📎 Pobierz treść tej lekcji w formacie markdown
+📎 Pobierz treść tej lekcji w formacie markdown (EN)
+EDIT 2024-11-19 08:57 → poprawiono treść pytania do embeddingu w zadaniu
+EDIT 2024-11-20 12:52 → poprawiono w opisie zadania “datę opisywanego
+wydarzeniaˮ na “datę raportuˮ
+Temat baz wektorowych oraz wyszukiwania semantycznego pojawiał się już
+kilkukrotnie, ale dopiero teraz przyjrzymy się mu bliżej. Dodam tylko, że elementy
+wprowadzające do embedding czy konfiguracji qdrant pojawiły się w lekcjach
+S01E05 — Produkcja oraz S01E04 — Techniki optymalizacji.
+Wyszukiwanie stanowi kluczowy element procesu łączenia LLM z zewnętrznymi
+danymi i to od niego zależy jakość generowanej odpowiedzi. Okazuje się jednak,
+że osiągnięcie 100% precyzji obecnie jeszcze nikomu się nie udało i możemy
+spodziewać się błędów na poziomie 3-6% i to tylko dla samego odzyskiwania
+treści, nie licząc błędów samego modelu.
+Back to Lekcje programu [AI3]
+PS
+22.11.2024, 12:28 S03E02 — Wyszukiwanie Semantyczne | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e02-wyszukiwanie-semantyczne 1/24
+
+===== STRONA 2 =====
+Faktyczna skuteczność systemu będzie zależała także od samego modelu,
+zestawu danych no i przetwarzanych zapytań. Poniższa grafika ze
+wspominanego już artykułu Anthropic pokazuje dodatkowo, że musimy także
+patrzeć w stronę strategii wyszukiwania łączącego ze sobą różne podejścia.
+Wyszukiwanie semantyczne
+Wiemy już, że embedding to sposób reprezentacji danych za pomocą liczb, które
+zwykle mają na celu opisać ich znaczenie na potrzeby analizy, a także
+wyszukiwania. Zwykle przechowujemy je w formie obiektów, łączących ze sobą
+sam embedding oraz metadane. Obiekty te nazywamy punktami, bądź
+dokumentami i przechowujemy je w bazie wektorowej, która w zasadzie jest
+silnikiem wyszukiwania.
+Aby zrozumieć zasady wyszukiwania semantycznego, zerknijmy do przykładu
+embedding w którym znajdują dane testowe w postaci nazw kilku popularnych
+firm oraz mojego newslettera, a także kilka prostych zapytań. Już na pierwszy
+rzut oka widać, że dopasowanie tych słów na podstawie sposobu zapisu, nie jest
+możliwe i klasyczne wyszukiwanie nam tutaj nie pomoże.
+Po uruchomieniu przykładu okazuje się, że Qdrant poprawnie dopasował Teslę do
+firmy produkującej samochody i skojarzył Apple z MacBookiem. Było to możliwe,
+22.11.2024, 12:28 S03E02 — Wyszukiwanie Semantyczne | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e02-wyszukiwanie-semantyczne 2/24
+
+===== STRONA 3 =====
+ponieważ model wykorzystany do embeddingu oddał znaczenie tych informacji,
+co pozwoliło na skuteczne wyszukanie semantyczne.
+Jednak w dwóch pozostałych przypadkach — dopasowania "Meta" (czyli nowej
+nazwy spółki) do Facebooka oraz Tech•sistence do Newslettera się nie powiodło,
+ponieważ text-embedding-3-large nie posiada informacji pozwalającej opisać
+znaczenie tych terminów.
+Co ciekawe, dokładnie ta sama logika zrealizowana z pomocą modelu jina-
+embeddings-v3 pozwoliła na poprawne dopasowanie także trzeciego zapytania,
+ale za to popełniła błąd w przypadku Tesli.
+Sytuacja zmienia się diametralnie, gdy wzbogacimy nasze dane o opisy ich
+kategorii. Model nie musi wtedy polegać jedynie na "rozumieniu nazwy firmy", co
+pozwala na poprawne kojarzenie wszystkich zapytań z odpowiednimi danymi.
+22.11.2024, 12:28 S03E02 — Wyszukiwanie Semantyczne | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e02-wyszukiwanie-semantyczne 3/24
+
+===== STRONA 4 =====
+W embeddingu warto także rozumieć to, że w zależności od modelu z
+pomocą którego go generujemy, będziemy posługiwać się inną liczbą wymiarów
+(eng. dimensions) i ta liczba będzie stała dla całej naszej kolekcji. Co więcej,
+embedding będzie także musiał być generowany z pomocą tego samego modelu,
+więc musimy go mądrze wybrać.
+W pliku /embedding/points.json znajdują się również informacje zapisane w
+Qdrant. Właściwość vector zawiera listę 1024 liczb wygenerowanych przez model
+jina-embeddings-v3, które opisują znaczenie treści dokumentu. Oznacza to, że
+zarówno dla dokumentu będącego jednym słowem, jak i dla dokumentu
+składającego się z kilkunastu zdań, model ma tyle samo przestrzeni na ich
+opisanie. Warto o tym pamiętać i utrzymywać każdy z dokumentów możliwie
+krótkim i skupiającym się na indywidualnej informacji. Dodatkowo, musimy mieć
+także na uwadze limity kontekstu dla samego modelu generującego embedding
+oraz modelu, który będzie go przetwarzać.
+Na tym etapie już w pełni jasny powinien być poniższy obrazek, pochodzący z
+jednej z wcześniejszych lekcji.
+22.11.2024, 12:28 S03E02 — Wyszukiwanie Semantyczne | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e02-wyszukiwanie-semantyczne 4/24
+
+===== STRONA 5 =====
+Czyli każde zapytanie do bazy wektorowej musi zostać zamienione na
+embedding, bo dopiero wtedy możemy zestawić go z danymi przechowywanymi
+w kolekcji. Nie jest to jednak wszystko, co musimy wiedzieć na temat
+wyszukiwania semantycznego.
+Baza wektorowa
+W kontekście bazy wektorowej, niemal zawsze odwołuję się do Qdrant. Nie
+oznacza to, że jest to jedyna opcja i pozostałe nie są warte uwagi.
+Podobnie jak w przypadku każdego innego elementu aplikacji, decyzję o wyborze
+bazy wektorowej będziemy uzależniać od konkretnego projektu. Czasem bardziej
+uzasadnione będzie skorzystanie z bezpłatnego rozwiązania, a niekiedy z
+komercyjnego, oferującego wysoką dostępność.
+Całkiem interesujące zestawienie można znaleźć na stronie Picking a vector
+database, w którym zostały uwzględnione popularne opcje.
+22.11.2024, 12:28 S03E02 — Wyszukiwanie Semantyczne | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e02-wyszukiwanie-semantyczne 5/24
+
+===== STRONA 6 =====
+Za Qdrant przemawia u mnie bardzo przyjazne API oraz sensowny bezpłatny
+plan, który nie wymaga ode mnie żadnych dodatkowych konfiguracji. Po prostu
+do dyspozycji mam jeden klaster o specyfikacji wystarczającej na potrzeby
+developmentu i małych projektów.
+W ramach klastra, mam zdefiniowaną jedną kolekcję, wewnątrz której
+przechowuję wszystkie informacje dla danej aplikacji. Jednak poszczególne
+dokumenty/punkty posiadają metadane na podstawie których filtruję je na etapie
+wyszukiwania.
+22.11.2024, 12:28 S03E02 — Wyszukiwanie Semantyczne | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e02-wyszukiwanie-semantyczne 6/24
+
+===== STRONA 7 =====
+Posiadanie jednej kolekcji jest zazwyczaj rekomendowane, podobnie jak jednej
+bazy danych dla jednej aplikacji. Dopiero w specyficznych przypadkach, takich
+jak wymagania klienta lub logika aplikacji, pojawia się potrzeba tworzenia nowych
+kolekcji lub zupełnie nowych instancji.
+Całkiem zasadne może wydawać się także pytanie na temat wyboru pomiędzy
+pgvector i sqlite-vec, które pozwalają na przechowywanie embeddingu oraz
+przeszukiwanie bezpośrednio w bazie danych PostgreSQL czy SQLite, a bazą
+wektorową taką jak Qdrant. Tutaj decyzja może zależeć od testów wyszukiwania,
+skali działania aplikacji oraz wymaganej wydajności.
+Zbierając to wszystko w całość, interesuje nas:
+Wybór bazy wektorowej lub rozszerzenia dla bazy danych (Qdrant)
+Wybór modelu do embedding'u (text-embedding-3-large)
+Określenie struktury kolekcji i zawartych w niej dokumentów
+Dla ułatwienia w nawiasie zapisałem opcje, które są w porządku na początek i z
+którymi możemy zostać dłużej.
+Projektowanie kolekcji i dokumentów
+Przygotowanie dokumentów omówiliśmy w lekcji S03E01 — Dokumenty. Teraz
+spojrzymy na nie z perspektywy kolekcji bazy wektorowej, a konkretnie
+filtrowania oraz wczytywania treści.
+Przykład embedding omówiony wcześniej, pokazał nam, że wyszukiwanie
+semantyczne nie zawsze jest precyzyjne. Problem ten znacznie rośnie, gdy w
+kolekcji pojawia się więcej danych, ponieważ w zależności od kontekstu, możemy
+mieć do czynienia z szumem (eng. noise) utrudniającym dotarcie do pożądanych
+treści.
+22.11.2024, 12:28 S03E02 — Wyszukiwanie Semantyczne | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e02-wyszukiwanie-semantyczne 7/24
+
+===== STRONA 8 =====
+Wspominałem już, że dokumenty/punkty dodawane do kolekcji, muszą
+posiadać metadane wykorzystywane na potrzeby filtrowania już na etapie
+samego wyszukiwania, a nie po nim. Jest to także jedna z rzeczy, które należy
+sprawdzić wybierając bazę wektorową.
+Należy mieć na uwadze także fakt, że sam embedding jest nieodwracalny. Co
+prawda w publikacji "Information Leakage in Embedding Models" został opisany
+sposób na odzyskiwanie z nich pojedynczych informacji, jednak nie ma to
+praktycznego zastosowania z naszej perspektywy.
+Musimy zatem zawsze przechowywać oryginalne informacje i co więcej, nie
+powinno mieć to miejsca wyłącznie w bazie wektorowej. Powodem jest
+utrudniony dostęp do informacji, np. na potrzeby wypisania wszystkich rekordów
+zapisanych w kolekcji.
+Zatem poza sytuacjami w których mamy pewność, że indeksowane dane
+będą nam potrzebne tylko na potrzeby wyszukiwania, konieczne będzie
+przynajmniej częściowe synchronizowanie danych pomiędzy klasyczną bazą
+danych, a bazą wektorową. Rekordy muszą więc posiadać wspólny identyfikator,
+a aplikacja musi uwzględniać logikę dbającą o spójność danych.
+22.11.2024, 12:28 S03E02 — Wyszukiwanie Semantyczne | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e02-wyszukiwanie-semantyczne 8/24
+
+===== STRONA 9 =====
+W bazie wektorowej możemy przechowywać zarówno embedding opisujący
+znaczenie tekstu, ale także taki, który będzie opisywał obrazy. Proces
+wyszukiwania u swoich podstaw będzie wyglądał tak samo, ale musimy pamiętać
+o tym, aby unikać wyszukiwania dwóch rodzajów treści. Problem z tym związany
+dobrze obrazuje poniższy wpis z Jina AI.
+22.11.2024, 12:28 S03E02 — Wyszukiwanie Semantyczne | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e02-wyszukiwanie-semantyczne 9/24
+
+===== STRONA 10 =====
+Zatem, podsumowując ten fragment:
+Każdy dokument musi mieć swój unikatowy identyfikator (UUID)
+Dokumenty powinny być synchronizowane z klasyczną bazą danych
+Metadane muszą posiadać właściwości pozwalające na zawężenie
+wyszukiwania
+Metadane mogą posiadać właściwości określające ich dostępność (np. rola
+użytkownika, czy plan subskrypcji)
+Treść dokumentów powinna być możliwie monotematyczna, aby opisanie jej
+znaczenia pozwoliło na przyszłe dopasowanie do zapytań
+22.11.2024, 12:28 S03E02 — Wyszukiwanie Semantyczne | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e02-wyszukiwanie-semantyczne 10/24
+
+===== STRONA 11 =====
+Długość dokumentu nie może przekraczać limitu kontekstu modelu do
+embeddingu, oraz modelu, który będzie przetwarzał jego treść (mam tutaj na
+myśli zarówno input jak i output context limit)
+Strategie wyszukiwania
+Jeśli posiadasz już jakiekolwiek doświadczenie w pracy z bazami wektorowymi,
+to poniższy schemat (źródło: https://pub.towardsai.net/advanced-rag-
+techniques-an-illustrated-overview-04d193d8fec6) powinien być Ci znajomy.
+Jest to tzw. "naive RAG" polegający na podziale dużej treści na fragmenty, ich
+indeksowaniu oraz późniejszym przeszukiwaniu na podstawie oryginalnego
+zapytania użytkownika.
+Takie podejście szybko ujawnia swoje wady, ponieważ nie zawsze oryginalne
+zapytanie użytkownika wystarczy nam do poprawnego odnalezienia danych.
+W przykładzie naive_rag mamy taką samą logikę, jak w przykładzie embedding,
+lecz zmieniłem w nim dane na cytaty z książek Jima Collinsa oraz Simona Sineka.
+UWAGA: przed uruchomieniem tego przykładu, należy usunąć kolekcję "aidevs"
+z Qdrant.
+Pomimo tego, że mamy tam tylko kilkanaście rekordów, nasz RAG nie potrafił
+wskazać informacji pozwalających odpowiedzieć na pytanie: "Co Sinek mówił na
+temat pracy z ludźmi?" i to nawet pomimo faktu, że zapytanie jest
+dość precyzyjne.
+22.11.2024, 12:28 S03E02 — Wyszukiwanie Semantyczne | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e02-wyszukiwanie-semantyczne 11/24
+
+===== STRONA 12 =====
+No i tutaj do gry wchodzą zaawansowane techniki związane zarówno z
+indeksowaniem danych, ich filtrowaniem oraz klasyfikacją i wzbogacaniem
+zapytania. Można je w prostej wersji sprawdzić w praktyce, na przykładzie
+better_rag.
+Przede wszystkim zadbałem w nim o to, aby zestaw danych zawierał informację
+na temat autora książki. Author został dodany także jako właściwość w obiekcie
+"metadata" dokumentów dodawanych do bazy wektorowej.
+22.11.2024, 12:28 S03E02 — Wyszukiwanie Semantyczne | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e02-wyszukiwanie-semantyczne 12/24
+
+===== STRONA 13 =====
+Następnie sama logika uwzględnia teraz dodatkowy krok odpowiedzialny za
+klasyfikację zapytania pod kątem autora lub autorów. Pozwala to na utworzenie
+filtra dla przeszukiwanych dokumentów.
+No i przekłada się to na rezultat w przypadku którego nawet jeśli zapytamy o obu
+autorów, to otrzymujemy poprawny wynik.
+Problem pojawi się jednak w przypadku pytań, które wymagają odpowiedzi na
+podstawie większej liczby dokumentów. Wówczas limitowanie wyników jedynie
+do trzech, uniemożliwi nam dotarcie do wszystkich tych, które są istotne.
+Pierwszym rozwiązaniem, które przychodzi do głowy, jest zwiększenie limitu, ale
+uwzględnienie filtrowania na podstawie parametru Score. Choć może to
+zaadresować część problemu, to z pewnością nie jest to wystarczające
+rozwiązanie, bo jakiś dokument może nie być zbliżony do zapytania znaczeniem,
+ale i tak zawierać wartościową treść.
+Dlatego w ocenę tego, czy dany dokument jest istotny, czy nie, zaangażujemy
+model. Jest to tzw. proces re-rank.
+W naszym przypadku polega on na tym, że każdy ze zwróconych dokumentów
+(zwiększyłem limit do 15), zostanie przeprocesowany przez prompt określający
+przydatność dokumentu. Poniższą logikę dodałem do przykładu rerank.
+22.11.2024, 12:28 S03E02 — Wyszukiwanie Semantyczne | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e02-wyszukiwanie-semantyczne 13/24
+
+===== STRONA 14 =====
+Efekt jest taki, że pomimo zwiększenia limitu zwracanych przez Qdrant
+dokumentów, otrzymałem najlepszy dotychczasowy rezultat w postaci jedynie
+dwóch dokumentów! Oznacza to, że jeśli ich treść trafi do kontekstu modelu, to
+nie będziemy rozpraszać jego uwagi niepotrzebnymi informacjami.
+To jednak nie koniec optymalizacji, ponieważ jak dotąd nie zajęliśmy się jeszcze
+wzbogacaniem / transformacją samego zapytania. No bo jeśli użytkownik
+zadałby pytanie w taki sposób, że trudno byłoby od razu wywnioskować o co
+może chodzić, to moglibyśmy zaangażować model, aby spróbował to naprawić.
+Tym jednak zajmiemy się w dalszej części kursu, ale już teraz możesz mieć tę
+możliwość na uwadze.
+Tymczasem, podsumowując tę część:
+Dane, które trafiają do indeksu bazy danych, muszą uwzględniać metadane
+pozwalające na ich filtrowanie
+Filtry mogą być ustawiane programistycznie (np. prawo dostępu na podstawie
+planu subskrypcji) lub przez model (np. określenie kategorii na temat której
+użytkownik zadaje pytanie)
+Zapytanie użytkownika może być wzbogacane, rozszerzane lub
+doprecyzowywane w celu zwiększenia prawdopodobieństwa dotarcia do
+istotnych dokumentów.
+Zwrócone przez wyszukiwarkę dokumenty, mogą zostać ocenione przez
+model, pod kątem ich przydatności dla danego zapytania
+Nietrudno się domyślić, że powyższe koncepcje nie wyczerpują tematu strategii
+wyszukiwania, ale stanowią do nich dobry fundament.
+22.11.2024, 12:28 S03E02 — Wyszukiwanie Semantyczne | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e02-wyszukiwanie-semantyczne 14/24
+
+===== STRONA 15 =====
+W sieci pod hasłem "Advanced RAG patterns" można znaleźć wiele przykładów
+oraz publikacji, na temat różnych podejść zarówno związanych z
+przechowywaniem danych, jak i procesem wyszukiwania czy dostarczania do
+modelu. Przykładem mogą być wpis na blogu Pinecone, wpis na blogu
+LlamaIndex czy wpis udostępniony przez Amazon.
+Wartościowa grafika poniżej pochodzi ze wspomnianego wpisu LLamaIndex i
+prezentuje szereg koncepcji, które rysują ogólną perspektywę możliwości, jakie
+mamy do dyspozycji. Część z nich będziemy jeszcze wykorzystywać w praktyce.
+22.11.2024, 12:28 S03E02 — Wyszukiwanie Semantyczne | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e02-wyszukiwanie-semantyczne 15/24
+
+===== STRONA 16 =====
+Ograniczenie zaangażowania LLM
+Pomimo wzrostu szybkości inferencji, zaangażowanie modelu w logikę aplikacji
+może ją znacznie spowolnić. Często nie potrzebujemy możliwości rozumowania,
+które model oferuje, ale nadal mamy do czynienia z językiem naturalnym, co
+uniemożliwia 'zakodowanie' logiki.
+22.11.2024, 12:28 S03E02 — Wyszukiwanie Semantyczne | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e02-wyszukiwanie-semantyczne 16/24
+
+===== STRONA 17 =====
+W przykładzie semantic dodałem zestaw danych w postaci narzędzi z których
+mógłby potencjalnie korzystać nasz agent. Poniżej widzimy, że w efekcie jego
+działania, zapytania takie jak 'play music' zostały poprawnie skojarzone z
+odpowiadającymi im narzędziami.
+Okazuje się, że za takie dopasowanie odpowiada vector database, a sam
+schemat określamy jako "Semantic Router", co zresztą zostało przedstawione w
+repozytorium o tej samej nazwie.
+Sam zawsze wybierałem logikę opartą o LLM, ale wspominam o takiej możliwości,
+ponieważ w niektórych przypadkach może okazać się wystarczająca. Oczywiście
+ponownie zwracam tutaj uwagę na problem z dopasowaniem słów kluczowych
+czy terminów, które nie są znane modelowi generującemu embedding.
+Podsumowanie
+Po tej lekcji powinno być dla Ciebie oczywiste to, że baza wektorowa to istotny
+element aplikacji w której pojawia się potrzeba przetwarzania języka naturalnego.
+Jednocześnie na podstawie pokazanych przeze mnie ograniczeń wiemy także, że
+nie jest to jedyny element i musimy wspierać go, albo poprzez LLM, albo poprzez
+klasyczne bazy danych, klasyczne silniki wyszukiwania oraz
+programistyczną logikę.
+Jeśli masz zapamiętać z tej lekcji tylko jedną rzecz, to skup się na przykładzie
+rerank i zrozum jego komponenty, ponieważ każdy z nich będzie pojawiał się w
+kolejnych lekcjach. Możesz się też zastanowić nad scenariuszami, w których
+model nie poradzi sobie z odnalezieniem istotnych dokumentów oraz tym, jak
+możesz to zmienić.
+Powodzenia!
+NOTATKA ZYGFRYDA
+22.11.2024, 12:28 S03E02 — Wyszukiwanie Semantyczne | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e02-wyszukiwanie-semantyczne 17/24
+
+===== STRONA 18 =====
+ZADANIE
+22.11.2024, 12:28 S03E02 — Wyszukiwanie Semantyczne | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e02-wyszukiwanie-semantyczne 18/24
+
+===== STRONA 19 =====
+Centrala złamała hasło do pliku ZIP, który wysłaliśmy wczoraj.
+Brzmi ono:
+1670
+W archiwum weapons_tests.zip znajdziesz raporty z testów nowoczesnej broni.
+Zaindeksuj je z użyciem embeddingów w swojej bazie wektorowej, a następnie
+odpowiedz na pytanie:
+Edit 2024-11-19 10:54 CET: Którego dnia skradziono prototyp broni?
+W raporcie, z którego dnia znajduje się wzmianka o kradzieży prototypu broni?
+Oczekiwana jest odpowiedź w formacie YYYY-MM-DD
+Nazwa zadania w centrali to wektory.
+Co należy zrobić w zadaniu?
+Pobierz archiwum z poprzedniej lekcji
+https://centrala.ag3nts.org/dane/pliki_z_fabryki.zip
+Rozpakuj znajdujące się w nim zaszyfrowane archiwum weapons_tests.zip za
+pomocą hasła: 1670
+Zaindeksuj z użyciem dowolnego modelu do embeddingów (OpenAI ma ich aż
+trzy) raporty w swojej bazie danych
+Zadbaj, aby metadane trzymane wraz z wektorami zawierały datę raportu
+(mogą zawierać więcej szczegółów, ale to Twoja decyzja)
+22.11.2024, 12:28 S03E02 — Wyszukiwanie Semantyczne | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e02-wyszukiwanie-semantyczne 19/24
+
+===== STRONA 20 =====
+Liked by Damian and 66 others
+Comment 310 comment s
+Franciszek Ruszkowski 21m
+See more
+Like Reply
+Mateusz Drogowski 14h
+📡 Telecom Eng 🤖 AI Enthusiast 📈 Investor
+Like Reply 1 like
+Utwórz embedding z pytania “W raporcie, z którego dnia znajduje
+się wzmianka o kradzieży prototypu broni?ˮ i odpytaj nim swoją bazę danych,
+ustawiając limit zwracanych rekordów na 1. Jeśli baza nie będzie
+zwracać odpowiednich rezultatów, wzbogać raporty o odpowiednie metadane
+w sposób, w jaki robiliśmy to wczoraj.
+Sprawdź jaką datę zwróciła baza do powyższego zapytania i wyślij ją w polu
+“answerˮ do centrali (/report) w formacie YYYY-MM-DD do zadania wektory.
+Jeśli data jest poprawna, otrzymasz w odpowiedzi flagę do zadania
+W yjaśnienie: To zadanie ze względu na miniaturowy rozmiar zestawu danych
+można oczywiście wykonać za pomocą jednego prompta i nie potrzebujesz do
+niego bazy wektorowej. Celem ćwiczenia jest jednak zaznajomienie się z
+działaniem tego typu baz i zachęcenie Cię do przynajmniej jednokrotnego
+wykorzystania takiej bazy w praktyce. Spróbuj więc wykonać ćwiczenie
+zgodnie z jego założeniami.
+Like
+FR
+Pytanie ogólne do lekcji:
+Jeśli chcemy wyszukać podobne dwa teksty za postacią similarity
+search, to jak najlepiej przygotować tekst do bazy wektorowej, aby
+wyniki similarity search były najskuteczniejsze? 
+Wyekstraktować po kilka słów kluczowych? streszczenie np na 30
+słów? Czy może po całych tekstach? Załóżmy że teksty są krótkie
+po 100-500 słów…
+Ogarnięte na bazie Qdrant i Jina, wynik prawidłowo uzyskany bez
+dodatkowych metadanych.
+22.11.2024, 12:28 S03E02 — Wyszukiwanie Semantyczne | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e02-wyszukiwanie-semantyczne 20/24
+
+===== STRONA 21 =====
+Piotr Święcik16h
+Python Developer / Quant Finance & Risk
+Like Reply 1 like
+Paweł Dulak (dulare) AI_Dev 14h
+I'm here to help
+Like Reply
+Piotr Święcik14h
+Python Developer / Quant Finance & Risk
+Like Reply 1 like
+Paweł Dulak (dulare) AI_Dev 14h
+I'm here to help
+Like Reply
+Adam K uśmierz 19h
+Like Reply
+Paweł Dulak (dulare) AI_Dev 17h
+I'm here to help
+Próbowałem w tym zadaniu paru różnych opcji - “naiwnyˮ RAG,
+wzbogacenie metadanych o słowa kluczowe (wyciągnięte przez
+LLMa) i o tytuł, zespawanie metadanych z treścią tekstu przed
+zrobieniem embeddingu. Generalnie żadna z metod nie działała za
+dobrze tzn. wynik “oczekiwanyˮ lądował na 2-5 miejscu.
+To co pomogło to zapięcie do bazy wektorowej customowego
+embeddingu - po użyciu https://huggingface.co/jinaai/jina-
+embeddings-v3 zadziałało za pierwszym razem.
+Piotr Święcik A jakich embeddingów użyłeś wcześniej? Tych
+które nie sprawdziły się?
+OpenAI - sprawdzałem 3-small, 3-large i adę
+Piotr Święcik dzięki :) u mnie na 3-large poszło, ale zrobię testy
+jeszcze raz…
+overment, “Przede wszystkim zadbałem w nim o to, aby zestaw
+danych zawierał informację na temat autora książki. Author został
+dodany także jako właściwość w obiekcie "metadata" dokumentów
+dodawanych do bazy wektorowej.ˮ - to brzmi jakby oprócz
+metadanych w zestawie danych, “authorˮ był jeszcze gdzieś. Gdzie
+go znaleźć prócz metadanych?
+Adam Kuśmierz Tutaj za “bazęˮ robi zmienna:
+22.11.2024, 12:28 S03E02 — Wyszukiwanie Semantyczne | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e02-wyszukiwanie-semantyczne 21/24
+
+===== STRONA 22 =====
+Like Reply
+Adam K uśmierz 17h
+Like Reply 1 like
+Ireneusz Prokopski 22h
+{ fullstack : " NestJS & NextJS & TypeScript " }
+Like Reply 1 like
+Jakub Gondek 1d
+See more
+Like Reply 1 like
+Sebastian Lenkiewicz 2d
+SRE
+Jest autor w każdym rekordzie tej “bazyˮ a także jest
+dodawany do metadanych przy wysyłaniu do bazy wektorowej.
+Jest w tych dwóch miejscach.
+aa, tego mi brakowało, że `data` robi za “bazęˮ :) dzięki!
+Zadanko super i Supabase też super daje radę. ;)
+JG
+@here czy ktoś pracuje tutaj w Deno? Jestem w stanie przeportować
+przykład rerank, ale po zmodyfikowaniu go żeby używał danych
+załadowanych asynchronicznie nie może zainicjalizować tokenizera i
+przepełnia stos.
+Po zmodyfikowaniu initializeData aby wołał textSplitter.document
+jeden raz wcześniej działa poprawnie.
+Fajna sprawa z tym embeddingiem i bazami wektorowymi. Juz mam
+prawie wszystko ogarnięte. Chyba zostało mi tylko lepsze ogarnięcie
+tworzenia embeddingu z danych wejściowych (np. dodać daty
+raportów). Fajnie tylko ze dokumentacja pod golangowa biblioteke
+22.11.2024, 12:28 S03E02 — Wyszukiwanie Semantyczne | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e02-wyszukiwanie-semantyczne 22/24
+
+===== STRONA 23 =====
+Like Reply 2 likes
+Sebastian Lenkiewicz 1d
+SRE
+Like Reply 1 like
+Bartek Karalus 2d
+coder, tinkerer, regular person
+Like Reply 2 likes
+Michal Mlak 2d
+Like Reply 1 like
+Piotr Janik2d
+See more
+Like Reply 1 like
+Show more comment s
+qdranta mogłaby być trochę lepsza. Więcej czasu spędziłem na
+szarpaniu się z libką niż z problemem xd
+No i zadanie rozpykane. Na przyszłość warto zapamiętać, żeby
+wpisywać dobrą nazwę kolekcji, bo inaczej nie dostanie się w
+ogóle odpowiedzi z bazy :D
+Za dużo czasu spędziłem na s2e5 i dzięki temu dzisiaj mialem gotowe
+klocki żeby rozwiązać to i nadgonić w 20 minut.
+no i suweniry:
+MM
+Nie mam na to lepszego wyrażenia, ale spotkałem się z tym, że “re-
+rankˮ też czasami używany jest w kontekście “poprzestawiaj mi te
+dokumenty, od najbardziej do najmniej istotnego dla tego zapytaniaˮ.
+PJ
+overment Mam pytanie dotyczące baz wektorowych oraz
+przechowywania całych dokumentów lub ich „fragmentówˮ. Czy
+zastosowanie metod preprocesingu stosowanych w NLP, takich jak
+usuwanie stop words czy lematyzacja, nie zwiększyłoby precyzji i
+wydajności wyszukiwania semantycznego? Co o tym sądzisz? Proces
+transformacji takich danych musiałby być wykonywany zarówno przed
+zapisaniem ich do bazy, jak i przed wydaniem zapytania do
+przeszukiwania. …
+22.11.2024, 12:28 S03E02 — Wyszukiwanie Semantyczne | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e02-wyszukiwanie-semantyczne 23/24
+
+===== STRONA 24 =====
+PS
+Post
+What are your thoughts?
+22.11.2024, 12:28 S03E02 — Wyszukiwanie Semantyczne | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s03e02-wyszukiwanie-semantyczne 24/24

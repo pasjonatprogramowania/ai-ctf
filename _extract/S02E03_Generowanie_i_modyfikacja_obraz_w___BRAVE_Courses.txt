@@ -1,0 +1,368 @@
+
+===== STRONA 1 =====
+S02E03  Gener owanie i modyfikacja obrazów
+overment Admin Nov 13
+I'm just curious.
+» Lekka wersja przeglądarkowa «
+📎 Pobierz treść tej lekcji w formacie markdown
+📎 Pobierz treść tej lekcji w formacie markdown EN
+Wskazówka: Narzędzie ComfyUI omówione w dzisiejszej lekcji wymaga
+posiadania sprzętu umożliwiającego lokalne uruchomienie modeli takich jak
+Stable Diffusion czy Flux. Dlatego jeśli nie masz możliwości uruchomienia go,
+skup się na pozostałych narzędziach i technikach omówionych w lekcji.
+Mieliśmy okazję przekonać się o możliwościach generatywnego AI w zakresie
+przetwarzania tekstu i audio, a także o zdolności do interpretowania obrazu.
+Teraz zobaczymy jakie opcje mamy w kontekście manipulacji i generowania
+nowych grafik oraz zdjęć.
+Projektowanie kreacji graficznych i praca ze zdjęciami do tej pory nie kojarzyły
+się bezpośrednio z programowaniem, z wyjątkiem rozwoju narzędzi dla tej branży
+czy budowania zaawansowanych interakcji z HTML Canvas i WebGL. Wydaje się
+zatem, że w dobie generatywnego AI, to raczej osoby zajmujące
+się projektowaniem, czy tworzeniem ilustracji, powinny być zainteresowane
+narzędziami takimi jak Midjourney czy Stable Diffusion. Okazuje się jednak, że nie
+do końca.
+Back to Lekcje programu [AI3]
+PS
+22.11.2024, 12:27 S02E03 — Generowanie i modyfikacja obrazów | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e03-generowanie-i-modyfikacja-obrazow 1/21
+
+===== STRONA 2 =====
+Przykładem może być narzędzie picthing, pozwalające na skuteczne usuwanie tła
+ze zdjęć, zbudowane przez twórcę kanału Theo — t3.gg. Choć samo usuwanie tła
+nie jest czymś nowym, tutaj mówimy o znacznym wzroście jakości. Przede
+wszystkim jednak, projekt ten jest przykładem, jak generatywne AI może być
+wykorzystane do budowania użytecznych produktów.
+Drugim przykładem jest Pieter Levels i jego projekt PhotoAI oraz InteriorAI.
+Adresują one konkretne problemy i potwierdzają swoją użyteczność poprzez
+statystki publikowane przez Pietera.
+Powyższe projekty wymieniam, aby nakreślić potencjalne obszary, którymi
+możemy się zająć i które mogą nas zachęcić do zainteresowania się generatywną
+grafiką. Tym bardziej, że nie musimy od razu tworzyć nowych produktów, ale
+22.11.2024, 12:27 S02E03 — Generowanie i modyfikacja obrazów | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e03-generowanie-i-modyfikacja-obrazow 2/21
+
+===== STRONA 3 =====
+nawet skorzystać z wybranych modeli na potrzeby funkcjonalności aplikacji, które
+już teraz rozwijamy.
+Obecne możliwości generowania obrazu
+Rozwój generatywnej grafiki świetnie przedstawia postęp, który dokonał się na
+przestrzeni 2 ostatnich lat. Poniższa grafika pochodzi z wpisu Comparing AI-
+generated images two years apart — 2022 vs. 2024 i jasno widać z niej, że w
+2022 roku trudno było mówić o poważnym zastosowaniu tych modeli.
+Dziś wygląda to zupełnie inaczej, choć nadal mówimy jeszcze o wielu
+ograniczeniach.
+Jednym z takich ograniczeń jest zdolność modelu do generowania elementów
+obrazu takich jak tekst, dłonie, zęby czy lustrzane odbicie. I choć obecnie
+dostępne modele takie jak Flux radzą sobie z tymi zadaniami coraz lepiej, to nadal
+trudno jest mówić o powtarzalnych rezultatach.
+22.11.2024, 12:27 S02E03 — Generowanie i modyfikacja obrazów | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e03-generowanie-i-modyfikacja-obrazow 3/21
+
+===== STRONA 4 =====
+Przeciętnie wypada także podążanie za instrukcjami, o czym już pisałem w lekcji
+S01E03 — Limity. Dlatego im bardziej złożony prompt opisujący grafikę, tym
+mniejsze prawdopodobieństwo, że otrzymamy rezultat zgodny z oczekiwaniami.
+Nie zmienia to jednak faktu, że jakość generowanych obrazów jest już teraz
+bardzo wysoka. Choć dojście do pożądanego efektu wymaga wielu prób, z
+pewnością jest to możliwe. Tym bardziej, że nie zawsze będzie nam zależało na
+tworzeniu kompleksowego obrazu, lecz pojedynczych elementów (np. tekstury
+czy tła) albo edycji istniejącej już grafiki czy zdjęcia. Poniżej nawet mamy prosty
+przykład ComfyUI, które zamienia moją twarz na zdjęciu wygenerowanym w
+Midjourney.
+22.11.2024, 12:27 S02E03 — Generowanie i modyfikacja obrazów | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e03-generowanie-i-modyfikacja-obrazow 4/21
+
+===== STRONA 5 =====
+Z programistycznego punktu widzenia, będzie nas interesowała dostępność
+modeli przez API lub ich samodzielny hosting. W tym pierwszym przypadku,
+naszą uwagę powinny zwrócić usługi takie jak wspomniana platforma Replicate, a
+także Leonardo.ai. Z kolei w drugim, może nas zainteresować RunPod lub
+podobne platformy oferujące dostęp do GPU.
+Poza samą manipulacją obrazem, przydatne jest także posługiwanie się
+szablonami, na podstawie których będziemy generować grafiki. Jest to zwykle
+konieczne na potrzeby marketingowe, np. generowania kreacji reklamowych,
+okładek artykułów na bloga czy newslettera. Zwykle potrzebujemy tej samej
+kreacji w różnych formatach, których ręczne opracowanie jest bardzo
+czasochłonne. Poniżej mamy przykład szablonów okładek wydarzeń i kursów
+publikowanych na eduweb.pl. Aby wygenerować nowy zestaw, wystarczy
+podmienić zdjęcie i tekst w głównym komponencie, a zmiany zostaną
+odwzorowane na wszystkich pozostałych instancjach.
+22.11.2024, 12:27 S02E03 — Generowanie i modyfikacja obrazów | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e03-generowanie-i-modyfikacja-obrazow 5/21
+
+===== STRONA 6 =====
+Obecnie sterowność modeli generujących grafiki jest dość ograniczona, ale
+można opracować prompty składające się zarówno z instrukcji tekstowych, jak i
+grafik referencyjnych. Pozwala to na zachowanie spójności stylu, co jest często
+wymagane w kontekście tonu marki czy wymagań projektu. Poniżej przykład
+okładek, które wykorzystywałem w jednym z moich projektów.
+Znacznie większą sterowność można także uzyskać w ComfyUI, natomiast
+faktyczny wpływ na generowaną grafikę zależy od konfiguracji samego workflow
+oraz naszych potrzeb.
+Podsumowując, modele z obszaru generatywnej grafiki znacznie wzbogacają
+możliwości manipulacji i kreacji obrazów, a które jeszcze do niedawna były
+niemożliwe lub bardzo ograniczone. Pozwala nam to na:
+Zwiększanie skali obrazu z (ograniczonym) zachowaniem detali
+Zwiększanie skali obrazu z powiększeniem kadru (przykładem jest Generative
+Expand dostępna w Photoshopie)
+Automatyczne usuwanie tła, również w trudnych przypadkach (np. włosy,
+cienie, krople)
+22.11.2024, 12:27 S02E03 — Generowanie i modyfikacja obrazów | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e03-generowanie-i-modyfikacja-obrazow 6/21
+
+===== STRONA 7 =====
+Usuwanie wybranych elementów zdjęcia (np. tła), zamianę ich z innymi oraz
+łączenie wielu zdjęć
+Generowanie spójnych obrazów, zgodnych z wymaganiami marki opisanymi w
+brandbooku
+Wykorzystywanie istniejących grafik do automatycznego generowania wielu
+formatów
+Tworzenie przybliżonych wizualizacji na podstawie opisów i grafik
+referencyjnych
+Animacje grafik do formy wideo (np. dzięki Runway Heygen, czy Kling AI)
+...i wiele innych.
+Techniki projektowania promptów dla modeli
+Generowanie grafik podobnie jak w przypadku LLM wymaga napisania promptu,
+aczkolwiek sama ich treść znacznie się różni, ponieważ zamiast pełnych
+instrukcji, potrzebujemy raczej słów kluczowych oraz flag sterujących
+ustawieniami. Widać to na przykładzie promptu Midjourney w publicznej galerii
+użytkownika kvovoorde. Widać w nim szczegółowy opis sceny z uwzględnieniem
+słów kluczowych takich jak shiny, dark blue, warm weather, natural lighting.
+Z kolei inny przykład równie świetnej grafiki, posługuje się wyłącznie słowami
+kluczowymi, takimi jak vibrant colors, cloes-up, black cat. Widać także, że model
+nie uwzględnił wszystkich z wymienionych słów.
+22.11.2024, 12:27 S02E03 — Generowanie i modyfikacja obrazów | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e03-generowanie-i-modyfikacja-obrazow 7/21
+
+===== STRONA 8 =====
+Ogólna rekomendacja w przypadku Midjourney mówi, aby prompty były krótkie i
+zawierały minimum informacji opisujących oczekiwany wynik. Jednak przegląd
+publicznie dostępnej galerii użytkowników sugeruje, że nie zawsze jest to prawda
+i znacznie lepiej jest eksperymentować. Nikt też nie powiedział, że nie możemy
+łączyć ze sobą różnych strategii.
+Poniżej widzimy prostą wizualizację zielonego dymu na czarnym tle,
+wygenerowanego modelem niji, który charakteryzuje styl anime. Sam prompt to
+zaledwie kilka słów, ale też pozornie trudno jest mówić o szczególnym
+dopasowaniu do moich potrzeb.
+22.11.2024, 12:27 S02E03 — Generowanie i modyfikacja obrazów | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e03-generowanie-i-modyfikacja-obrazow 8/21
+
+===== STRONA 9 =====
+Na tym etapie detale nie miały większego znaczenia. Bardziej zależało mi na
+uzyskaniu ogólnego stylu, który będzie stanowić referencję dla dalszych grafik.
+Tutaj korzystając z pomocy modelu, zamieniłem uproszczony opis na
+precyzyjną wizję tego, co chcę uzyskać.
+Powstała więc pierwsza wersja wizualizująca awatary w stylu, który przypadł mi
+do gustu. Jest to zatem dobra podstawa do generowania kolejnych grafik. Co
+więcej, prompt, który wykorzystałem do stworzenia pierwszej wersji, ma
+charakter meta promptu. Oznacza to, że możemy wygodnie użyć go do
+generowania kolejnych awatarów.
+22.11.2024, 12:27 S02E03 — Generowanie i modyfikacja obrazów | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e03-generowanie-i-modyfikacja-obrazow 9/21
+
+===== STRONA 10 =====
+Konkretnie, prompt zawiera stałe elementy, ale też daje możliwość podmiany
+fragmentu opisującego samą postać. Widać to na poniższym screenie, gdzie
+oznaczyłem go placeholderem [DESC]. Tutaj ponownie miałem ogólny pomysł na
+to, jakich postaci potrzebuję, ale skorzystałem z pomocy modelu, aby
+wygenerować bogatszy w słowa kluczowe opis. Poza tym, do samej wiadomości
+dołączyłem także grafikę prezentującą pierwszą wersję awatarów.
+22.11.2024, 12:27 S02E03 — Generowanie i modyfikacja obrazów | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e03-generowanie-i-modyfikacja-obrazow 10/21
+
+===== STRONA 11 =====
+Rezultat w postaci pierwszej iteracji widać poniżej i dalsze próby będą zależały
+już od naszych idywidualnych preferencji. Widzimy jednak, że spójny styl został
+zachowany w przypadku każdej z postaci, wyłączając pojedyncze grafiki, które
+wykraczają poza paletę kolorów.
+Na tym jednak nie koniec, ponieważ wypracowany styl możemy połączyć także z
+istniejącymi już grafikami czy nawet zdjęciami. W przypadku większości
+popularnych narzędzi do generatywnej grafiki mamy możliwość dołączenia
+postaci, która ma zostać odwzorowana przez model. Jak widać na przykładzie
+Alice, rezultaty są w porządku na tyle, że spośród nich możemy wybrać ten, który
+będzie odpowiadał nam najbardziej.
+22.11.2024, 12:27 S02E03 — Generowanie i modyfikacja obrazów | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e03-generowanie-i-modyfikacja-obrazow 11/21
+
+===== STRONA 12 =====
+Choć sam zdecydowałem się w tym przypadku na styl ilustracji, to nic nie stoi na
+przeszkodzie, aby wybrać inne, w tym także bardzo realistyczny.
+Midjourney, za pomocą którego wygenerowałem powyższe grafiki,
+charakteryzuje się świetną jakością, ale bardzo niską sterownością. Jednak
+największym problemem jest brak oficjalnego API (nieoficjalne wrappery mogą
+doprowadzić do zablokowania konta). Pomimo tego, wszystkie powyższe
+techniki można zastosować w połączeniu z ComfyUI lub podobnymi narzędziami.
+Mam tutaj na myśli przede wszystkim: nadawanie stylu, meta prompty oraz
+obrazy referencyjne. Przykładem tego może być poniższy workflow, który
+pokazuje to w praktyce. Oczywiście w związku z zastosowaniem innego modelu,
+efekt różni się od wcześniejszego, natomiast schemat pozostaje taki sam.
+Generowanie grafik w oparciu o szablony
+22.11.2024, 12:27 S02E03 — Generowanie i modyfikacja obrazów | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e03-generowanie-i-modyfikacja-obrazow 12/21
+
+===== STRONA 13 =====
+Jak widać, ComfyUI daje ogromne możliwości wpływania na kształt
+generowanych grafik. Jednak w praktyce może okazać się to niewystarczające,
+szczególnie gdy będzie nam zależało na bardzo konkretnych szablonach.
+Tutaj z pomocą przychodzą rozwiązania takie jak htmlcsstoimage, które
+pozwalają na generowanie grafik z pomocą API, na podstawie szablonów HTML.
+Mamy więc możliwość dynamicznego podmieniania tekstów oraz grafik, a nawet
+stylów CSS. Natomiast teraz wchodzą do gry dwa dodatkowe elementy — Vision
+Language Models oraz generatywna grafika.
+Możemy zatem:
+Zdefiniować szablon HTML, zawierający określoną kolorystykę, fonty i ogólny
+układ, wliczając w to także responsywność oraz dopasowanie zachowania w
+zależności od rozmiaru elementów (np. ilości tekstu)
+Zbudować workflow ComfyUI i/lub prompty do innych narzędzi generujących
+grafiki lub elementy szablonów poprzez API
+Stworzyć aplikację, która reaguje na zdarzenia takie jak dodanie do kolejki
+posta social media, wpisu na bloga czy newslettera, a następnie tworzy serię
+grafik i przekazuje je do weryfikacji
+Taki schemat (z wyłączeniem generowanych grafik, które wtedy jeszcze nie były
+dostępne) stosowaliśmy przez niemal 3 lata w eduweb.pl, generując w ten
+sposób materiały promocyjne 5 różnych wydań newslettera. Grafiki
+22.11.2024, 12:27 S02E03 — Generowanie i modyfikacja obrazów | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e03-generowanie-i-modyfikacja-obrazow 13/21
+
+===== STRONA 14 =====
+dopasowywały się do autora lub autorki, a także specjalizacji oraz treści samego
+newslettera.
+Pomimo responsywności, powyższe szablony były jednak dość statyczne ze
+względu na potrzebę ograniczenia interwencji ze strony użytkownika. Obecnie
+możemy pozwolić sobie na znacznie więcej, ponieważ część błędów może
+automatycznie naprawić model.
+Podsumowanie
+Narzędzia z obszaru generatywnej grafiki pozwalają na tworzenie automatyzacji
+oraz wyspecjalizowanych narzędzi zdolnych do transformacji obrazów według
+zdefiniowanego stylu. Z tego powodu warto zainteresować się nimi, nawet jeśli
+sami bezpośrednio nie jesteśmy zaangażowani w procesy związane z grafiką.
+Spośród wszystkich wymienionych dzisiaj rozwiązań, na szczególną uwagę
+zasługują ComfyUI oraz HTMLCSStoImage, ponieważ mocno przecinają się one z
+obszarem programowania. Z ich pomocą możemy budować zaawansowane
+rozwiązania zdolne do wsparcia lub nawet automatyzacji elementów procesu
+marketingowego czy produktowego. Ostatecznie wartość wiedzy na temat
+budowania programistycznych rozwiązań, które wykorzystują modele
+generatywnej grafiki, wystarczająco dużo mówią przykłady produktów Pietera
+Levelsa z początku tej lekcji. W sieci można spotkać także inne zastosowania,
+bezpośrednio związane z procesem projektowym, tworzenia reklam, czy edycji
+zdjęć.
+22.11.2024, 12:27 S02E03 — Generowanie i modyfikacja obrazów | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e03-generowanie-i-modyfikacja-obrazow 14/21
+
+===== STRONA 15 =====
+WAŻNE: Jeśli nie posiadasz komputera, który pozwoli na swobodną pracę z
+ComfyUI i nie chcesz korzystać z płatnych narzędzi, to możesz pominąć poniższy
+film.
+Powodzenia!
+NOTATKA ZYGFRYDA
+22.11.2024, 12:27 S02E03 — Generowanie i modyfikacja obrazów | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e03-generowanie-i-modyfikacja-obrazow 15/21
+
+===== STRONA 16 =====
+ZADANIE
+Zebraliśmy zeznania od naszych wysłanników, którzy obserwowali fabrykę.
+Opisali oni, jak wyglądały roboty, które się tam kręciły. Na podstawie ich opisów
+przygotuj proszę grafikę, która będzie pewnego rodzaju wizualizacją
+potencjalnego wyglądu tych robotów, a następnie prześlij nam linka do tej grafiki.
+Użyj w tym celu modelu Dall-E w wersji 3. Grafika, której oczekujemy powinna
+być w formacie PNG o wymiarach 1024x1024px. Zadanie w raportach nazywa
+się ʼrobotidʼ.
+Opis robota (zmienia się co 10 minut):
+https://centrala.ag3nts.org/data/KLUCZ-API/robotid.json
+Co należy zrobić w zadaniu?
+Pobierz jedno z zeznań wysłanników
+Stwórz obraz na podstawie opisu (wykorzystaj sugerowany model DALL-E lub
+dowolny inny, który będzie dla Ciebie dogodny)
+Odeślij URL wygenerowanej grafiki do centrali
+Grafika musi być w formacie PNG i mieć wymiary 1024×1024 px
+Jeśli obraz zostanie zaakceptowany, otrzymasz flagę
+UWAGA: nie musisz samodzielnie hostować pliku PNG. Możesz podać adres URL
+otrzymany od generatora.
+22.11.2024, 12:27 S02E03 — Generowanie i modyfikacja obrazów | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e03-generowanie-i-modyfikacja-obrazow 16/21
+
+===== STRONA 17 =====
+Liked by Damian and 132 others
+Comment 393 comment s
+Igor Wnęk 12h
+Software Engineer | Creator
+Like Reply
+Mikołaj Siwek 14h
+Like
+Pochwalę się i swoim robotem 🤖
+22.11.2024, 12:27 S02E03 — Generowanie i modyfikacja obrazów | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e03-generowanie-i-modyfikacja-obrazow 17/21
+
+===== STRONA 18 =====
+See more
+Like Reply
+Łukasz Grzejszczyk 15h
+Hah a u mnie tak :D
+…
+ŁG
+22.11.2024, 12:27 S02E03 — Generowanie i modyfikacja obrazów | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e03-generowanie-i-modyfikacja-obrazow 18/21
+
+===== STRONA 19 =====
+Like Reply
+Adam K ęsy 22h
+Like Reply
+Maciej Podkowa 1d
+Java Game De veloper
+AK
+Czy to normalne, że serwer zwraca takie enkodowanie polskich
+znaków? Pytam, bo przy okazji problemu z wysłaniem zadania przez
+API do centrali okazało się, że serwer ma problem, jeśli wysyła się
+polskie znaki, pomimo że po mojej stronie wysyłam to w UTF-8.
+22.11.2024, 12:27 S02E03 — Generowanie i modyfikacja obrazów | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e03-generowanie-i-modyfikacja-obrazow 19/21
+
+===== STRONA 20 =====
+See more
+Like Reply
+Tomasz Czuw ara 1d
+AI Enthusiast, DevOps Professional, and Marketing Maven: Bridging the Gap Between Data and
+Creativity
+Like Reply
+Marcin Zakrzewski 1d
+Like Reply
+Krzysztof Owsiany 1d
+MrDev.pl
+Like Reply
+Dorota Macherzyńska 2d
+Like Reply 1 like
+Joanna Panimasz 2d
+Front-End Developer
+Tutaj krótki poradnik jak odpalić model FLUX na słabszych sprzętach z
+6GB/8GB VRAM.
+https://www.youtube.com/watch?v=0uTRfXDs7Iw
+Osobiście korzystam z modeli GGUF i na laptopowej karcie RTX 3070
+(6GB VRAM) + 32 GB RAM generuje 2 obrazy w podstawowej
+rozdzielczości 1080 × 1920 przy 25 krokach w 9 minut razem z …
+Pozostał wam tylko strach
+To także wrzucę moje.
+KO
+A mi taki wyszedł.
+A tu mój:
+JP
+Ciekawy wynik….
+22.11.2024, 12:27 S02E03 — Generowanie i modyfikacja obrazów | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e03-generowanie-i-modyfikacja-obrazow 20/21
+
+===== STRONA 21 =====
+Like Reply 1 like
+Grzegorz Boński 2d
+Hobb ysta Pythonista
+Like Reply 1 like
+Joanna Panimasz 2d
+Front-End Developer
+Like Reply
+Show more comment s
+Joanna Panimasz zdenerwowany gentleman!
+JP
+Grzegorz Boński Jak tak patrzy to czuć jakiś taki niepokój
+PS
+Post
+What are your thoughts?
+22.11.2024, 12:27 S02E03 — Generowanie i modyfikacja obrazów | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s02e03-generowanie-i-modyfikacja-obrazow 21/21

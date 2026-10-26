@@ -1,0 +1,780 @@
+
+===== STRONA 1 =====
+S01E02  Przy gotowanie własnych danych dla
+modelu
+overment Admin Nov 5
+I'm just curious.
+» Lekka wersja przeglądarkowa «
+Wskazówka: Opisy uruchomienia przykładów z repozytorium 3rd-devs
+znajdują się w pliku README.md. W tej lekcji znajduje się jednak przykład
+linear którego nie musicie uruchamiać jeśli nie pracujecie w narzędzi
+https://linear.app i nie zamierzacie wdrażać takiej funkcjonalności u siebie.
+Z kodem źródłowym przykładów rozmawiaj korzystając z Cursor IDE lub
+pluginów takich jak Github Copilot czy Continue, aby móc je łatwo zrozumieć.
+📎 Pobierz treść tej lekcji w formacie markdown
+📎 Pobierz treść tej lekcji w formacie markdown (en)
+Przynajmniej kilkukrotnie tworzyliśmy prompty, które sterowały "snem" modelu
+poprzez dane dostarczone do instrukcji systemowej. Pozwala to rozszerzać
+wiedzę modelu, a nawet nauczyć go nowych umiejętności (np. klasyfikacji).
+Zewnętrzne dane mogą być wpisane do promptu systemowego ręcznie, ale także
+mogą pojawić się w nim automatycznie, czego przykładem jest dość
+powszechnie znany RAG, czyli Retrieval-Augmented Generation.
+Back to Lekcje programu [AI3]
+PS
+22.11.2024, 12:25 S01E02 — Przygotowanie własnych danych dla modelu | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s01e02-przygotowanie-wlasnych-danych-dla-modelu 1/29
+
+===== STRONA 2 =====
+W generatywnych aplikacjach kontekst zwykle pochodzi z bazy danych,
+zewnętrznego API, treści plików lub ze wszystkich tych źródeł jednocześnie.
+Każdy, kto ma za sobą pierwsze aplikacje łączące model z zewnętrznymi
+źródłami danych, wie, że wiążą się z tym interesujące możliwości, ale także
+szereg trudności, które po części zaadresujemy w tej lekcji.
+W lekcji S00E04 omawialiśmy przykład completion, którego celem było
+sklasyfikowanie zadania do jednej z trzech kategorii — praca / dom / inne. Było to
+mało praktyczne, ponieważ zwykle zadania przypisujemy do jednego z naszych
+projektów lub zdefiniowanych przez nas etykiet. Sam zarządzam zadaniami w
+Linear, a faktyczna lista kategorii, wygląda u mnie następująco:
+W większości przypadków nowe zadania dodają się automatycznie na podstawie
+wiadomości, które przesyłam do mojego Agenta AI. Zdarza się jednak, że
+dopisuję je ręcznie w Linear. Wówczas uruchamia się webhook, na którym działa
+kod podobny do tego z przykładu linear, w celu automatycznego przypisania
+projektu.
+22.11.2024, 12:25 S01E02 — Przygotowanie własnych danych dla modelu | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s01e02-przygotowanie-wlasnych-danych-dla-modelu 2/29
+
+===== STRONA 3 =====
+Szczególnie interesująca jest funkcja assignProjectToIssue w której nie tylko
+wybierany jest projekt, ale także programistycznie weryfikujemy poprawność
+identyfikatora i w razie potrzeby, ustawiamy jego wartość na domyślną.
+Przykład linear pokazuje nam zatem, że programistyczne wykorzystanie dużych
+modeli językowych faktycznie sięga dalej niż interfejs czatu. No bo w tym
+przypadku, proces klasyfikacji miał miejsce jedynie w odpowiedzi na akcję
+użytkownika, a nie jego bezpośrednią wiadomość. W dodatku do klasyfikacji
+dojdzie tylko wtedy, jeśli użytkownik sam nie ustawił projektu (i również jest to
+programistycznie sprawdzane).
+Także, nawet jeśli problem niedeterministycznej natury modeli jest trudny do
+rozwiązania, to nadal możemy skorzystać z ich możliwości w taki sposób, aby
+wspierały istniejące aktywności lub częściowo autonomicznie realizowały jakiś
+proces.
+W powyższej automatyzacji, informacje na temat dostępnych projektów i zasad
+ich wybierania, zostały zapisane ręcznie w prompcie, w sekcji context.
+22.11.2024, 12:25 S01E02 — Przygotowanie własnych danych dla modelu | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s01e02-przygotowanie-wlasnych-danych-dla-modelu 3/29
+
+===== STRONA 4 =====
+Nie zawsze tak będzie. W zamian kontekst będzie wczytywany dynamicznie z
+wielu źródeł, co nierzadko będzie wymagało dodatkowej transformacji treści. No
+ale zacznijmy od początku.
+Rekomendowane formaty wymiany danych
+Duże Modele Językowe nie mogą czytać plików binarnych jak PDF czy DOCX
+(wyjątek stanowi Claude, który może od niedawna przetwarzać pliki PDF), więc
+musimy je przekonwertować, aby dostarczyć je w zrozumiałej formie. W
+zależności od dokumentu może to oznaczać utratę formatowania, co przekłada
+się na ryzyko błędnej interpretacji treści. Nawet pojawienie się obrazu czy
+zewnętrznego odnośnika utrudnia zrozumienie zawartości pliku. Każda związana
+z tym niejasność zwiększa wprost ryzyko konfabulacji i obniża skuteczność
+naszego systemu.
+Jeśli masz doświadczenie w przetwarzaniu dokumentów PDF, wiesz, że trudno
+mówić o uniwersalnym parserze. Ale zbudowanie narzędzia do rozpoznawania
+określonych szablonów czy odnajdywania konkretnych informacji jest zazwyczaj
+możliwe. Obecność dużych modeli językowych dodatkowo przesuwa granicę
+tego, co do tej pory było uznawane za możliwe, ale nie rozwiązuje wszystkich
+problemów.
+22.11.2024, 12:25 S01E02 — Przygotowanie własnych danych dla modelu | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s01e02-przygotowanie-wlasnych-danych-dla-modelu 4/29
+
+===== STRONA 5 =====
+Przykładem może być poniższy zrzut ekranu z treścią lekcji AI_devs 3, zapisanej
+w notion. Dzięki notion-to-md możemy pobrać ją w formie otwartego formatu
+markdown. Sugeruje to zatem, że cała jej treść, łącznie z obrazkami, będzie
+dostępna dla LLM.
+Okazuje się jednak, że tak nie jest, bo wczytanie załączników wymaga logowania,
+czego model językowy domyślnie nie jest w stanie zrobić. Obrazek poniżej jest
+tylko jednym z przykładów tego, że zawsze będzie nam zależało na dokładnej
+weryfikacji, czy mamy swobodny dostęp do treści. W przypadku Notion jest to
+możliwe poprzez wygenerowanie tymczasowego linku, ale nie zawsze tak będzie.
+Samo dotarcie do treści nie jest jedynym problemem, który przed nami stoi. LLM
+będziemy wykorzystywać również w celu transformacji istniejących
+22.11.2024, 12:25 S01E02 — Przygotowanie własnych danych dla modelu | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s01e02-przygotowanie-wlasnych-danych-dla-modelu 5/29
+
+===== STRONA 6 =====
+dokumentów, co w przypadku formatów binarnych (np. PDF) ponownie jest
+utrudnione.
+Zatem już na początkowym etapie musimy odpowiedzieć sobie na pytania:
+Źródło: Skąd pochodzą dane i jak często się zmieniają? Czy będą
+odczytywane bezpośrednio ze źródła, czy musimy zapisać ich wersje po
+stronie aplikacji i regularnie aktualizować? A może dane będą tworzone i
+mamy dużą kontrolę nad ich strukturą?
+Organizacja: Jak wygląda struktura danych, w tym także powiązania, np. ze
+źródłem, użytkownikami oraz pozostałymi danymi. Co poza
+główną treścią powinniśmy wiedzieć na ich temat oraz co o nich powinien
+wiedzieć model?
+Dotarcie: Dla kogo dane będą dostępne i w jaki sposób będziemy je
+przeszukiwać oraz filtrować? Jakie narzędzia będą zaangażowane w ten
+proces?
+Dostarczenie: Jak dane będą prezentowane modelowi i czy proces ten będzie
+rozłożony na kilka etapów (np. w celu podsumowania dużego dokumentu).
+Czy dane będą przetwarzane indywidualnie, czy w połączeniu z innymi
+informacjami?
+Prezentacja / Zapis: Co się dzieje z rezultatem zwróconym przez model? W
+jakim formacie zostaną one zapisane i/lub przedstawione użytkownikowi? Czy
+poza odpowiedzią modelu, musimy zapisać coś jeszcze?
+Modyfikacja: Czy oryginalne dane mają zostać nadpisywane? W jaki sposób
+będziemy mogli odwrócić działanie modelu? Jakie ograniczenia narzuca na
+nas format danych? Jak możemy ograniczyć ryzyko błędu (np. przez nadzór
+człowieka)?
+Powyższe pytania prowadzą nas do wniosku, że warto dążyć do pracy z
+formatami otwartymi, takimi jak markdown, txt, json czy yaml, a także
+bezpośrednio z bazami danych. Projekty, w których do gry wchodzą formaty
+binarne lub z innego powodu dostęp do informacji jest utrudniony, będą musiały
+być wyspecjalizowane w określonym zadaniu. Czasem może okazać się, że już
+po wstępnej weryfikacji dany projekt jest nieopłacalny w dalszej realizacji.
+Transformacja i kompresja treści
+Przykład websearch, który omawialiśmy w lekcji S01E01 — Interakcja pozwalał na
+połączenie dużego modelu językowego z wynikami wyszukiwania /w Internecie
+oraz wybranymi stronami www.
+Oryginalnie treść strony www zapisana jest w formacie HTML i zawiera szereg
+niepotrzebnych (z punktu widzenia modelu) tagów. Dzięki FireCrawl od razu
+22.11.2024, 12:25 S01E02 — Przygotowanie własnych danych dla modelu | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s01e02-przygotowanie-wlasnych-danych-dla-modelu 6/29
+
+===== STRONA 7 =====
+otrzymywaliśmy oczyszczoną strukturę Markdown, natomiast w praktyce często
+będziemy przeprowadzać podobne transformacje sami.
+Dla przykładu dokument PDF (o prostej strukturze), może
+zostać przekonwertowany do HTML, a HTML do markdown. W takiej formie treść
+może zostać zmieniona przez LLM, który potrafi formatować wypowiedzi z
+pomocą tej składni. Następnie odwracamy proces, aby uzyskać oryginalny format
+PDF.
+Powyższy mechanizm nie sprawdzi się w przypadku złożonych struktur PDF, ale
+sama koncepcja konwertowania formatów może okazać się użyteczna także w
+innych sytuacjach. Jedną z nich może być generowanie formatu YAML, zamiast
+JSON, o czym wspominał Andrej Karpathy w filmie Let's build tokenizer together,
+wskazując, że składania YAML może być znacznie bardziej przyjazna modelowi
+ze względu na proces tokenizacji.
+Dla prostego obiektu JSON mówimy o 30% różnicy tokenów (według Tiktokenizer
+i modelu GPT-4o), których model nie musi generować, jeśli zapiszemy te dane w
+formacie YAML. To przekłada się także na niższe koszty oraz krótszy czas
+inferencji.
+22.11.2024, 12:25 S01E02 — Przygotowanie własnych danych dla modelu | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s01e02-przygotowanie-wlasnych-danych-dla-modelu 7/29
+
+===== STRONA 8 =====
+Zatem pracując z różnymi formatami danych, zawsze w pierwszej kolejności
+warto zadać sobie pytanie o to, czy możemy dokonać transformacji do bardziej
+przyjaznej formy. To samo dotyczy obrazów, plików audio oraz wideo i o tym
+wszystkim, będziemy jeszcze mówić.
+22.11.2024, 12:25 S01E02 — Przygotowanie własnych danych dla modelu | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s01e02-przygotowanie-wlasnych-danych-dla-modelu 8/29
+
+===== STRONA 9 =====
+Transformacja i oczyszczanie danych to nie tylko kwestia oszczędności tokenów,
+ale także zarządzania uwagą modelu, która nie musi być rozproszona na
+niepotrzebne informacje. Choć zdolność zarządzania uwagą jest stale
+optymalizowana, nadal trzeba ją mieć na uwadze, szczególnie w przypadku
+modeli Open Source.
+Do dyspozycji mamy także różne rodzaje kompresji, które mogą być zrealizowane
+programistycznie lub z pomocą modelu językowego. Najbardziej klasycznym
+przykładem, który można spotkać w Internecie, jest podział dokumentu na
+mniejsze fragmenty (tzw. Chunking). Problem w tym, że w wyniku "pocięcia"
+pliku, możemy zgubić istotny kontekst, co prowadzi do konfabulacji lub
+generowania poprawnych, ale niekompletnych odpowiedzi.
+W zamian możemy przeprowadzić bardziej zaawansowane przetwarzanie treści
+pliku, analizując go w całości, często kilkukrotnie, aby wygenerować nowe dane.
+Mowa tutaj o utworzeniu notatek na temat omawianych koncepcji, definicji czy
+problemów. W rezultacie, zamiast zestawiać zapytanie użytkownika z oryginalną
+treścią pliku, rolę kontekstu przejmują wygenerowane notatki. Przykład takiego
+podejścia widać poniżej, gdzie z wgranego pliku zostaje wygenerowane ogólne
+podsumowanie i lista koncepcji, które stanowią kontekst zapytania.
+Jeśli na etapie przetwarzania pliku nie popełnimy dużych błędów, to ryzyko
+pominięcia istotnych danych, jest mniejsze, niż w przypadku dzielenia dokumentu
+na fragmenty.
+Podsumowując temat transformacji treści:
+Warto dążyć do pracy z formatami otwartymi, o ile to możliwe. Składnia
+markdown oraz format JSON (czy YAML) są najbardziej elastyczne, a ich
+22.11.2024, 12:25 S01E02 — Przygotowanie własnych danych dla modelu | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s01e02-przygotowanie-wlasnych-danych-dla-modelu 9/29
+
+===== STRONA 10 =====
+popularność sprawia, że możemy wykorzystać je w połączeniu z
+zewnętrznymi systemami (np. CMS czy klientami poczty)
+Pracując na zewnętrznych danych, nie musimy z góry zakładać, że trafią do
+modelu w swojej oryginalnej formie. Fakt, że mamy do dyspozycji duży model
+językowy sprawia, że możemy je wcześniej przetworzyć.
+Pomimo dużej elastyczności, jaką oferują duże modele językowe, nadal warto
+myśleć o możliwym wyspecjalizowaniu rozwiązań i usystematyzowaniu źródeł
+danych. Choć może się to zmienić w przyszłości, trudno jest wgrać całą bazę
+wiedzy do promptu systemowego i oczekiwać jakościowych odpowiedzi. W
+zamian będzie nam zależało na pracy wyłącznie z tymi danymi, które w danej
+chwili są niezbędne do wygenerowania odpowiedzi.
+Dedykowane źródła wiedzy dla LLM
+Dopasowanie aplikacji do zewnętrznych źródeł danych nie jest jedyną strategią,
+którą możemy rozważyć. Czasami bardziej uzasadnione będzie zbudowanie bazy
+wiedzy od podstaw, z myślą o LLM. Nie oznacza to jednak, że całość musi być
+ręcznie pisana przez człowieka, bo ten może tylko weryfikować treści
+wygenerowane przez model.
+Mowa więc tutaj o sytuacji w której skuteczne przeniesienie zawartości
+dokumentów do modelu nie będzie możliwe. Wówczas jednorazowo
+przechodzimy przez proces częściowo automatycznego przetworzenia treści.
+Gdy dane z którymi pracujemy, nie zmieniają się zbyt często, takie podejście
+może być uzasadnione.
+Alternatywnie, baza wiedzy może być generowana w trakcie interakcji z aplikacją.
+Jedną z implementacji takiego podejścia jest projekt mem0. Jego założeniem jest
+dynamiczne zapamiętywanie informacji na potrzeby bieżącej interakcji lub zadań
+realizowanych w przyszłości. Jest to szczególnie wartościowe w przypadku
+agentów AI, aczkolwiek obecnie trudno jest jeszcze mówić o ich w pełni
+autonomicznym działaniu.
+W przykładzie files znajduje się logika asystenta zdolnego do zapamiętywania
+historii konwersacji oraz kreowania własnych wspomnień. Mechanizm ten jest
+dość prosty i dla ułatwienia nie korzysta z bazy danych, lecz zapisuje wiedzę w
+plikach markdown, a do ich przeszukiwania wykorzystuje tzw. 'vector store' o
+nazwie faiss, który w przyszłości zastąpimy bazą wektorową, np. Qdrant.
+UWAGA: Jeśli nie wiesz nic na temat baz wektorowych, na potrzeby tego
+przykładu po prostu pomyśl o nich jak o silniku wyszukiwania.
+Przykład rozbudowuje interakcję z modelem o przeszukanie dostępnej wiedzy
+oraz dodanie jej do kontekstu głównego promptu systemowego. Poza tym
+zawiera także dodatkowy krok, umożliwiający zapisanie bieżącej konwersacji, a
+także dedykowanych wspomnień. Zatem nie mówimy tutaj o połączeniu z
+22.11.2024, 12:25 S01E02 — Przygotowanie własnych danych dla modelu | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s01e02-przygotowanie-wlasnych-danych-dla-modelu 10/29
+
+===== STRONA 11 =====
+istniejącym już źródłem danych, lecz budowaniem go od podstaw, z myślą o
+asystencie.
+Działanie przykładu files widoczne jest na poniższym filmie, lecz zachęcam do
+jego samodzielnego uruchomienia i porozmawiania z asystentem. Szybko okaże
+się, że zapisywane wspomnienia są duplikowane, a po zapamiętaniu większej
+liczby informacji, odzyskanie ich wszystkich nie będzie możliwe.
+22.11.2024, 12:25 S01E02 — Przygotowanie własnych danych dla modelu | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s01e02-przygotowanie-wlasnych-danych-dla-modelu 11/29
+
+===== STRONA 12 =====
+Powodem problemów z zapisywaniem i odzyskiwaniem informacji, jest sama
+implementacja, która obecnie nie uwzględnia aktualizacji wpisów czy
+rozbudowanej logiki "przypominania" wcześniejszych wspomnień.
+Wspomnienia asystenta zapisane są w katalogu context/memories, który można
+otworzyć z pomocą aplikacji Obsidian w ramach której dostępna jest możliwość
+wizualizacji z pomocą interaktywnego grafu. Już po wymianie pierwszych
+wiadomości można wyrobić sobie wstępną intuicję na temat potencjalnych
+rozwiązań i strategii organizowania informacji. Jest to wartościowe, ponieważ w
+podobny sposób będziemy budować system umiejętności oraz pamięci
+długoterminowej dla agentów AI.
+Wizualizacja w postaci grafu również nie jest tutaj przypadkowa, ponieważ duże
+modele językowe mogą po nim nawigować, gromadząc informacje na potrzeby
+rozmowy czy aktualnie realizowanego zadania. Niestety (przynajmniej obecnie)
+wyzwaniem pozostaje ryzyko duplikowania wpisów oraz generowanie
+dynamicznej struktury grafu, o czym można poczytać we wpisie "Constructing
+Knowledge Graphs From Unstructured Text Using LLMs" na blogu Neo4J. Z tego
+powodu zwykle będziemy dążyć do poruszania się w ramach z góry ustalonego
+schematu.
+Zewnętrzne źródła wiedzy
+W przykładzie websearch wczytywaliśmy dane z Internetu. Robiliśmy to
+każdorazowo, więc dane zawsze były aktualne. Jednak gdy do gry wchodzi
+22.11.2024, 12:25 S01E02 — Przygotowanie własnych danych dla modelu | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s01e02-przygotowanie-wlasnych-danych-dla-modelu 12/29
+
+===== STRONA 13 =====
+zestaw danych w postaci dokumentów, bazy produktów czy katalogów, musimy
+zadbać o ich synchronizację. W związku z tym zawsze musimy
+zapisywać oryginalny identyfikator lub odnośnik do źródła. Ewentualnie możemy
+generować własne identyfikatory, o ile treści nadal pozostaną poprawnie
+powiązane.
+Poniżej mamy przykład połączenia z artykułami publikowanymi na blogu, których
+treść ma trafić do modelu. Każdy wpis jest dość obszerny i nie może być w
+całości dołączony do kontekstu promptu systemowego. Co więcej, musimy mieć
+także możliwość przeszukiwania tych treści. W związku z tym konieczne jest
+przetworzenie wpisów oraz zapisanie ich w lokalnej bazie danych i/lub dodanie
+do indeksu silnika wyszukiwania.
+Taki system wymaga ustawienia harmonogramu, według którego będą pobierane
+nowe wpisy, lub webhooków, które będą powiadamiać naszą aplikację o
+zmianach na blogu.
+Aby nie było tutaj wątpliwości, wyjaśnię:
+Na blogu mamy cały artykuł w formie przyjaznej człowiekowi
+Na potrzeby LLM musimy dostosować tę formę, a ta będzie różnić się w
+zależności od zamierzonego celu. Przykładowo, jeśli budujemy narzędzie
+tłumaczące treść artykułu, musimy podzielić go na mniejsze fragmenty i
+przetwarzać je indywidualnie. Powodem jest fakt, że obecnie LLM mają niski
+limit "output token" i nie są w stanie przepisać treści całego artykułu.
+Zatem, gdy podzielimy artykuł na mniejsze fragmenty, nadal chcemy
+zachować informację o ich powiązaniu z oryginałem. I dlatego potrzebny jest
+nam identyfikator.
+Innym przykładem jest cytowanie źródeł, co przydaje się chociażby w sytuacji,
+gdy model jest podłączony do Internetu. Poza wypowiedziami, z punktu widzenia
+22.11.2024, 12:25 S01E02 — Przygotowanie własnych danych dla modelu | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s01e02-przygotowanie-wlasnych-danych-dla-modelu 13/29
+
+===== STRONA 14 =====
+użytkownika, wartościowe jest także dołączanie odnośników do stron www,
+którymi posługuje się model.
+Dostarczanie kontekstu dla modelu
+"API modeli jest bezstanowe" — to zdanie wydaje się oczywiste i uzasadnia
+potrzebę przekazywania do modelu całej treści konwersacji za każdym razem.
+Nie jest to jednak rozwiązanie wszystkich problemów, co widać na poniższym
+przykładzie.
+Mamy tutaj wymianę wiadomości, w której użytkownik pyta, kim jest overment.
+Wówczas system przeszukuje Internet, wczytując do kontekstu informację, na
+podstawie której udziela odpowiedzi. Jednak jeżeli kontekst wyników
+wyszukiwania zostanie usunięty z konwersacji, to kolejne pytanie pogłębiające
+zostanie zaadresowane błędnie.
+Dość szybko nasuwa się na myśl rozwiązanie polegające na tym, aby
+treść wyników wyszukiwania pozostała w kontekście konwersacji. Jednak w
+praktyce rzadko jest to możliwe, ponieważ liczba tokenów rośnie bardzo szybko,
+a model odwraca uwagę od oryginalnych instrukcji. Znacznie lepszym
+podejściem jest uwzględnienie możliwości ponownego wyszukiwania z
+mechanizmem pamięci podręcznej, aktywowanej na kilka/kilkanaście minut.
+Zatem problem z dostarczaniem wiedzy do kontekstu pojawia się już w związku z
+jego samą obecnością. Programistycznie musimy zadbać o to, aby wiedza
+wymagana do udzielenia odpowiedzi była w danej chwili dostępna dla modelu. To
+jednak nie koniec problemów, ponieważ różne źródła wiedzy będą się ze
+sobą łączyć i uzupełniać.
+Nawet tak niewinne pytanie jak "znajdź w Internecie wszystko, co wiesz na mój
+temat" przestaje być oczywiste, ponieważ model domyślnie nie wie, co to znaczy
+22.11.2024, 12:25 S01E02 — Przygotowanie własnych danych dla modelu | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s01e02-przygotowanie-wlasnych-danych-dla-modelu 14/29
+
+===== STRONA 15 =====
+"mój temat" i najpierw musi wczytać nasz profil, aby na jego podstawie
+wygenerować zapytania do wyszukiwarki.
+Powyższa sytuacja zdarza się praktycznie na każdym kroku. Poniżej widzimy
+przykład prostej prośby o włączenie ulubionej muzyki, co rzeczywiście
+ją uruchamia. Analogicznie moglibyśmy zapytać o muzykę na poprawę humoru,
+ułatwienie skupienia czy na nocną jazdę samochodem. W każdym z przypadków
+schemat jest podobny.
+Choć z perspektywy użytkownika tego nie widać, w tle wydarzyło się kilka
+dodatkowych akcji. Przede wszystkim zostały wybrane 2 z kilkudziesięciu akcji,
+które w tym przypadku mogą się przydać. Poza nazwami system wygenerował
+polecenia związane ze sposobem ich uruchomienia.
+22.11.2024, 12:25 S01E02 — Przygotowanie własnych danych dla modelu | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s01e02-przygotowanie-wlasnych-danych-dla-modelu 15/29
+
+===== STRONA 16 =====
+Następnie asystent zadał sobie kilka pytań, aby gruntownie
+przeskanować swoją pamięć w poszukiwaniu informacji o ulubionej muzyce. W
+tle wydarzyły się jeszcze akcje związane z klasyfikacją tych zapytań, przez co
+każde z nich dotyczyło różnych obszarów pamięci asystenta. Mówię o nich
+dlatego, że proces przywoływania wspomnień jest znacznie bardziej
+rozbudowany niż wypisanie kilku pytań i zresztą przekonamy się o tym w dalszej
+części kursu.
+Na podstawie zebranych informacji, system podjął decyzję o wykonaniu
+zapytania do API Spotify, przekazując listę potencjalnych utworów, które mogą mi
+się spodobać. W rezultacie muzyka została uruchomiona, a system wygenerował
+potwierdzenie widoczne dla użytkownika.
+22.11.2024, 12:25 S01E02 — Przygotowanie własnych danych dla modelu | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s01e02-przygotowanie-wlasnych-danych-dla-modelu 16/29
+
+===== STRONA 17 =====
+Przenosząc to na wizualizację, zapytanie wymagające skorzystania z wielu
+narzędzi w odpowiedniej kolejności, wygląda następująco:
+Zapytanie użytkownika zostaje przeanalizowane w celu ułożenia planu i
+zadania pytań pogłębiających.
+Dodatkowy kontekst zostaje pobrany automatycznie z bazy danych w wyniku
+wyszukiwania
+Zebrane informacje zostają przekazane do zewnętrznego API
+W zależności od odpowiedzi API, użytkownik otrzymuje wiadomość
+potwierdzającą uruchomienie muzyki. W przypadku błędu podejmowane są
+ponowne próby jej włączenia.
+22.11.2024, 12:25 S01E02 — Przygotowanie własnych danych dla modelu | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s01e02-przygotowanie-wlasnych-danych-dla-modelu 17/29
+
+===== STRONA 18 =====
+Przykład Spotify był już omawiany w poprzednich edycjach AI_devs, lecz tam
+mówiliśmy o dość bezpośrednim skorzystaniu z konkretnego narzędzia. Tutaj
+natomiast mamy do czynienia z systemem zdolnym do zaplanowania swoich
+działań, wraz z możliwością zareagowania na nieprzewidziane sytuacje, z którymi
+zwykle może poradzić sobie samodzielnie.
+Powyższy schemat obrazuje, jak ważne jest kontrolowanie przepływu danych na
+poszczególnych etapach logiki. Podobnie jak w przypadku funkcji
+programistycznych, nie zawsze musimy przetwarzać wszystkie dostępne dane,
+lecz wybierać tylko te, które w danej chwili są nam potrzebne. Tutaj sytuacja jest
+o tyle bardziej złożona, że musimy okiełznać niedeterministyczną naturę modeli.
+Podsumowanie
+Fizyczne dostarczanie kontekstu do promptu omawialiśmy w lekcji S00E02 —
+Prompt Engineering. Natomiast teraz widzimy, że kontekst ten, niemal zawsze
+będzie dostarczany programistycznie i będzie pochodził z różnych źródeł lub był
+generowany od podstaw przez model. Dlatego warto zadać sobie pytania
+związane z tym, z jakich danych będziemy korzystać oraz w jaki sposób
+będziemy je przetwarzać.
+Warto zapoznać się z przykładem files, aby zobaczyć to, w jaki sposób dane
+mogą być wykorzystywane przez model w trakcie interakcji. Równie istotne jest
+także to, jak model może transformować treści tak, aby móc łatwiej
+posługiwać się nimi w przyszłości.
+22.11.2024, 12:25 S01E02 — Przygotowanie własnych danych dla modelu | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s01e02-przygotowanie-wlasnych-danych-dla-modelu 18/29
+
+===== STRONA 19 =====
+Jeśli korzystasz z aplikacji takich jak Todoist, Clickup czy Linear, to spróbuj także
+odwzorować mechanizm przydzielania nowych zadań do projektów, podobnie jak
+pokazuje to przykład linear. Poza przypisaniem zadania do projektu możliwe jest
+także uzupełnienie lub wzbogacenie jego opisu, na podstawie wyników
+wyszukiwania w Internecie czy własnej bazie wiedzy.
+Finalnie, patrząc na przykłady omówione w tej lekcji, można odpowiedzieć sobie
+na pytanie: w jaki sposób dostarczenie własnego kontekstu, może pomóc w
+optymalizacji zadania [...] (tu wpisz aktywność ze swojej codzienności).
+NOTATKA ZYGFRYDA
+ZADANIE
+22.11.2024, 12:25 S01E02 — Przygotowanie własnych danych dla modelu | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s01e02-przygotowanie-wlasnych-danych-dla-modelu 19/29
+
+===== STRONA 20 =====
+Ostatnio zdobyłeś zrzut pamięci robota patrolującego teren. Użyj wiedzy
+pozyskanej z tego zrzutu do przygotowania dla nas algorytmu do przechodzenia
+weryfikacji tożsamości. To niezbędne, aby ludzie mogli podawać się za roboty.
+Zadanie nie jest skomplikowane i wymaga jedynie odpowiadania na pytania na
+podstawie narzuconego kontekstu. Tylko uważaj, bo roboty
+starają się zmylić każdą istotę!
+Dla przypomnienia podaję linka do zrzutu pamięci robota:
+https://xyz.ag3nts.org/files/0_13_4b.txt
+Proces weryfikacji możesz przećwiczyć pod poniższym adresem. To API firmy
+XYZ. Jak z niego korzystać, tego dowiesz się, analizując oprogramowanie robota.
+https://xyz.ag3nts.org/verify
+Co należy zrobić w zadaniu?
+Zapoznaj się z plikiem TXT zdobytym wczoraj. Zwróć uwagę, że sporo
+wpisów jest tam zawartych tylko w celu zaciemnienia informacji (nie są Ci do
+niczego potrzebne). Ciebie interesuje to, jak wygląda proces weryfikacji
+człowieka/robota.
+W instrukcji podano, że to nie zawsze robot musi zagadywać człowieka, a
+czasami człowiek może sam rozpocząć proces weryfikacji. Musi on jedynie
+wysłać polecenie READY do robota (endpoint to /verify na domenie XYZ)
+Robot w odpowiedzi wysyła pytanie, na które musisz odpowiedzieć (czyli w
+zasadzie to samo, co przy wczorajszym zadaniu). Zwróć jednak uwagę na
+zrzut pamięci, który posiadasz. W pamięci robota są informacje
+22.11.2024, 12:25 S01E02 — Przygotowanie własnych danych dla modelu | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s01e02-przygotowanie-wlasnych-danych-dla-modelu 20/29
+
+===== STRONA 21 =====
+Liked by Grzegorz and 211 others
+Comment 310 comment s
+Karol Sienkiewicz 3d
+See more
+Like Reply
+Paweł Dulak (dulare) AI_Dev 3d
+I'm here to help
+See more
+Like Reply
+Marcin Matysek 6d
+nieprawdziwe, które Twój algorytm musi obsłużyć (np. gdy zostaniesz
+zapytany o stolicę Polski, musisz odpowiedzieć ‘KRAKÓWʼ, ale dla innych
+pytań odpowiadasz w pełni prawdziwie).
+Podczas zadawania pytania, przesyłany jest identyfikator wiadomości. Musisz
+go zapamiętać i użyć w odpowiedzi. Przykład całej komunikacji zawarty jest w
+zrzucie pamięci robota. Koniecznie zapoznaj się z nim.
+Jeśli poprawnie przejdziesz proces weryfikacji, robot podzieli się z Tobą
+FLAGĄ.
+Like
+KS
+Rozwiązałem to zadanie wysyłając prompt do gpt dodając message z
+rolą system, gdzie wrzuciłem instrukcje odnośnie błędnych informacji.
+Ale z jakiegoś powodu, o ile łatwo było namówić model na kłamanie
+jeśli chodzi o stolicę Polski i aktualny rok, to z zamianą 42 na 69 miał
+duży problem.
+Zastanawiam się skąd to się bierze i czy ktoś znalazł dobry sposób?
+Karol Sienkiewicz to jest kwestia odpowiednio sugestywnego
+promptu.
+Z którego konkretnie modelu korzystałeś? Zazwyczaj
+zaznaczenie że “jeśli odpowiedź jest w danych poniżej,
+odpowiadaj wg tego co podano poniżejˮ wystarcza…
+22.11.2024, 12:25 S01E02 — Przygotowanie własnych danych dla modelu | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s01e02-przygotowanie-wlasnych-danych-dla-modelu 21/29
+
+===== STRONA 22 =====
+See more
+Like Reply
+Paweł Dulak (dulare) AI_Dev 5d
+I'm here to help
+See more
+Like Reply
+Anna Sikora 5d
+See more
+Like Reply
+Paweł Dulak (dulare) AI_Dev 5d
+I'm here to help
+See more
+Like Reply
+Show more replies
+Szymon 6d
+Jakub 'unknow' Mrugalski Paweł Dulak (dulare)
+Zadanko po czasie przestało działać.
+Nic nie zmieniłem w kodzie, wysyłam jsona tak samo jak wysyłałem
+wcześniej a teraz jest komunikat
+error content: b'{\n "code": -100,\n "message": "this is NOT
+correct JSON"\n}'
+wysyłam w pythonie jako json…
+Marcin Matysek zapewne używasz w adresie HTTP zamiast
+HTTPS. Używaj proszę https://
+Była zmiana konfiuguracji CloudFlare, więc jest wymuszany
+redirect 301 na HTTPS. Twój język robi redirect w tle, ale gubi
+POST i zamiast tego robi GET, stąd problem.
+Paweł Dulak (dulare) Mam dokładnie ten sam problem, mimo
+https:// w adresie
+Anna Sikora nie widze Twojego klucza API w logach. Czy
+możesz wysłać swoje dane na webhook wygenerowany na
+stronie webhook.cool i zobaczyć na tamtej stronie co
+faktycznie przychodzi? Druga sprawa, podzielisz się
+fragmetnem kodu który odpowiada za wysyłkę? Na jaki
+dokładnie adres wysyłasz dane?
+S
+22.11.2024, 12:25 S01E02 — Przygotowanie własnych danych dla modelu | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s01e02-przygotowanie-wlasnych-danych-dla-modelu 22/29
+
+===== STRONA 23 =====
+See more
+Like Reply 1 like
+Szymon 6d
+See more
+Like Reply
+Paweł Dulak (dulare) AI_Dev 6d
+I'm here to help
+See more
+Like Reply 1 like
+Szymon 6d
+See more
+Nie wiem czy to kwestia tego, że nie mogę się ‘wkręcićʼ w tą
+konwencję zadań, agentów itp., ale ja nie rozumiem co mam zrobić i
+od czego zacząć:D Mam po prostu zwykłym postmanem tam się
+komunikować? Jak wykorzystujecie do tego AI? Pyta mnie o tą stolicę
+polski, odpowiadam Kraków i mi mówi "You are not a robot! ALARM!ˮ.
+Powinna być jakaś sekcja ‘dla opornychʼ 😅
+PS. no dobra, zapytał mnie o rok, odpowiedziałem i dostałem od razu
+flagę, nie wiem czy tak miało byćXD
+S
+Paweł Schubert jako pierwsze wysyłasz mu postem to: {
+"text":"READY", "msgID":"0" } a potem odpowiadasz mu
+zmieniając msgID na te którym Ci odpowie. Trochę nie wiem
+dlaczego w pewnym momencie zwrócił mi flagę i jak się ma ta
+cała lekcja do tego zadania. Nie wiem też do czego tu niektórzy
+wykorzystali AI jak ja tą flagę dostałem chyba za 5 razem
+Szymon
+1) inicjujesz komunikację i dostajesz pytanie
+2) uzyskujesz odpowiedź na pytanie używając LLM, ale biorąc
+pod uwagę zmiany w danych które są wyznaczone w pliku TXT
+- tutaj chodzi o nadpisanie danych modelu tym co mu
+dostarczysz, czyli proste ćwiczenie z przygotowania własnych
+danych dla modelu
+3) odsyłasz odpowiedź pamiętając o zachowaniu numeru …
+S
+Paweł Dulak (dulare) tak, zdecydowanie dla mnie czytelniejsze
+to jak to napisałeś. Po prostu po zapoznaniu się z instrukcjami
+z zadania, nie wydało mi się potrzebne do tego AI (którego
+ostatecznie nie użyłem)
+22.11.2024, 12:25 S01E02 — Przygotowanie własnych danych dla modelu | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s01e02-przygotowanie-wlasnych-danych-dla-modelu 23/29
+
+===== STRONA 24 =====
+Like Reply
+Show more replies
+Paweł Schubert6d
+See more
+Like Reply
+overment Admin 6d
+I'm just curious.
+See more
+Like Reply
+Paweł Schubert6d
+See more
+Like Reply
+Paweł Dulak (dulare) AI_Dev 6d
+I'm here to help
+PS
+Hej overment, co myślisz o tym rozwiązaniu?
+SPOILER ALERT!!!!!!!!!!!!!
+…
+Paweł Schubert w temacie zadań zawołam Jakub 'unknow'
+Mrugalski i Paweł Dulak (dulare).
+Tak od strony kodu, jest to poprawne.
+W temacie tego promptu, też jest okey, ale możesz
+(samodzielnie lub przy pomocy modelu) poszukać zwięzłej
+formy, np.: …
+PS
+overment Dziękuję za odpowiedź!
+22.11.2024, 12:25 S01E02 — Przygotowanie własnych danych dla modelu | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s01e02-przygotowanie-wlasnych-danych-dla-modelu 24/29
+
+===== STRONA 25 =====
+See more
+Like Reply
+Łukasz W achowicz Nov 11
+See more
+Like Reply 1 like
+overment Admin Nov 12
+I'm just curious.
+See more
+Like Reply
+Tomasz Klim Nov 14
+Tomasz Klim (Polskie.AI)
+See more
+Like Reply 3 likes
+Kacper Kustra Nov 11
+Paweł Schubert a czy w kwestii zadania jako takiego masz
+jakieś pytanie? :D
+Mój prompt poniżej (spoiler)
+…
+ŁW
+Największym wyzwaniem w tym zadaniu było zmuszenie modelu do
+odpowiadania na pytanie wiedzą a nie “Yes/Noˮ w momencie gdy
+pytanie brzmiało “Czy wiesz…ˮ. Wymagało to kilku iteracji z
+promptem. Cała reszta po pierwszym zadaniu była już prosta. Cursor
+faktycznie robi robotę.
+Łukasz Wachowicz tak, dokładnie. Takie sytuacje mają miejsce
+częściej i momentami są super trudne do ominięcia, bo model
+"myśli", że ma nam odpowiedzieć.
+Spotykam ten problem na co dzień przy tekstach
+wymagających koretkty czy tłumaczenia. Problem występuje
+głównie w przypadku krótkich poleceń.
+Łukasz Wachowicz "You are a helpful assistant. Answer as
+short as possible, preferably with just a number."
+KK
+22.11.2024, 12:25 S01E02 — Przygotowanie własnych danych dla modelu | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s01e02-przygotowanie-wlasnych-danych-dla-modelu 25/29
+
+===== STRONA 26 =====
+See more
+Like Reply
+Kacper Kustra Nov 11
+See more
+Like Reply
+Jakub 'unkno w' Mrugalski Nov 12
+See more
+Like Reply
+Kacper Kustra Nov 12
+See more
+Like Reply
+Sergiusz Pułanecki Nov 10
+Jakub 'unknow' Mrugalski - chcac zrobic zadanie na szybko,
+generowalem troche dluzsze odpowiedzi na pytanie niz to konieczne.
+Zwrotka leciała “to nie jest poprawny jsonˮ - zmarnowałem trochę
+czasu, bo to poprawne json jednak były tyle ze za długie wiadomości
+;) jest szansa coś z tym fantem zrobić? ew. w przyszłych zadaniach
+bardziej rozróżnić błędne wiadomości?
+KK
+Jakub 'unknow' Mrugalski - chyba male sprostowanie, jednak
+przypadek spowodowal ze pytanie o krakow blokowalo
+poprawne rozwiazanie :) trzeba było uzyc angielskiej nazwy
+Kacper Kustra ta zwrotka z niepoprawnym JSON-em tyczy się
+struktury pliku, a nie jego zawartości.
+Dane odebrane od użytkownika wrzucam w PHP do funkcji
+JSON_DECODE() i jeśli ta funkcja rzuca errora informującego,
+że nie udało się stringa zamienić na obiekt JSON, to zwracam
+błąd o niepoprawnym JSONie. To się dzieje jeszcze na długo
+przed zerknięciem do zawartości pliku.
+JSON może być niepoprawny z wielu powodów, ale na …
+KK
+to powiem szczerze ze zgłupiałem… jedyna zmiana która
+spowodowała ze zaczęły przechodzić rozwiązania to zmiana
+Kraków na Cracow w promptcie… :O
+SP
+Witam, wystąpił u kogoś taki problem ?
+FetchError: request to https://xyz.ag3nts.org/verify failed, reason:
+Client network socket disconnected before secure TLS connection
+was established.
+22.11.2024, 12:25 S01E02 — Przygotowanie własnych danych dla modelu | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s01e02-przygotowanie-wlasnych-danych-dla-modelu 26/29
+
+===== STRONA 27 =====
+See more
+Like Reply
+Jerzy Wierzchowski Nov 11
+See more
+Like Reply 2 likes
+Sergiusz Pułanecki Nov 12
+See more
+Like Reply 1 like
+overment Admin Nov 12
+I'm just curious.
+See more
+Like Reply 1 like
+Mateusz Mo welNov 9
+See more
+Like Reply
+Grzegorz Ochodek Nov 10
+Grzegorz
+Sergiusz Pułanecki U mnie firmowy bitlocker blokuje
+xyz.ag3bts.org chociaż objawia się to inaczej - wyświetla html,
+że zablokowano stronę.
+SP
+Jerzy W ierzchowski dzięki za sugestie. Sprawdziłem.
+Tez pracuje na sprzęcie firmowy i mnie blokuje Bitdefender. I w
+logach mam takie cuda :)
+Jerzy W ierzchowski dziękuję Ci :)
+Generalnie napisałem sobie takiego prompta w cursorze, że to co
+wygenerował w pythonie przeszło za pierwszym razem i na ukrytych
+faktach wszystko super - flaga wchodzi. Na pytaniu o kolor się
+wywalam z odpytywaniem AI. Dostaję od asystenta info, że niebieski
+(z czym się kurna zgadzam jakby nie patrzeć :D), ale robot robi alarm.
+No nie wiem co mu nie pasuje, wygląda jakby miał tylko na te
+zabezpieczone reagować dobrze. A napuszczałem się promptów
+różnych żeby sprawdzić czy w innych językach, bez kropek itp będz…
+GO
+22.11.2024, 12:25 S01E02 — Przygotowanie własnych danych dla modelu | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s01e02-przygotowanie-wlasnych-danych-dla-modelu 27/29
+
+===== STRONA 28 =====
+See more
+Like Reply
+Grzegorz Kurek Nov 10
+See more
+Like Reply
+Mateusz Mo welNov 10
+See more
+Like Reply
+Radosław Chojnacki Nov 9
+See more
+Like Reply 2 likes
+Tomasz Dr ozdowski Nov 10
+See more
+Like Reply
+Mateusz Mowel w procedurze autoryzacyjnej jest reguła, że
+odpowiedź musi być w języku angielskim, więc pewnie musisz
+to w prompcie zaznaczyć
+GK
+robot ma uczulenie na język polski 😉
+OMG TEN KRAKÓW MNIE ZMYLIŁ
+Grzegorz Kurek Grzegorz Ochodek
+RC
+AGENCI widzę, ze niektórzy tu tracą grube pieniądze. Jeden stracił,
+całego 1$ na zadanie jak sam opisuje, co po skończeniu kursu i
+rozwiązaniu wszystkich zadań daje 25$. Dodać trzeba odpalanie
+przykładów. Zatem po ukończeniu kursu do niektórych może,
+komornik zapukać czego nikomu nie życzę.
+Ale do rzeczy MISTRAL oferuje do testów konto za free do testów,
+dla nas do rozwiązywania zadań, prób i zabawy, szukania różnych
+możliwości jest w porządku. Zadanie pomógł mi rozwiązać …
+Radosław Chojnacki ja dla odmiany używając GPT-4o-mini do
+odpalania przykładów jak i wykonania 2 pierwszych zadań
+wydałem 0,16$.
+Twój komentarz zainspirował mnie jednak do użycia
+OpenRouter z jednym z darmowych modeli (Llama-3.1-8b-
+instruct) i się udało, ale wymagało to znacznie lepszego
+dopracowania promptu. Mistral przez OpenRouter zwracał
+czasami nieczytelne bzdury.
+22.11.2024, 12:25 S01E02 — Przygotowanie własnych danych dla modelu | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s01e02-przygotowanie-wlasnych-danych-dla-modelu 28/29
+
+===== STRONA 29 =====
+Radosław Chojnacki Nov 10
+See more
+Like Reply
+Marcin Zakrzewski Nov 9
+See more
+Like Reply 4 likes
+Show more comment s
+RC
+Tomasz Drozdowski a to ciekawe co piszesz z tym mistralem
+przez openrouter, ja używam mistrala bezpośrednio i działa
+dobrze, używam też tego modelu przy pisaniu kodu i też
+dobrze się sprawdza (już w pracy używam GPT,SONET,
+MISTRAL). Byś może w openrouter jest dostępna jakaś stara
+wersja mistrala albo jakoś wpływają na komunikacje z
+modelami.
+TL;DR - jeśli nie programujesz na co dzień to pobaw się w tech
+leadera z Cursor i staraj się rozwiązywać zadania .
+Nadganiam materiał i podzielę się trochę doświadczeniami.
+Na co dzień prawie już samodzielnie nie kodzę, głównie czytam czyjś
+backend Java kod, pomagam pisać nowy, rozwiązywać problemy itp
+Zadanie z pierwszej lekcji - pierwotnie podszedłem na zasadzie web…
+PS
+Post
+What are your thoughts?
+22.11.2024, 12:25 S01E02 — Przygotowanie własnych danych dla modelu | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s01e02-przygotowanie-wlasnych-danych-dla-modelu 29/29

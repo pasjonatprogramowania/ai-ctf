@@ -1,0 +1,444 @@
+
+===== STRONA 1 =====
+S00E04  Pr ogramo wanie
+overment Admin Aug 28
+I'm just curious.
+» Lekka wersja przeglądarkowa «
+Widzimy już, że generatywne AI może stać się zarówno częścią logiki aplikacji,
+jak i skutecznie wspierać nas w rozwiązywaniu problemów, czy pisaniu kodu.
+Choć narzędzia takie jak Devin rysują przyszłość, w której rola osób tworzących
+oprogramowanie zmieni się lub całkowicie zniknie, obecnie trudno jest mówić o
+autonomicznym rozwoju aplikacji. Trzeba mieć jednak na uwadze projekty takie
+jak wspominany już Aider, w przypadku którego coraz większa część
+kodu kolejnych wersji jest generowana przez LLM.
+Back to Lekcje programu [preAI3]
+PS
+22.11.2024, 12:21 S00E04 — Programowanie | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e04-programowanie 1/21
+
+===== STRONA 2 =====
+To przykłady sygnałów mówiących, że programowanie, jakie znamy, się zmienia.
+Możemy więc pracować jak dotychczas i obserwować związane z tym
+konsekwencje lub wykorzystać dostępne narzędzia, aby wzmocnić posiadane
+umiejętności. No i właśnie w tej lekcji skupimy się na zagadnieniach, które
+musimy poznać bliżej, aby móc swobodnie pracować z LLM w kodzie aplikacji.
+Przydatna wiedza i zestaw umiejętności do pracy z LLM
+Aplikacje, w których logice pojawia się LLM, zwykle wymagają pracy z
+narzędziami, które można spotkać na co dzień w pracy programisty. Nie
+wszystkie są jednak powszechne, dlatego warto się im przyjrzeć nieco bliżej.
+22.11.2024, 12:21 S00E04 — Programowanie | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e04-programowanie 2/21
+
+===== STRONA 3 =====
+Full-stack Development: W zależności od specjalizacji, musimy wiedzieć, jak
+tworzyć lub korzystać z wymienionych na schemacie elementów. Patrząc na
+to z szerokiej perspektywy, mówimy tutaj głównie o pracy z danymi —
+przetwarzaniu plików, organizacji w bazie danych, wyszukiwaniu oraz szeroko
+rozumianej komunikacji i transferze danych
+Bazy danych: Choć stanowią fundament niemal każdej aplikacji, to w
+przypadku LLM ich rola polega na przechowywaniu dokumentów, kontekstu
+konwersacji, historii wiadomości czy organizowania całych baz wiedzy.
+Zwykle mówimy tutaj o rozwiązaniach takich jak PostgreSQL czy MongoDB,
+ale pod uwagę należy brać także Neo4J ze względu na systemy RAG
+Silniki wyszukiwania: Wyszukiwanie informacji na potrzeby dynamicznego
+kontekstu dla LLM wymaga silników takich jak Algolia czy Qdrant, które zwykle
+są synchronizowane z bazami danych. W związku z tym, że w procesie
+wyszukiwania istotną rolę odgrywają bazy wektorowe, będziemy pracować
+także z embeddingiem, który omówimy w dalszej części AI_devs
+HTTP, JSON, API: Przesyłanie danych przez API można uznać za podstawową
+umiejętność programisty. Jednak dodatkowa trudność polega na tym, że w
+procesie komunikacji udział bierze także LLM w roli nadawcy i/lub odbiorcy
+treści. Oznacza to, że musimy zadbać o czytelny format odpowiedzi, struktury
+danych, obsługę błędów, zrozumiałe informacje o błędach (zawierające nieco
+więcej szczegółów niż komunikaty wyświetlane użytkownikowi) czy nawet
+próby automatycznego naprawiania problemów
+Streaming, Webhooki i Zdarzenia: Czyli narzędzia do
+zadań asynchronicznych, a także tych realizowanych w czasie rzeczywistym z
+22.11.2024, 12:21 S00E04 — Programowanie | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e04-programowanie 3/21
+
+===== STRONA 4 =====
+uwzględnieniem różnych formatów danych
+Przetwarzanie plików: Mowa tutaj o przesyłaniu, udostępnianiu,
+odczytywaniu, transformacji i generowaniu różnego rodzaju plików oraz
+zarządzaniu prawami dostępu do nich. Przykładowo, możemy mieć potrzebę
+wczytania treści pliku, podzielenia jej na części oraz przetworzenia z pomocą
+LLM. Może to być wieloetapowy, długi proces, po którego ukończeniu
+użytkownik powinien otrzymać powiadomienie z odnośnikiem do rezultatu
+Projektowanie API i praca z dokumentacją: Aplikacje wykorzystujące
+Generative AI będą wymagały zarówno połączenia z istniejącym API, jak i
+tworzenia nowych interfejsów w który będziemy wyposażać tworzonych
+agentów. Z tego powodu znajomość założeń REST API czy pracy z GraphQL
+stają się przydatnymi umiejętnościami.
+CI/CD i DevOps: Automatyzacja deploymentu oraz konfiguracja środowiska
+produkcyjnego również zaczyna rozszerzać swoje przeznaczenie ze względu
+na Generative AI, ponieważ agenci AI coraz częściej mają możliwość
+uruchamiania kodu w środowisku sandboxowym (np. dzięki e2b) oraz
+udostępniania aplikacji (np. dzięki Github Actions).
+Zakres wiedzy i umiejętności, uwzględniony w powyższych punktach jest
+obszerny, jednak już teraz skutecznie może nas wspierać LLM. Warto budować
+małe projekty, testować różne podejścia i narzędzia, oraz wrócić do podstaw
+technologii, z którą pracujemy. To właśnie fundamenty, takie jak obsługa błędów,
+natywnie dostępne metody i wzorce projektowe, pozwalają na tworzenie logiki
+zaawansowanych aplikacji Generative AI.
+Completion, chain vs agent od strony kodu
+LLM API pozwala na budowanie zaawansowanych systemów, potencjalnie
+zdolnych do autonomicznego działania. Określenie "potencjalnie" jest poprawne,
+ponieważ droga od prostego demo do produkcyjnej aplikacji jest daleka, a ilość
+sytuacji brzegowych jest trudna do opanowania. Zacznijmy jednak od początku.
+Nawet zwykłe zapytanie typu completion może pomóc w pojedynczych
+elementach logiki aplikacji. W przykładzie completion mamy funkcję addLabel,
+która przypisuje jedną z trzech etykiet na podstawie treści zadania korzystając z
+umiejętności modelu gpt-4o-mini.
+22.11.2024, 12:21 S00E04 — Programowanie | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e04-programowanie 4/21
+
+===== STRONA 5 =====
+Pomimo że ostatnie zadanie zawiera klasyczny prompt injection, model i tak
+otrzymuje jeden z dostępnych wariantów. Nie oznacza to, że prompt zawsze
+będzie działał poprawnie, ponieważ na zachowanie modelu mają wpływ same
+jego możliwości, instrukcja systemowa czy kontekst użytkownika. Przykładowo
+dla jednej osoby "Granie na pianinie" będzie pracą, a dla innej rozrywką.
+Taka klasyfikacja zadań może być wykorzystana w interfejsie użytkownika jako
+sugestia i pomoc w wyborze, co i tak wnosi wartość, nawet jeśli funkcjonalność
+będzie działać ze skutecznością 70-90%. Jest to również przykład logiki, która
+nie stanowi krytycznego elementu systemu.
+Choć completion może być bardzo użyteczne do prostych zadań, tak w
+przypadku nieco bardziej złożonych lub tych, które będą wymagać zewnętrznego
+kontekstu, konieczne będzie wykonanie kilku połączonych kroków, czyli Chain.
+Przede wszystkim wiemy, że LLM generując treść, bierze pod uwagę wszystkie
+tokeny uwzględnione w konwersacji (ale jego zdolność do utrzymania uwagi jest
+ograniczona). Zatem, zamiast wykonywać dwa różne zadania jednocześnie,
+rozsądne może być zrealizowanie ich indywidualnie. Ponadto poszczególne kroki
+mogą być od siebie zależne, a rezultat pierwszego może być wykorzystany w
+drugim.
+22.11.2024, 12:21 S00E04 — Programowanie | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e04-programowanie 5/21
+
+===== STRONA 6 =====
+W przykładzie chain mamy serię pytań dotyczących trzech osób, pochodzących
+z różnych źródeł. Przed udzieleniem odpowiedzi musimy najpierw wybrać jedno z
+nich, a następnie wczytać je do kontekstu. Tak wygląda prosty Chain, który w
+praktyce może składać się z wielu etapów.
+Powyższy schemat w różnych wariantach będziemy spotykać niemal w każdej
+aplikacji w której pojawi się LLM, ponieważ w ten sposób będziemy klasyfikować,
+wzbogacać i transformować zapytania w celu łączenia modelu z zewnętrznymi
+narzędziami takimi jak Web Search, Code Interpreter czy Long-Term Memory.
+22.11.2024, 12:21 S00E04 — Programowanie | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e04-programowanie 6/21
+
+===== STRONA 7 =====
+No i ostatecznie mamy agentów AI, których logika nie jest sztywno dopasowana
+do konkretnego problemu i może dynamicznie dopasowywać się do bieżącej
+sytuacji. Ze względu na obecne możliwości modeli, nie mówimy jeszcze o w pełni
+autonomicznych systemach zdolnych do realizowania dowolnego zadania, lecz o
+rozwiązaniach wyspecjalizowanych w konkretnych obszarach.
+Trudno jednoznacznie określić, kiedy mówimy o Agencie AI, a kiedy o mniej
+złożonym systemie. Andrew Ng zasugerował mówienie o 'logice agencyjnej' jako
+zakresie, a nie konkretnym punkcie. Wówczas dane rozwiązanie może być 'mniej
+lub bardziej agencyjne', a niekoniecznie 'być agentem AI lub nie'. Choć można się
+z tym nie zgadzać, takie spojrzenie wydaje się dość elastyczne i może z nami
+zostać do czasu wydzielenia jednoznacznej granicy pomiędzy agentami AI a
+innymi rodzajami aplikacji.
+Na temat agentów AI będziemy więcej mówić w drugiej części AI_devs 3. Warto
+jednak pobieżnie zapoznać się z poniższym schematem oraz repozytorium
+"Cracker". Obrazują one to rozwiązania, które będziemy wdrażać oraz związane z
+nimi możliwości. Mianowicie poniżej widzimy, że wygenerowanie odpowiedzi
+przez Agenta opiera się o pętlę uwzględniającą kroki związane z refleksją,
+planowaniem, podejmowaniem działań, łączeniem modelu z narzędziami czy
+pamięcią długoterminową.
+22.11.2024, 12:21 S00E04 — Programowanie | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e04-programowanie 7/21
+
+===== STRONA 8 =====
+Opierając się dokładnie o powyższy schemat powstał Agent "Cracker", który jest
+zdolny do samodzielnego ukończenia zagadki ze strony game.aidevs.pl, którą na
+4500 graczy rozwiązało zaledwie 79 osób. Co ciekawe, agent ten nie jest
+wyspecjalizowany w rozwiązywaniu tej konkretnej gry, lecz po prostu ma dostęp
+do narzędzi, które pozwalają mu wejść z nią w interakcję. W połączeniu z
+możliwościami modeli jest to wystarczające do złamania wszystkich
+zabezpieczeń systemu i uzyskania sekretnego hasła.
+Łącząc Completion, Chain i Agentów AI widzimy, jak LLM może stanowić część
+logiki aplikacji. Wykorzystamy więc tę ogólną perspektywę, aby przyjrzeć
+się szczegółom, które pozwolą na świadome budowanie użytecznych narzędzi na
+których można polegać.
+Podział odpowiedzialności i balansowanie ciężarem logiki
+Duże modele językowe to narzędzia, które zastosowane w niewłaściwy sposób,
+przyniosą nam więcej problemów niż korzyści. Przykładowo poniżej mamy listę
+adresów e-mail, która oryginalnie zawiera 70 rekordów, z czego kilka z nich to
+duplikaty. Choć model językowy nie miał problemu z tym zadaniem, to Google
+Sheet zrealizował je natychmiast, podczas gdy model potrzebował kilkudziesięciu
+sekund.
+22.11.2024, 12:21 S00E04 — Programowanie | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e04-programowanie 8/21
+
+===== STRONA 9 =====
+Przygotowanie danych na potrzeby modelu językowego może wymagać podziału
+dużego dokumentu na mniejsze fragmenty, czym zresztą będziemy
+się zajmować. Jedną z technik jest tzw. Semantic Chunking, która polega na
+zaangażowaniu LLM do podziału treści w taki sposób, aby możliwie zachować jej
+kontekst. Twórcy jina.ai podeszli do tego problemu w nieco inny sposób, pisząc
+wyrażenie regularne zdolne do podziału książki "Alicja w Krainie Czarów" w
+zaledwie 2ms. Wyrażenie o którym mowa jest dostępne tutaj.
+Co prawda brzmi to, jak coś oczywistego, jednak zastosowanie LLM tam, gdzie
+do tej pory świetnie sprawdzał się kod czy wyspecjalizowane w danym zadaniu
+narzędzia, po prostu nie jest efektywne. Najbardziej wymownym przykładem jest
+chęć tworzenia chatbotów przez firmy wchodzące w obszar Generative AI, które
+umożliwią rozmowę z "firmową bazą wiedzy". Choć pozornie wydaje się to
+niezwykle użyteczne, to w praktyce zrealizowanie takiego projektu jest trudne,
+22.11.2024, 12:21 S00E04 — Programowanie | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e04-programowanie 9/21
+
+===== STRONA 10 =====
+ponieważ dane są rozproszone w różnych usługach i formatach. Ostatecznie w
+większości przypadków chatbota można zastąpić klasycznymi silnikami
+wyszukiwania.
+Nie oznacza to jednak, że narzędzia AI należy od razu odstawiać na bok. Dobrym
+przykładem jest (nieaktywny już) projekt "All-In On AI". To strona, która
+wykorzystując wyszukiwanie semantyczne realizowane z pomocą bazy
+wektorowej, pozwalała na łatwe odnalezienie konkretnych fragmentów podcastu
+"All-In". Jednak tutaj wyniki nie były cytowane przez LLM, lecz wyświetlane w
+formie prostego interfejsu.
+Są też sytuacje w których umiejętności LLM są konieczne, ale niewystarczające.
+Wówczas możemy wyposażyć model w możliwość wykonywania kodu w celu
+wsparcia procesu rozumowania. Szerzej zostało opisane to w publikacji "PAL:
+Program-aided Language Models", natomiast jednym z narzędzi, które można w
+tym celu wykorzystać jest e2b lub własna implementacja z podobnymi
+możliwościami.
+22.11.2024, 12:21 S00E04 — Programowanie | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e04-programowanie 10/21
+
+===== STRONA 11 =====
+Podobnie jak w przypadku programistycznych rozwiązań (np. frameworków czy
+architektury mikroserwisów), o skuteczności naszej pracy z LLM nie będzie
+decydować sama technologia, lecz sposób, w jaki z niej skorzystamy. O ile w
+ogóle zdecydujemy się to zrobić.
+Wnioski:
+LLM to narzędzia sprawdzające się w wybranych obszarach. Powinniśmy je
+zidentyfikować oraz dopasować sposób zastosowania tak, aby dostarczały
+nam jak najwięcej wartości
+Nie ma powodu, aby odchodzić od sprawdzonych, programistycznych
+rozwiązań, o ile Generatywne AI nie oferuje dodatkowej wartości, która
+uzasadni koszty lub spadek wydajności
+Połączenie programistycznego doświadczenia z praktyczną wiedzą na temat
+Generatywnego AI pozwala na sprawne połączenie kodu z modelami,
+korzystając wzajemnie z ich możliwości
+Podejmując się projektu, który w założeniu ma wykorzystywać Generatywne
+AI, warto zadać sobie pytanie: Czy rzeczywiście potrzebujemy modeli oraz
+jaką będziemy mieć z tego korzyść, biorąc pod uwagę koszty.
+Przepływ informacji pomiędzy kodem, a modelem
+22.11.2024, 12:21 S00E04 — Programowanie | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e04-programowanie 11/21
+
+===== STRONA 12 =====
+Dzięki Structured Output i JSON Mode możemy generować obiekty JSON, a więc
+interakcja z modelem przypomina kontakt z dowolnym innym API. Różnica polega
+jednak na tym, że w tym przypadku, treść odpowiedzi i jej kształt jest uzależniona
+od zapytania. Jest to z jednej strony bardzo elastyczne, a z drugiej generuje
+szereg wyzwań.
+Coraz częściej prompt engineering określa się mianem flow engineeringu właśnie
+ze względu na przepływ danych oraz ich transformację przez model i/lub kod
+aplikacji. W publikacji "Prompt Chaining or Stepwise Prompt?" zawarty jest
+przykład podsumowania realizowanego poprzez Chain oraz pojedynczy, złożony
+prompt (określany jako stepwise prompt).
+Na tym etapie, nawet bez zaglądania do powyższej publikacji, wiemy, że wyższą
+jakość osiągniemy, rozbijając problem na mniejsze kroki. Dodatkowo zyskujemy
+elastyczność, ponieważ między poszczególnymi etapami możemy podjąć
+dodatkowe działania. Obrazuje to poniższy schemat, który także przedstawia
+proces podsumowania treści, jednak rozbija go na dodatkowe kroki.
+22.11.2024, 12:21 S00E04 — Programowanie | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e04-programowanie 12/21
+
+===== STRONA 13 =====
+Konkretnie mamy tutaj "kompresję", która może uwzględniać np. zamianę linków i
+obrazków na placeholdery (dzięki czemu LLM nie musi ich przetwarzać) lub
+zamianę formatu (np. HTML -> Markdown). Następnie LLM przepisuje słowa
+kluczowe, wzbogacone przez wyszukiwarkę internetową. Dopiero tak
+przygotowany tekst zostaje podsumowany, a następnie rozwinięty do ostatecznej
+formy.
+Oczywiście powyższa logika będzie różnić się w zależności od przypadku, jednak
+od korzyści wynikające z takiego przepływu danych są oczywiste i
+pozwalają redukować koszty, czas reakcji, zwiększać precyzję czy zmniejszać
+problem związany z Knowledge Cutoff.
+Największe wyzwanie leży tutaj w obszarze skuteczności osiąganej na każdym
+etapie, dlatego powinniśmy zadbać o to, aby każdy z nich niezależnie działał
+możliwie niezawodnie, a dopiero później, możemy łączyć je ze sobą. Szczególnej
+uwagi wymagają także miejsca w których otrzymujemy dane z zewnątrz (np.
+input użytkownika czy wyniki wyszukiwania) oraz odpowiedzi ze strony modelu.
+Tutaj pomaga skorzystanie z Moderation API czy (jeśli to możliwe) zastosowanie
+tzw. Guardrails, czyli mechanizmów weryfikacji i wspomnianej opcji "Structured
+Output".
+Organizowanie promptów w aplikacji
+22.11.2024, 12:21 S00E04 — Programowanie | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e04-programowanie 13/21
+
+===== STRONA 14 =====
+Dla prostych zadań zapisanie promptu bezpośrednio w kodzie, nie wydaje
+się złym pomysłem, jednak sytuacja szybko zaczyna się komplikować, gdy do gry
+wchodzą dynamiczne wartości i zmienne. Frameworki takie jak LangChain
+oferują więc narzędzia do budowania promptów poprzez system szablonów,
+którego przykład widzimy poniżej.
+Zastosowanie takich szablonów w kodzie, możemy zobaczyć na przykładzie
+repozytorium Quivr.
+Niestety na przestrzeni ostatnich miesięcy rozwój LangChain pokazał, że jest to
+narzędzie do którego zastosowania należy podchodzić z dużym dystansem. Braki
+w dokumentacji i częste zmiany w API stanowią duży problem w produkcyjnych
+aplikacjach. Z drugiej strony należy pamiętać, że wciąż jesteśmy przed wersją 1.0
+tego frameworka i warto go jeszcze obserwować.
+W każdym razie samo formatowanie promptu można zastąpić narzędziami
+dostępnymi natywnie w językach programowania i mowa tutaj o Template Strings
+(JavaScript) oraz Tagged Templates (JavaScript).
+W praktyce, poza zapisem promptu i jego strukturą, interesować nas będzie także
+jego skuteczność oraz historia zmian (co częściowo rozwiązuje Git). Ale przede
+wszystkim będziemy chcieli móc także podejrzeć oraz przetestować sam prompt,
+co nie jest takie oczywiste, bo od strony kodu może wyglądać on tak, jak na
+poniższym obrazku.
+22.11.2024, 12:21 S00E04 — Programowanie | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e04-programowanie 14/21
+
+===== STRONA 15 =====
+Uruchomienie takiego promptu wymaga interakcji z interfejsem aplikacji, a i tak
+najbardziej zależy nam na podejrzeniu jego ostatecznej struktury i ewentualnym
+wprowadzeniu zmian. Tutaj z pomocą przychodzą rozwiązania takie, jak
+LangFuse czy LangSmith, ponieważ dzięki nim możemy podejrzeć poszczególne
+zapytania do LLM czy akcje wykonywane po stronie kodu. Mamy także możliwość
+zmiany i przetestowania promptu w Playgroundzie.
+Co więcej, sam prompt również może być wczytywany do aplikacji z poziomu
+LangFuse. Wówczas to tam możemy go sprawdzić na testowym zestawie danych
+czy przełączać się pomiędzy wersjami.
+22.11.2024, 12:21 S00E04 — Programowanie | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e04-programowanie 15/21
+
+===== STRONA 16 =====
+Praktyczną pracą z LangFuse oraz organizacją promptów w kodzie aplikacji,
+będziemy się jeszcze zajmować. Tymczasem wystarczy świadomość tego, że
+prompty w kodzie aplikacji to coś więcej niż kilka zdań zapisane z
+pomocą naturalnego języka. Z drugiej strony połączenie się z narzędziami do
+monitorowania i testowania promptów nie jest trudne, choć sam proces
+debugowania, opracowania zestawów testowych czy iterowania samych instrukcji
+są czasochłonne.
+Podstawy struktury baz danych i silników wyszukiwania
+Bazy danych (np. PostgreSQL) i silniki wyszukiwania (np. Qdrant) będą pojawiać
+się niemal zawsze jako komponenty aplikacji wykorzystujących duże modele
+językowe. Choć pracą z nimi będziemy zajmować się w dalszych częściach
+kursu, to już teraz warto przyjrzeć się im nieco bliżej. Dla osób posiadających
+doświadczenie w pracy z tymi narzędziami (np. ElasticSearch czy Algolia), temat
+konfiguracji będzie oczywisty, ponieważ ogólne zasady pozostają takie same i
+wszystko sprowadza się do odpowiedniej struktury danych oraz ich
+synchronizacji pomiędzy usługami.
+Poniżej mamy schemat przedstawiający połączenie bazy danych z bazą
+wektorową czy też silnikiem wyszukiwania. Baza danych jest tutaj "źródłem
+prawdy" i przechowuje oryginalne informacje na których pracuje aplikacja.
+Natomiast silnik wyszukiwania zawiera tylko te dane, które są istotne podczas
+procesu wyszukiwania oraz filtrowania odnalezionych rekordów. Dodatkowo
+jedno i drugie źródło jest ze sobą połączone poprzez identyfikatory.
+22.11.2024, 12:21 S00E04 — Programowanie | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e04-programowanie 16/21
+
+===== STRONA 17 =====
+Od strony praktycznej wygląda to zatem tak:
+Baza danych, Baza Wektorowa / Indeks silnika wyszukiwania zawierają
+wspólne identyfikatory rekordów
+Aplikacja jest połączona z bazą danych i silnikiem wyszukiwania
+Oryginalne dane przechowywane są w bazie danych
+Modyfikacja wpisu w bazie danych powoduje jego synchronizację w bazie
+wektorowej czy też indeksie silnika wyszukiwania
+W indeksie przechowywane są wyłącznie dane niezbędne w procesie
+wyszukiwania z możliwą opcją ich wzbogacenia lub transformacji (np. tagów,
+kategorii czy innych metadanych)
+W przypadku baz wektorowych potrzebujemy także embeddingu, czyli
+liczbowej reprezentacji treści, opisującej jej znaczenie (więcej o tym w dalszej
+części kursu)
+Dostęp do danych może być uzyskany bezpośrednio poprzez zapytanie do
+bazy lub poprzez zapytanie do silnika wyszukiwania, który zwraca wyniki wraz
+z identyfikatorami, które można wykorzystać do wczytania wpisu z bazy
+danych
+Dane będziemy wyszukiwać na potrzeby interfejsu użytkownika oraz w celu
+wczytania jako kontekst promptu dla modelu. Dodatkowo sam LLM będzie nam
+potrzebny także do identyfikacji zapytania, jego wzbogacenia czy klasyfikacji, co
+jest potrzebne do zwiększenia skuteczności procesu wyszukiwania.
+Poniżej mamy schemat interakcji w której użytkownik zadaje proste pytanie "Jak
+się masz", w odpowiedzi na które asystent:
+Wczytuje informacje na swój temat poprzez przeszukanie pamięci i dostęp do
+bazy danych
+22.11.2024, 12:21 S00E04 — Programowanie | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e04-programowanie 17/21
+
+===== STRONA 18 =====
+Wczytuje informacje na temat użytkownika poprzez przeszukanie pamięci i
+dostęp do bazy danych
+Wczytuje informacje na temat bieżącej lokalizacji
+Wczytuje informacje na temat otoczenia
+Na podstawie zebranych informacji, udziela odpowiedzi
+Obsługa błędów w aplikacji przez kod, LLM i człowieka
+Poza typowymi dla programowania błędami, w aplikacjach korzystających z LLM
+API pojawiają się problemy związane ze stabilnością API, spadkami wydajności
+lub całkowitym brakiem dostępności. Obecne są także błędy wynikające
+bezpośrednio z niedeterministycznej natury modeli, które zwykle możemy
+rozwiązać poprzez bardziej precyzyjne prompty. Dość popularne są także błędy
+powstające na pograniczu programowania i połączenia z modelem, gdy np.
+kontekst promptu jest dostarczony niepoprawnie w wyniku błędnego mapowania
+treści lub niewłaściwego zwrócenia informacji o błędzie.
+Z drugiej strony, zyskujemy możliwość automatycznego naprawienia błędu ze
+względu na fakt, że LLM jest w stanie przeanalizować obiekt żądania i
+odpowiedzi, a następnie ponowić zapytanie. Od strony kodu, zwykle realizuje się
+to z pomocą instrukcji try ... catch (aczkolwiek nie zawsze).
+22.11.2024, 12:21 S00E04 — Programowanie | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e04-programowanie 18/21
+
+===== STRONA 19 =====
+Działanie według powyższego schematu w praktyce, widać poniżej na
+przykładzie mojej integracji ze Spotify, która działa tylko wtedy, gdy aplikacja jest
+aktywna na którymś z urządzeń i w przeciwnym razie otrzymujemy błąd.
+Posiadam jednak specjalne makro, które jest w stanie ominąć ten problem, ale
+tylko wtedy, gdy mój komputer jest aktywny.
+Wysyłając wiadomość z prośbą o włączenie muzyki, otrzymałem potwierdzenie
+jej realizacji, a wskazany utwór faktycznie został uruchomiony. Nie ma tutaj
+wzmianki o jakichkolwiek trudnościach.
+Wynika to z faktu, że przy pierwszej próbie, API zwróciło informację o tym, że
+aplikacja jest nieaktywna, więc Agent AI podjął decyzję o próbie jej uruchomienia,
+a to zakończyło się powodzeniem.
+22.11.2024, 12:21 S00E04 — Programowanie | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e04-programowanie 19/21
+
+===== STRONA 20 =====
+Co ciekawe, jeśli wspomniana próba zakończyłaby się niepowodzeniem,
+otrzymałbym wiadomość z prośbą o włączenie Spotify samodzielnie. Inaczej
+mówiąc, agent poprosiłby o pomoc człowieka.
+Logika o której mówimy, od strony aplikacji jest całkiem prosta:
+Agent posiada dostęp do listy narzędzi i jednym z nich jest Spotify
+API Spotify jest uruchamiane przez funkcję, która informuje agenta o statusie
+podjętej akcji. W sytuacji, gdy aplikacja jest nieaktywna, komunikat o błędzie
+sugeruje podjęcie próby uruchomienia jej zdalnie
+Agent podejmuje więc taką próbę i jeśli ta się nie powiedzie, przestaje
+próbować i zwraca się do użytkownika z prośbą o pomoc
+Zatem obecność LLM w logice aplikacji nie tylko wiąże się z nowymi wyzwaniami,
+ale także z zupełnie nowymi możliwościami dynamicznego reagowania na
+nietypowe sytuacje.
+Podsumowanie
+Duże modele językowe, a przede wszystkim ich dostępność przez API bez
+wątpienia otworzyły zupełnie nowe scenariusze związane z projektowaniem
+aplikacji. Funkcjonalności, które jeszcze kilkanaście miesięcy temu były
+niemożliwe do wykonania, dziś są w naszym zasięgu.
+Jednak obecne możliwości modeli oraz związanych z nimi narzędzi są często
+niewystarczające do produkcyjnych wdrożeń i z tego powodu wiele firm decyduje
+się na budowanie narzędzi wspierających procesy wewnętrzne. Nie oznacza to
+jednak, że budowanie aplikacji działających w dużej skali leży poza zasięgiem,
+aczkolwiek wymagają one bardzo dobrego zrozumienia generatywnego AI oraz
+niemałych, programistycznych umiejętności.
+Trudno jest wskazać tylko jedną rzecz, która jest warta zapamiętania z tej lekcji.
+Na uwagę zasługują tutaj zarówno koncepcje związane z łączeniem promptów
+(tzw. Chain) oraz monitorowaniem aplikacji (np. poprzez LangFuse). Natomiast
+najważniejszą ze wspomnianych umiejętności, jest zdolność oceny tego, kiedy
+22.11.2024, 12:21 S00E04 — Programowanie | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e04-programowanie 20/21
+
+===== STRONA 21 =====
+Liked by Mateusz and 185 others
+Comment 56 comment s
+LLM rzeczywiście wnoszą wartość do procesu, a kiedy wprost powinniśmy z nich
+zrezygnować.
+MS
+Like
+22.11.2024, 12:21 S00E04 — Programowanie | BRAVE Courses
+https://bravecourses.circle.so/c/prework-ai3/s00e04-programowanie 21/21

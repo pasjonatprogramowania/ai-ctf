@@ -1,0 +1,665 @@
+
+===== STRONA 1 =====
+S04E01  Int erfejs
+overment Admin Nov 25
+I'm just curious.
+» Lekka wersja przeglądarkowa «
+📎 Pobierz treść tej lekcji w formacie markdown
+📎 Pobierz treść tej lekcji w formacie markdown (EN)
+EDIT: 2024-11-25 05:39 CET - dopisany dokładny format odpowiedzi którą należy
+wysłać do Centrali
+EDIT: 2024-11-25 11:30 CET - poprawka w opisie zadania (nieścisłość) - “trzema
+zdjęciamiˮ zamienione na prawidłowe “czterema zdjęciamiˮ
+EDIT: 2024-12-14 15:46 CET - dodano jeszcze jedną informację o tym że rysopis
+ma być w języku polskim
+Back to Lekcje programu AI3
+PS
+15.12.2024, 20:05 S04E01 — Interfejs | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e01-interfejs 1/20
+
+===== STRONA 2 =====
+18:19
+W przykładach dołączonych do dotychczasowych lekcji często łączyliśmy model
+z zewnętrznymi narzędziami. Zazwyczaj były to proste interakcje, które pozwalały
+na dostarczanie zewnętrznego kontekstu lub wykonywanie nieskomplikowanych
+zadań. Co więcej, sposób korzystania z tych narzędzi, tylko w małym stopniu
+leżał po stronie LLM i w większości opisywaliśmy go z pomocą kodu, tworząc
+tzw. chain.
+Teraz przeniesiemy to na wyższy poziom, przygotowując narzędzia, które
+przesuną więcej odpowiedzialności na model językowy. Jednocześnie
+zachowamy możliwie dużą kontrolę oraz wsparcie dla modelu po stronie kodu.
+Inaczej mówiąc:
+LLM nie będzie odpowiedzialny tylko za generowanie danych wejściowych i
+sterowanie parametrami funkcji
+W zamian LLM otrzyma narzędzie (zestaw funkcji), instrukcję obsługi oraz
+komplet informacji umożliwiających niemal całkowicie autonomiczne działanie
+Pierwsze przykłady integracji modeli językowych (LLM) z zewnętrznymi
+narzędziami przedstawiliśmy w lekcji S01E01. Teraz zgłębimy ten temat bardziej
+kompleksowo, zwiększając precyzję działania i odporność na potencjalne błędy.
+W ramach wstępu zaznaczę także obecność Function Calling (lub Tool Use) -
+funkcjonalności oferowanych przez OpenAI i Anthropic. Ich założeniem jest
+ułatwienie interakcji z modelem, gdy pojawiają się informacje z zewnętrznych
+źródeł. Celowo jednak ograniczę ich zastosowanie, ponieważ narzucają szereg
+ograniczeń, nie oferując w zamian wartości uzasadniającej ich wybór. Zaznaczę
+tylko, że koncepcje, które będziemy omawiać, będą miały zastosowanie także w
+przypadku tych funkcjonalności, więc nie będzie przeszkód, aby po nie sięgnąć.
+15.12.2024, 20:05 S04E01 — Interfejs | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e01-interfejs 2/20
+
+===== STRONA 3 =====
+W zamian wykorzystamy techniki prowadzenia interakcji z modelem, o których
+dotychczas mówiliśmy, wspierając się przy tym JSON Mode i Structured Output.
+Główną zaletą tego podejścia jest elastyczność, umożliwiająca nawet
+przełączanie się między modelami różnych dostawców. Ma to szczególne
+znaczenie ze względu na dynamiczny rozwój branży i potencjalną potrzebę
+szybkiego przechodzenia między modelami.
+Założenia narzędzi dla agentów
+Przez "narzędzie" dla agenta AI rozumiemy zestaw funkcji i promptów.
+Umożliwiają one LLM (zwykle) autonomiczne korzystanie z zewnętrznych usług,
+serwisów, aplikacji czy urządzeń. Obejmuje to zarówno zarządzanie listą zadań w
+Linear, jak i wykonywanie działań na urządzeniach połączonych z Internetem.
+Narzędziem może być także inna generatywna aplikacja, wyspecjalizowana w
+określonym zadaniu — inaczej mówiąc: inny agent AI.
+Do tej pory wielokrotnie przekonaliśmy się, że przewidywalność działania modeli
+jest ograniczona. Nigdy nie mamy pewności, czy otrzymamy oczekiwany rezultat.
+Zamiast tego poruszamy się w obszarze prawdopodobieństwa, dążąc do
+zwiększania szansy na działanie zgodnie z założeniami.
+Wyraźnie sugeruje to, że narzędzia dla agentów nie powinny realizować
+krytycznych procesów, ich kontakt ze światem zewnętrznym powinien być
+możliwie ograniczony, a podejmowane akcje odwracalne. Z drugiej strony
+otwieramy przed sobą przestrzeń do realizowania procesów, które do tej pory
+pozostawały poza zasięgiem kodu.
+Narzędzie dla LLM musi zatem spełniać następujące wymagania:
+Jego nazwa musi być oczywista, zwięzła, unikatowa i charakterystyczna, aby
+model mógł z wysoką pewnością stwierdzić, które narzędzie wybrać spośród
+dostępnej listy umiejętności
+Każde narzędzie powinno zawierać zwięzły opis. Taki opis nie tylko ułatwi
+modelowi wybór odpowiedniego narzędzia, ale także przedstawi jego
+możliwości i ograniczenia
+Narzędzie musi posiadać także instrukcję obsługi, która może mieć
+formę jednego lub wielu promptów. Wynikiem ich działania będzie obiekt
+JSON/YAML zawierający właściwości potrzebne do uruchomienia funkcji
+Narzędzie musi mieć zdefiniowaną strukturę danych wejściowych,
+zależności, strukturę danych wyjściowych oraz listę dostępnych akcji.
+Inaczej mówiąc, każde z narzędzi musi być zbudowane tak, aby możliwe było
+korzystanie z nich w różnych konfiguracjach.
+Dodatkowo musimy zadbać o aspekty związane z logiką używania narzędzi w
+skład której wchodzi między innymi:
+15.12.2024, 20:05 S04E01 — Interfejs | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e01-interfejs 3/20
+
+===== STRONA 4 =====
+Zestawy danych testowych oraz testy automatyczne dla wszystkich promptów
+Zapisywanie historii podjętych działań, pozwalających na wczytanie zapytania
+oraz wyników dla danej konwersacji
+Obsługa błędów z opcją automatycznego naprawienia
+System wykonywania akcji asynchronicznych (kolejka, reagowanie na
+zdarzenia lub działanie według harmonogramu)
+Zatem koncepcja 'narzędzia' kształtuje nam się na formę niezależnie działającego
+modułu aplikacji, którym może posługiwać się LLM. Spróbujmy więc to wszystko
+zebrać w całość.
+Struktura interfejsu narzędzi
+Zacznijmy od zarysowania ogólnej perspektywy tego, jaki zakres możliwości
+mogą oferować narzędzia dla agentów. Kilka przykładów:
+Zarządzanie listą zadań, nawet w kontekście całego projektu
+Zarządzanie kalendarzami i komunikacją w związku z nimi (szkice maili,
+podsumowania, raporty)
+Transformacja obszernych dokumentów (np. tłumaczenie)
+Generowanie rozbudowanych form (np. test, audio, obraz)
+Zaawansowane przeszukiwanie Internetu
+Zarządzanie harmonogramem zadań cyklicznych
+Systemy powiadomień i wiadomości (Slack, E-mail, SMS)
+...i inne
+Narzędzia te będą mogły być uruchamiane przez model indywidualnie, ale także
+w połączeniu. W rezultacie agent będzie mógł otrzymać polecenie takie jak:
+"Codziennie rano wejdź na strony ..., napisz streszczenie ich treści i wyślij mi je
+na e-mail", na podstawie którego ustali plan akcji i wykona je.
+Spróbujmy więc zbudować narzędzie pierwsze z listy, które kompleksowo
+zaopiekuje się naszą listą zadań i będzie to robić w sposób na tyle dobry, że
+będziemy chcieli z niego korzystać na co dzień. Co więcej, wypracowany
+schemat powinien otworzyć nam drogę do budowania kolejnych narzędzi, które
+ostatecznie będą ze sobą współpracować. Dla uproszczenia będziemy
+posługiwać się narzędziem Todoist ze względu na jego popularność, ale ustalimy
+interfejs pozwalający na możliwie łatwe przełączenie się na inne rozwiązanie.
+Akcje narzędzia do zarządzania aplikacją to-do, uwzględniają:
+Pobieranie listy projektów
+Pobieranie listy zadań
+15.12.2024, 20:05 S04E01 — Interfejs | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e01-interfejs 4/20
+
+===== STRONA 5 =====
+Dodawanie, modyfikowanie oraz usuwanie zadań
+Obserwowanie listy zadań
+Natomiast sam interfejs narzędzia prezentuje się tak:
+Input: Lista wiadomości z konwersacji, opcjonalny kontekst w postaci np.
+dokumentu, notatki ze spotkania, opisu zdjęcia czy aktualnej lokalizacji
+Output: Lista XML zawierająca szczegóły podjętych działań, wraz z ich
+statusem oraz informacją zwrotną
+A poszczególne akcje tak:
+Lista projektów
+Input: brak
+Output: tablica obiektów z ID, nazwą, opisem oraz liczbą aktywnych zadań
+lub informacja o błędzie
+Lista zadań (list):
+Input: ID projektów, ID zadań, zakres dat, status
+Output: tablica obiektów z ID, ID projektu, nazwą, opisem, statusem, datą
+rozpoczęcia, datą aktualizacji lub informacja o błędzie
+Zadanie (get):
+Input: ID zadania
+Output: obiekt z ID, ID projektu, nazwą, opisem, statusem, datą
+rozpoczęcia, datą aktualizacji lub informacja o błędzie
+Add Task (add):
+Input: ID projektu, nazwa, opis, status, data rozpoczęcia
+Output: obiekt z ID, ID projektu, nazwą, opisem, statusem, datą
+rozpoczęcia, datą aktualizacji lub informacja o błędzie
+Update Task (update):
+Input: ID zadania, przynajmniej jedno z opcjonalnych pól zadania
+Output: obiekt z ID, ID projektu, nazwą, opisem, statusem, datą
+rozpoczęcia, datą aktualizacji lub informacja o błędzie
+Understand Query:
+Input: oryginalne zapytanie użytkownika
+Output: obiekt zawierający zapytania typu "add", "update", "delete", "list",
+"get".
+Także w przypadku tych akcji, chodzi nam o zapewnienie kompletu informacji
+wejściowych potrzebnych do podjęcia działania oraz danych wyjściowych,
+potrzebnych LLM do określenia tego, co należy zrobić dalej.
+15.12.2024, 20:05 S04E01 — Interfejs | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e01-interfejs 5/20
+
+===== STRONA 6 =====
+Instrukcje dla modelu
+Teraz potrzebujemy serii promptów dla modelu, wraz z zestawem danych
+testowych oraz testów automatycznych, które pozwolą nam na uzyskanie
+możliwie wysokiego poziomu skuteczności.
+Zacznijmy od zdefiniowania nazwy, oraz opisu narzędzia, które budujemy:
+nazwa: manage_todo
+description: Use this tool to access & manage Todoist tasks and projects.
+Available actions: listing projects, retrieving tasks, adding, modifying, and
+deleting tasks, and monitoring for task updates.
+Nie ma więc tutaj miejsca na wątpliwości, co do tego, czym jest to narzędzie,
+oraz jakie akcje są dostępne.
+Pierwsza akcja, czyli Lista Projektów nie wymaga żadnych danych wejściowych,
+więc nie wymaga promptu. Natomiast zwrócony przez nią rezultat będzie mieć
+formę obiektu JSON, który będziemy mapować do tekstu z tagami XML-like.
+Druga akcja, czyli Lista zadań wymaga już instrukcji dla modelu,
+ponieważ musimy mieć możliwość zawężenia wyszukiwania względem daty oraz
+wybranych projektów. Treść takiego promptu znajduje się w pliku
+todo/prompts/list_tasks.ts, a on sam został wygenerowany z użyciem meta
+promptu, który omawialiśmy w lekcji S00E02 — Prompt Engineering i kilku iteracji
+kształtujących jego zachowanie.
+Poza instrukcją, w pliku znajduje się także zestaw przykładowych danych, oraz
+seria testów weryfikujących działanie promptu. Test można
+uruchomić poleceniem bun todo/prompts/list_tasks.ts, co po kilku/kilkunastu
+sekundach zwróci rezultat w postaci tabeli z wynikami PromptFoo. Same testy
+15.12.2024, 20:05 S04E01 — Interfejs | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e01-interfejs 6/20
+
+===== STRONA 7 =====
+również zostały wygenerowane przez LLM pod moim okiem (aczkolwiek mogą
+pojawić się tam pojedyncze nieścisłości).
+Wszystkie pozostałe prompty są przygotowane mniej więcej według tych samych
+zasad. Konkretnie:
+Struktura promptu podąża schematem: "Rola | Cel | Format odpowiedzi |
+Zasady | Przykłady | Wezwanie do akcji."
+Prompty zawierają minimum niezbędnego kontekstu do działania i skupiają
+się na jednym kroku.
+Prompty generują obiekty JSON, których pierwsza właściwość to zawsze
+"_thinking," aby wydłużyć czas wypowiedzi modelu.
+Prompty zawierają kontekst w postaci listy projektów oraz (część z nich) listy
+zadań. Dodatkowo, tam gdzie to możliwe, daty umieszczone w prompcie
+generowane są dynamicznie, ponieważ z nimi LLM ma najwięcej problemu.
+Zestawy danych testowych mają na celu sprawdzenie typowych problemów z
+działaniem promptu i, tam gdzie to możliwe, weryfikację wypowiedzi modelu
+za pomocą kodu (JavaScript), szukając słów kluczowych.
+Tylko do dwóch promptów trafiają oryginalne wiadomości użytkownika.
+Pozostałe pracują na zapytaniach wygenerowanych przez model w celu
+zmniejszenia zakresu danych, które muszą być brane pod uwagę.
+Kolejny prompt get_task.ts jest dość opcjonalny, ponieważ w tym przypadku nie
+pracujemy z dodatkowymi informacjami na temat zadania, takimi jak komentarze,
+etykiety czy pod-zadania. Dołączam go jednak w celach poglądowych.
+Ostatnie z promptów odpowiedzialnych za akcje: add_tasks i update_tasks mają
+jedną bardzo istotną cechę — umożliwiają przetwarzanie wielu rekordów
+jednocześnie. Dzięki temu model może zdecydować, na przykład, o rozbiciu
+zapytania użytkownika na kilka zadań lub wymianie informacji między różnymi
+rekordami. Ten detal sprawia, że z perspektywy użytkownika większą wartość ma
+przesłanie jednej wiadomości opisującej serię zadań, niż wpisywanie ich ręcznie.
+Gdyby model pracował na indywidualnych rekordach, w większości przypadków
+wygodniejsze byłoby dodanie zadań samodzielnie. \ No i na samym końcu mamy
+prompt, który można określić jako 'mózg' naszego narzędzia. Odpowiada on za
+interpretację rozmowy z użytkownikiem, stworzenie planu działań oraz
+wygenerowanie zapytań dla każdej z akcji. Efekt jego działania widzimy poniżej.
+Zawiera on refleksję na temat tego, co powiedział użytkownik, oraz opis akcji (w
+tym przypadku aktualizacji zadania, które było już na liście).
+15.12.2024, 20:05 S04E01 — Interfejs | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e01-interfejs 7/20
+
+===== STRONA 8 =====
+Ostatecznie, struktura całego narzędzia prezentuje się następująco:
+Zapytanie użytkownika zostaje odebrane przez serwer
+Model planuje działania związane z zapytaniem użytkownika
+Następnie dochodzi do równoległego wykonania zapytań i zgromadzenia
+odpowiedzi (lub pominięcia tego kroku w przypadku, gdy rozmowa nie
+dotyczy zarządzania listą zadań)
+Ostatnim krokiem jest wygenerowanie odpowiedzi i zwrócenie jej
+użytkownikowi
+Zanim przejdziemy dalej, warto przyjrzeć się treści samych promptów,
+prezentowanych w nich przykładach oraz kategoriach projektów, a sama lista
+zadań zwykle nie przekracza kilkunastu rekordów. Wszystkie te dane są
+dopasowane do mojego stylu pracy i z dużym prawdopodobieństwem, nie
+sprawdzą się w każdej sytuacji.
+Bez względu na preferencje, istotne jest tutaj dopasowanie tych informacji do
+samego modelu, kierując się wskazówkami, które omawialiśmy wcześniej.
+Chociażby sama lista projektów zawiera nazwy i opisy, pozwalające łatwo
+dopasować zadanie.
+Może się jednak okazać, że powyższe opisy nie będą wystarczające i zajdzie
+potrzeba dodania ogólnego kontekstu zawierającego informacje na nasz temat,
+co również przyczyni się do zwiększenia skuteczności dopasowania. Przykład:
+Ukończenie lekcji kursu AI_devs 3 to z mojej perspektywy zadanie dla kategorii
+"Act", a nie "Learn". Z kolei z Twojej perspektywy, będzie odwrotnie.
+Po raz kolejny przekonujemy się zatem, że kontekst ma znaczenie.
+Struktura interfejsu danych i obsługa błędów
+W klasycznych aplikacjach występują dwie główne kategorie błędów:
+nieprzewidziane (np. brak dostępu do usługi) oraz te spowodowane działaniami
+użytkownika (np. niepoprawne hasło). W takim przypadku użytkownik otrzymuje
+informację o możliwych dalszych krokach. Informacja ta może być dość ogólna,
+ale mimo to użytkownik jest w stanie podjąć dalsze działania, w tym
+skontaktować się z obsługą techniczną.
+W przypadku LLM jest nieco inaczej, ponieważ poza błędem, zwykle będziemy
+potrzebowali przekazać także kontekst opisujący ewentualne dalsze kroki.
+Dodatkowo reakcja na takie scenariusze, musi być opisana w kodzie.
+15.12.2024, 20:05 S04E01 — Interfejs | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e01-interfejs 8/20
+
+===== STRONA 9 =====
+Poniżej mamy sytuację, w której proszę o wprowadzenie zmian w zadaniu, które
+nie istnieje. Pomimo tego, asystent poprawnie odnajduje się w tej sytuacji i
+sugeruje dalsze kroki.
+Z drugiej strony, istnieją sytuacje w których nasz asystent nie odnajduje się w
+pełni ze względu na ograniczony dostęp do informacji. Poniższa prośba o
+'przesunięcie wszystkich zadań do projektu X', została co prawda zrealizowana
+poprawnie, ale komunikat o jej realizacji jest błędny. Wynika on z tego, że w
+kontekście znajdują się zaktualizowane już zadania i nie ma śladu po tym, że
+zostały wykonane na nich jakieś akcje.
+Już na etapie planowania narzędzia musimy uwzględnić przepływ informacji
+między promptami, aby uniknąć rozbieżności między tym, co się wydarzyło, a
+tym, o czym wie asystent. Dla porównania, widzimy, że dodanie prostej informacji
+na temat "ID poprzedniego projektu" wystarczyło, aby asystent poprawnie
+zorientował się w sytuacji i właściwie odpowiedział.
+Konkretnie zmiana, która tutaj zaszła polegała na tym, aby do listy zawierającej
+zaktualizowaną listę zadań dodać właściwość informującą o poprzednim zmianie
+projektu. Jest to przykład podkreślający to, że samo wykonanie zadania nie jest
+wystarczające dla modelu, ponieważ musimy przekazywać także informację o
+tym, co się wydarzyło
+To wszystko prowadzi nas do następujących obserwacji i wniosków:
+15.12.2024, 20:05 S04E01 — Interfejs | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e01-interfejs 9/20
+
+===== STRONA 10 =====
+Narzędzie (tool) przyjmuje polecenie w naturalnym języku oraz w taki sam
+sposób odpowiada.
+Akcje zaplanowane są tak, aby móc odrzucić zapytania, które nie są zgodne z
+wytycznymi.
+Akcje są stosunkowo elastyczne i nie opierają się o określone polecenia, czy
+słowa kluczowe.
+Najbardziej wrażliwe elementy akcji są sterowane programistycznie
+Narzędzie (tool) może działać niezależnie. Oznacza to, że może skorzystać z
+niego człowiek, działająca w tle automatyzacja, bądź agent AI
+API asystenta i proxy dostępu do zewnętrznych usług
+Przykład todo oferuje integrację z Todoist, jednak model nie komunikuje się
+bezpośrednio z jego API, lecz posługuje się zestawem funkcji zdefiniowanych w
+TaskService.ts. Jest to rzecz, o której wspominałem już wcześniej, jednak teraz
+widzimy ją w praktyce.
+Nawet wspomniany powyżej przykład "przenoszenia projektów" i dodatkowego
+kontekstu w postaci "ID poprzedniego projektu" pokazuje, że zwykle będzie
+zależało nam na dopasowaniu interakcji z API do modelu.
+Podkreślam tę kwestię, ponieważ spotkałem się z przykładami integracji
+łączących się z API, bez dodatkowych warstw po stronie aplikacji. Jest to nie
+tylko ograniczające, ale także stanowi wyzwanie z punktu widzenia
+bezpieczeństwa.
+Zależności i relacje pomiędzy narzędziami
+Wspominałem na początku lekcji, że narzędzia takie jak przykład todo,
+będą mogły ze sobą współpracować. Teraz na kilku przykładach przedstawię, co
+miałem na myśli (o kolejnych dowiemy się w nadchodzących lekcjach).
+Przede wszystkim, nawet zrzuty ekranu z tej lekcji pokazują, że przykład todo
+połączyłem z interfejsem w postaci aplikacji Alice. Natomiast rolę takiego
+interfejsu mogą pełnić przeróżne usługi, aplikacje i skrypty.
+Przede wszystkim, korzystając z wiedzy z lekcji S01E05 — Produkcja,
+skonfigurowałem serwer VPS, dzięki czemu przykład todo jest dla mnie dostępny
+zdalnie. Mogę więc utworzyć scenariusz automatyzacji na platformie make.com i
+z pomocą dosłownie kilku kliknięć zbudować mechanizm obserwujący wybrane
+etykiety w Gmail. Wszystkie maile, które je otrzymają, zostaną dodane do mojej
+listy, a LLM zdecyduje o tym, jak je opisać i do którego projektu
+przyporządkować.
+15.12.2024, 20:05 S04E01 — Interfejs | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e01-interfejs 10/20
+
+===== STRONA 11 =====
+Analogiczne automatyzacje mogę stworzyć dla innych narzędzi: komunikatorów,
+kanałów RSS czy filmów na YouTube. Pozwala to więc na podłączenie wielu
+źródeł, w przypadku których wystarczy przesłanie ich treści. Co więcej, poza
+treścią, możemy przesłać także instrukcję z prośbą o ZDECYDOWANIE o tym,
+czy dany wpis w ogóle powinien trafić na naszą listę zadań czy listę nauki.
+Połączenie z przykładem todo może odbywać się także poprzez aplikację Siri
+Shortcuts w ekosystemie Apple. Utworzone makro może nagrać wiadomość
+głosową, a następnie jej treść przesłać jako treść zadań. W zależności od
+potrzeb, możemy połączyć się tam także z modelem Whisper czy modelem
+przetwarzającym zrobione przez nas zdjęcie.
+Takie integracje nie muszą mieć wyłącznie formy "zapisu", ale także odczytu. W
+końcu nic nie stoi na przeszkodzie, aby automatyzacja pobierała zadania, które
+mamy na liście i przygotowywała nam notatki mogące pomóc w ich wykonaniu.
+Np. dodajemy zadanie o naprawieniu błędu o określonej treści, a w opisie zadania
+pojawia się sugestia jego rozwiązania.
+Podsumowanie
+Patrząc na przykład todo dość dobrze widać po nim, że może stanowić
+niezależnie działającą aplikację, z którą można komunikować się z pomocą
+naturalnego języka. Dzięki automatycznym testom promptów (wskazane byłoby
+także przetestowanie samego kodu), możemy z stosunkowo dużą swobodą
+wprowadzać zmiany w logice.
+W ten sposób możemy 'otoczyć się' takimi modułami, które docelowo będą mogły
+komunikować się ze sobą i wykonywać dla nas (lub dla siebie nawzajem)
+przeróżne zadania.
+No i właśnie na tym polega koncepcja 'narzędzi dla agentów AI'.
+Jeśli z tej lekcji chcesz wynieść tylko jedną rzecz, będzie to wymagało od Ciebie
+nieco więcej uwagi. Chodzi o umiejętność tworzenia niezależnych narzędzi, w
+których dopracowane prompty umożliwiają działanie z bardzo niskim poziomem
+błędów lub nawet ze 100% skutecznością.
+Narzędzia, które w ten sposób stworzysz, nie muszą być szczególnie
+rozbudowane. Wystarczy, że będą dobrze robić nawet jedną, małą rzecz. Małe
+rzeczy mają to do siebie, że ich wartość szybko się sumuje.
+Powodzenia!
+15.12.2024, 20:05 S04E01 — Interfejs | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e01-interfejs 11/20
+
+===== STRONA 12 =====
+NOTATKA ZYGFRYDA
+ZADANIE
+Centrala posiada uszkodzone zdjęcia odzyskane z aparatu cyfrowego. Istnieje
+szansa, że na niektórych z nich jest Barbara. Nie wiemy, jak wygląda Barbara.
+Możesz na żywo porozmawiać z automatem działającym w centrali. Automat nie
+jest zbyt sprytny, ale może Ci pomóc w poprawieniu jakości zdjęć i w naprawianiu
+ich. Twoim zadaniem jest przygotowanie rysopisu Barbary.
+Automat może dla Ciebie poprawić posiadane zdjęcia. Obsługuje on kilka
+narzędzi:
+naprawa zdjęcia zawierającego szumy/glitche
+rozjaśnienie fotografii
+przyciemnienie fotografii
+Oto polecenia, które rozpoznaje automat:
+REPAIR NAZWA_PLIKU
+DARKEN NAZWA_PLIKU
+BRIGHTEN NAZWA_PLIKU
+Gdy będziesz mieć już pewność co do wyglądu Barbary, przygotuj jej rysopis w
+języku polskim. Uwzględnij wszystkie szczegóły ze zdjęć, które pomogą nam
+15.12.2024, 20:05 S04E01 — Interfejs | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e01-interfejs 12/20
+
+===== STRONA 13 =====
+ją rozpoznać.
+Zadanie nazywa się photos.
+API do obróbki zdjęć działa w sposób opisany poniżej i słucha jak zawsze na
+/report
+{
+ "task":"photos",
+ "apikey":"TWÓJ KLUCZ API",
+ "answer":"START"
+}
+Słowem “STARTˮ rozpoczynasz rozmowę z automatem. Przedstawi Ci on cztery
+fotografie. Niekoniecznie wszystkie z nich przedstawiają Barbarę i nie wszystkie
+z nich zawierają istotne dla nas szczegóły. Wydaj automatowi polecenia, mówiąc,
+na którym zdjęciu powinien wykonać jaką operację.
+Co należy zrobić w zadaniu?
+Wyślij do zadania o nazwie “photosˮ pole “answerˮ ustawione na “STARTˮ
+(tylko to jedno słowo). Pamiętaj o przesłaniu swojego klucza API. To zapytanie
+wygląda dokładnie tak, jak przy każdym innym zgłaszaniu odpowiedzi.
+W odpowiedzi na zapytanie, automat podzieli się z Tobą czterema zdjęciami
+odzyskanymi z uszkodzonego aparatu cyfrowego. Automat nie wie, co one
+przedstawiają. Na pewno na którymś, a może nawet na wszystkich jest
+Barbara.
+Poinstruuj automat, jak należy poprawić te zdjęcia. Możesz wysyłać polecenia
+np: DARKEN IMG_1234.PNG
+Automat odpowiada w języku naturalnym, zwracając nieustrukturyzowane
+dane. Czasami to będzie URL do zdjęcia, a czasami opis tego, jak to zdjęcie
+zdobyć.
+Jeśli już wiesz, jak wygląda Barbara, przygotuj jej rysopis w języku polskim i
+wyślij go w polu “answerˮ do centrali jako zadanie “photosˮ.
+Jeśli eksperci pracujący w centrali potwierdzą, że rysopis jest wystarczający,
+to w odpowiedzi otrzymasz flagę.
+UWAGA: każde poprawne polecenie wydane do automatu kończy się kodem
+ZERO i zwrotką “200 OKˮ. Nie oznacza to jednak, że zadanie jest zaliczone, a
+jedynie znaczy tyle, że poprawnie udało Ci się porozmawiać z automatem.
+Format finalnej odpowiedzi na zadanie:
+15.12.2024, 20:05 S04E01 — Interfejs | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e01-interfejs 13/20
+
+===== STRONA 14 =====
+110 likes 346 comment s
+Michał Pawełczyk 5h
+See more
+Like Reply 1 like
+Paweł Dulak (dulare) AI_Dev 1 2h
+I'm here to help
+See more
+Like Reply
+Michał Pawełczyk 13m
+{
+ "task": "photos",
+ "apikey": "1111-11-11-11-1111",
+ "answer": "tekstowy dokładny rysopis Barbary"
+}
+🧅  HINT 🧅 : jeśli chcesz oszczędzić tokeny w tym zadaniu, to każde z
+dostarczonych zdjęć posiada wersję o 50% mniejszą. Wystarczy dopisać do
+nazwy pliku sufix “-smallˮ, czyli zamiast IMG_123.PNG możesz operować na
+IMG_123-small.PNG. Pamiętaj, że na fotkach o niższej rozdzielczości,
+rozpoznawanie elementów może być trudniejsze dla modeli LLM.
+SS
+Paweł Dulak (dulare) potrzebuję pomocy przy tym zadaniu. Prawie
+dwie godziny spędziłem nie na algorytmie, ale na opisie ostatecznego
+wybranego zdjęcia, które wytypował mój algorytm. Ogólnie znalazłem
+dwa i ostatecznie zdobyłem flagę na drugim, ale w sumie nie wiem
+czemu to tak ma działać. W końcu testowałem po prostu automat
+Jakub 'unknow' Mrugalski bo nie wiedziałem o co chodzi.
+Zdjęcie: …
+Michał Pawełczyk Przyglądałeś się tym zdjęciom? Zwróciłeś
+uwagę że kobieta z rudymi włosami to nie Barbara?
+Przy przygotowywaniu rysopisu, nawet bez oglądania tych
+zdjęć osobiście, wystarczy każde z nich doprowadzić do
+używalności za pomcą “automatuˮ. Robisz to tak:
+za pomocą modelu vision oceniasz zdjęcie i wysyłasz do
+poprawki - darken, lighten, repair albo decydujesz że jest
+OK…
+15.12.2024, 20:05 S04E01 — Interfejs | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e01-interfejs 14/20
+
+===== STRONA 15 =====
+Like Reply
+Tomasz Prasołek 1d
+.NET Developer
+See more
+Like Reply 2 likes
+Paweł Dulak (dulare) AI_Dev 1 1d
+I'm here to help
+Paweł Dulak (dulare) Więc mówisz, że to nie jest Barbara…
+Nosz kurcze nie zauważyłem :P a ten hinty nie bardzo mi
+pomagały.
+Miałem trochę zle podejście, bo wysyłałem do GPT tylko
+zdjęcia portretowe. Zakładałem, że jak ktoś idzie tyłem to mi się
+nie przyda. Prawdopodobnie jak poprawię algorytm by szedł
+twoim tokiem to uda się lepiej.
+Jeszcze 5 zadań i będzie certyfikat :)
+Fajne zadanie, chwile mi zeszło napisać algorytm z rekurencją, ale po
+kilku iteracjach się udało go dopracować. Zapisywałem zdjęcia
+lokalnie, aby nie pobierać za każdym razem. Teraz nawet po
+skasowaniu zdjęć i puszczenia wszystko od zera przechodzi
+pozytywnie :)
+Oczywiście straciłem trochę czasu na …. czytaniu ze zrozumieniem …
+Tomasz Prasołek jest to napisane w pierwszej części opisu
+zadania, teraz dodałem tą informację (że rysopis w języku
+15.12.2024, 20:05 S04E01 — Interfejs | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e01-interfejs 15/20
+
+===== STRONA 16 =====
+Like Reply 1 like
+Hubert Szewczuk 3d
+See more
+Like Reply 1 like
+Paweł Dulak (dulare) AI_Dev 1 3d
+I'm here to help
+Like Reply
+Mariusz Bednarz 6d
+See more
+Like Reply 1 like
+Paweł Dulak (dulare) AI_Dev 1 5d
+I'm here to help
+polskim) także przy wypunktowaniu.
+Spędziłem nad tym zdecydowanie za długo, ale nauczyło mnie to paru
+rzeczy.
+Jednak nadal mam pewne wątpliwości.
+np, aby stwierdzić, czy automat potwierdza dobrą jakość zdjęcia,
+używałem podejścia typu
+…
+Hubert Szewczuk dobrą jakość zdjęcia można też sprawdzić
+modelem vision :)
+Czy przy tworzeniu rysopisu, model sam z siebie nie pisał nic o
+tatuażu? Czy wysyłałeś mu do analizy wszystkie cztery
+poprawione zdjecia na raz?
+MB
+Za pierwszym podejściem próbowałem zrobić wszystko na raz,
+pobierać linki, analizować, naprawiać i opisywać, agregować cechy
+wyglądu i się zakopałem.
+Potem zmieniłem podejście: SPOILER
+…
+Mariusz Bednarz najpierw obróbka każdego zdjęcia w pętli -
+jak najbardziej OK. Później można wszystkie cztery wysłać
+jednocześnie do analizy z prośbą o rysopis :) wtedy nie trzeba
+tego już dalej dzielić na etapy pracy.
+15.12.2024, 20:05 S04E01 — Interfejs | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e01-interfejs 16/20
+
+===== STRONA 17 =====
+Like Reply 1 like
+Paweł Wojcieszak 6d
+Like Reply 1 like
+Paweł Wojcieszak 6d
+Like Reply 1 like
+Adam K ęsy 6d
+Like Reply 1 like
+Paweł Dulak (dulare) AI_Dev 1 6d
+I'm here to help
+Like Reply
+Bartosz Szkiłądź Dec 7
+Like Reply 1 like
+Jakub 'unkno w' Mrugalski Dec 7
+PW
+Co oznacza zwrotka:
+'hints': ['Skup się\xa0na znakach szczególnych']
+Czy powodem takiego komunikatu może być opis niewłaściwego
+zdjęcia ?
+PW
+Git już działa.
+W momencie pisania skapnąłem się, że być może nie chodzi o
+jedno zdjęcie ale o więcej :)
+AK
+Otrzymany link prowadzi o klipu z borsukiem - o co chodzi tym
+razem? Skąd wziąć te pliki?
+Adam Kęsy zauważ że sama domena to nie wszystko - masz
+też nazwy konkretnych zdjęć - trzeba poprosić LLM żeby
+skonstruował właściwe adresy, lub zrobić to programistycznie.
+BS
+mój wynikowy json wysyłany ręcznie działa, ale gdy wysyłam ten sam
+json przez program to zwraca mi błąd `this is NOT correct JSON -
+please verify your data: jsonlint.com`. Gdy z kolei skopiuję tego
+samego jsona na stronę z wiadomości to też wszystko jest ok.
+Jakub 'unknow' Mrugalski czy mógłbyś to sprawdzić? Jak trzeba to
+mogę dorzucić tego jsona
+Bartosz Szkiłądź z logów wynika, że masz problem z
+kodowaniem polskich znaków. Wysyłasz dane, które wyglądają
+np tak:
+15.12.2024, 20:05 S04E01 — Interfejs | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e01-interfejs 17/20
+
+===== STRONA 18 =====
+Like Reply 2 likes
+Bartosz Szkiłądź Dec 7
+Like Reply 1 like
+Bartosz Szkiłądź Dec 7
+Like Reply 2 likes
+Dominik JeziorskiDec 7
+Performance Engineer
+Like Reply 1 like
+Jakub 'unkno w' Mrugalski Dec 7
+Like Reply 1 like
+Ma d?ugie, proste, czarne w?osy, kt\xf3re si?gaj?
+Ani to ISO, ani UTF-8. Parser się gubi
+BS
+Jakub 'unknow' Mrugalski coś tak właśnie podejrzewałem, ale
+gdy skopiowałem odpowiedź nawet z takimi znakami to ręcznie
+byłem w stanie dostać odpowiedź na zadanie. Mimo wszystko
+dzięki. Będę dalej szukać
+BS
+znalazłem  zapomniałem dodać content-type
+application/json. Już w sumie dawniej miałem taki błąd - na
+jakimś etapie spring coś inaczej interpretuje wysyłając request
+gdy nie ma takiego headera
+Paweł Dulak (dulare) / Jakub 'unknow' Mrugalski - możecie mi
+powiedzieć co nie pasuje walidatorowi w moim opisie. Ma być po
+polsku czy jak?
+Dobra ogarnąłem - trzeba po polsku gadać inaczej nic z tego.
+Dominik Jeziorski tak. Napisz go proszę po polsku
+15.12.2024, 20:05 S04E01 — Interfejs | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e01-interfejs 18/20
+
+===== STRONA 19 =====
+Borys Majewski Dec 5
+See more
+Like Reply 2 likes
+Szymon Mr ówczyński Dec 4
+See more
+Like Reply 1 like
+Paweł Dulak (dulare) AI_Dev 1 Dec 4
+I'm here to help
+Like Reply
+Szymon Mr ówczyński Dec 4
+Like Reply 1 like
+Paweł Dulak (dulare) AI_Dev 1 Dec 4
+I'm here to help
+BM
+Najbardziej uciążliwe w tym wszystkim było przekonanie gpt-4o-mini
+że nie łamie zasad opisując osoby. Nie wiem nawet jakie przykazania
+ai safety to łamie. Ale udało mi się przekonać go do pracy przez:
+SPOILER
+.
+.
+.
+.…
+SM
+Cześć w jaki sposób poradzić sobie z błędem RateLimitError w gpt-
+4o/mini jak wgrywałem pomniejszone zdjęcia (-small) to też go
+dostawałem Error code: 429 - {'error': {'message': 'Request too large
+for gpt-4o in organization … on tokens per min (TPM): Limit 30000,
+Requested 50610. W końcu użyłem modelu do wyciągnięcia url z
+odpowiedzi i ręcznie przesłałem polecenia REPAIR, DARKEN
+BRIGHTEN. Na końcu wpadłem na to żeby spróbować innym modelem
+i opis wygenerowałem pixtralem, także pewnie automat też mógłby…
+Szymon Mrówczyński próbowałeś użyć mniejszych zdjęć o
+których wspomina hint na końcu? W ten sposób powinieneś
+dać radę…
+SM
+Paweł Dulak (dulare) tak próbowałem wciąż miałem ten błąd
+copilot podpowiadał żeby zmniejszyć zdjęcie
+Szymon Mrówczyński hm, no to zostaje podzielić na etapy i
+czekać pomiędzy… Czy przy jednym zdjęciu już jest ten
+15.12.2024, 20:05 S04E01 — Interfejs | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e01-interfejs 19/20
+
+===== STRONA 20 =====
+Like Reply
+Show more replies
+Show more comment s
+problem?
+Jeszcze pytanie jak wysyłasz te zdjęcia, bo wystarczy URL
+podać. O tym wiesz? Nie trzeba załączać zdjęcia, wystarczy
+wysłać URL do analizy.
+PS
+Post
+What are your thoughts?
+15.12.2024, 20:05 S04E01 — Interfejs | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e01-interfejs 20/20

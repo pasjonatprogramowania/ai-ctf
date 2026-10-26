@@ -1,0 +1,776 @@
+
+===== STRONA 1 =====
+S01E01  Int erakcja z dużym modelem
+językowym
+overment Admin Nov 4
+I'm just curious.
+» Lekka wersja przeglądarkowa «
+Kilka wskazówek na start:
+Kod oraz prompty tej lekcji oraz kolejnych lekcji znajdują się w tym
+repozytorium. Linki do poszczególnych przykładów umieszczam także w treści
+lekcji.
+Pracując z przykładami zawsze korzystaj z pomocy modelu. Nawet pytania "co
+robi ten kod" lub "przepisz ten kod na Python" mogą pomóc Ci w jego
+zrozumieniu. Idealnie sprawdza się w tym Cursor IDE, ale możesz skorzystać
+także z ChatGPT/Claude/Gemini. Najlepiej w tej sytuacji sprawdza się jednak
+model Claude 3.5 Sonnet lub modele o1.
+Treści lekcji są obszerne, dlatego dołączam je także w formacie markdown.
+Dodaj go jako załącznik do rozmowy na ChatGPT/Claude lub po prostu wklej do
+kontekstu. Możesz wówczas poprosić o wypisanie tematów, listy narzędzi czy
+zadawać pytania na jej temat. Dołączaj w ten sposób pliki kolejnych lekcji i
+pracuj z modelem, który będzie "wiedział" coraz więcej na temat AI_devs,
+pomagając Ci przy tym w nauce i powrocie do wcześniej omówionych
+zagadnień.
+Back to Lekcje programu [AI3]
+PS
+22.11.2024, 12:24 S01E01 — Interakcja z dużym modelem językowym | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s01e01-interakcja-z-duzym-modelem-jezykowym 1/31
+
+===== STRONA 2 =====
+Pomimo wsparcia ze strony modelu, warto i tak samodzielnie zapoznać się z
+treścią lekcji.
+Pamiętaj także o tym, że możesz liczyć na moją pomoc w komentarzach. W
+temacie zadań wołaj Paweł Dulak (dulare) Jakub 'unknow' Mrugalski oraz
+Mateusz Chrobok. W temacie treści, przykładów kodu oraz filmów — mnie.
+📎 Pobierz treść materiałów wdrożeniowych w formacie markdown
+📎 Pobierz treść tej lekcji w formacie markdown
+📎 Pobierz treść tej lekcji w formacie markdown (EN)
+📎 Pobierz treść tej lekcji w formacie PDF
+Zdolność dużych modeli językowych do generowania ustrukturyzowanych treści
+pozwala na podłączenie ich do logiki aplikacji i programistyczne sterowanie ich
+zachowaniem. Przy ich aktualnym poziomie rozwoju pełnią rolę narzędzia, dzięki
+któremu możemy przetwarzać i generować dane w sposób, który do tej pory nie
+był możliwy programistycznie (np. z pomocą wyrażeń regularnych).
+W AI_devs 3 skupimy się na interakcji programistycznej z dużymi modelami
+językowymi poprzez API, tworząc częściowo autonomiczne narzędzia zwane
+"Agentami AI". To złożone rozwiązania, które wymagają praktycznego
+doświadczenia w programowaniu i dobrego zrozumienia natury dużych modeli
+językowych.
+Narzędzia te mogą realizować różne zadania i procesy, ale raczej nie są
+uniwersalne (przynajmniej na razie). Dlatego skupimy się na tworzeniu ich
+indywidualnych komponentów i modułów. Dzięki temu możliwe będzie ich
+łączenie w różnych konfiguracjach i dopasowanie do naszych potrzeb.
+Jeszcze kilkanaście miesięcy temu wybór modelu ogólnego zastosowania
+praktycznie zaczynał się i kończył na OpenAI. Natomiast dziś pod uwagę możemy
+brać:
+OpenAI: Modele z rodziny GPT, w tym także TTS, Whisper i Embedding
+Anthropic: Modele z rodziny Claude (tylko tekst + obraz)
+Google AI Studio: Modele Gemini oraz wybranych dostawców (np. Anthropic) i
+inne
+Amazon Bedrock (Amazon): Modele Anthropic, Mistral czy Meta i inne
+Azure (Microsoft): Modele OpenAI, Meta i inne
+Groq: Modele Open Source, np. Llama, Qwen, Gemma
+22.11.2024, 12:24 S01E01 — Interakcja z dużym modelem językowym | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s01e01-interakcja-z-duzym-modelem-jezykowym 2/31
+
+===== STRONA 3 =====
+a także kilka innych, np.: OpenRouter, Perplexity, Cerebras, Databricks,
+Mistral AI czy Together AI
+Możemy zatem wybierać między różnymi ofertami cenowymi, limitami dostępu do
+API, polityką prywatności i przetwarzania danych, a także samymi modelami. Jest
+to istotne, ponieważ Agenci AI będą autonomicznie korzystać z naszych baz
+wiedzy lub uzyskają dostęp do narzędzi. Przełoży się to na działanie na dość
+dużej skali, uwzględniającej przetwarzanie nawet dziesiątek milionów tokenów,
+co generuje zauważalne koszty. Obrazuje to poniższy przykład zapytania z
+prośbą do Agenta AI o zapisanie zadań w Linear, co przełożyło się na 17,400
+tokenów zapytania (input) i 461 tokenów odpowiedzi (output). Warto też zwrócić
+uwagę na czas wykonania zapytania, czyli "aż" 24 sekundy.
+Jedna wiadomość, kilka podjętych działań, niemal 18 tysięcy tokenów i pół
+minuty na reakcję — z boku brzmi to, jak rozwiązanie, które nie ma sensu.
+Spójrzmy jednak na nie z nieco innej perspektywy.
+Zarządzanie zadaniami wymaga aktywnego działania ze strony osoby
+obsługującej urządzenie z aplikacją taką jak Linear, Todoist czy ClickUp. Zadanie
+musi zostać nazwane, opisane, przypisane do kategorii, daty, priorytetu czy
+projektu — w ten sposób pracuje większość z nas.
+22.11.2024, 12:24 S01E01 — Interakcja z dużym modelem językowym | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s01e01-interakcja-z-duzym-modelem-jezykowym 3/31
+
+===== STRONA 4 =====
+Proces ten można częściowo zautomatyzować. Przykładowo, możemy za
+pomocą API monitorować skrzynkę e-mail oraz pojawiające się słowa kluczowe.
+Na ich podstawie możliwe jest ustawienie reguł przekierowujących wiadomość do
+wskazanej osoby lub nawet utworzenie nowego wpisu w aplikacji do zadań. Tutaj
+zaangażowanie człowieka nie jest wymagane, lecz potrzebny jest zestaw
+programistycznie zdefiniowanych zasad (co nie zawsze jest możliwe) —
+mówimy więc tutaj o automatyzacji procesu według ściśle określonych reguł.
+22.11.2024, 12:24 S01E01 — Interakcja z dużym modelem językowym | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s01e01-interakcja-z-duzym-modelem-jezykowym 4/31
+
+===== STRONA 5 =====
+Teraz do budowy takiego systemu możemy wykorzystać duże modele językowe.
+Dzięki nim możemy przyjmować różne formy treści pochodzące z różnych źródeł,
+ponieważ za ich interpretację oraz podejmowane działania odpowiada model
+połączony z logiką aplikacji.
+Taki system może otrzymywać dane w formie zwykłych wiadomości
+pochodzących od innej osoby, a także poprzez zdjęcia z telefonu, nagrania
+głosowe z zegarka czy wiadomości przesłane na laptopie lub z zewnętrznego
+API. Co więcej, źródłem danych może być nawet inny agent AI!
+W poniższym schemacie widzimy, że wszystkie źródła danych generują
+zapytanie, które interpretuje duży model językowy. Na podstawie tej interpretacji
+powstaje plan działań, a następnie są podejmowane konkretne akcje.
+22.11.2024, 12:24 S01E01 — Interakcja z dużym modelem językowym | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s01e01-interakcja-z-duzym-modelem-jezykowym 5/31
+
+===== STRONA 6 =====
+Szczególnie interesujący jest tutaj fakt, że podczas realizowania powyższej logiki,
+możliwe jest dynamiczne uzyskiwanie dostępu do informacji. Np. na podstawie
+wspomnianej nazwy projektu agent może wczytać dodatkowe informacje na jego
+temat lub pobrać dane z Internetu, aby wzbogacić opis. Z kolei w sytuacji, gdy nie
+będzie w stanie sobie poradzić z zadaniem ... może poprosić człowieka o pomoc.
+03:21
+No i właśnie budowaniem takich rozwiązań, będziemy zajmować się przez
+najbliższe tygodnie, zatem — witaj w AI_devs 3!
+Połączenie z modelem, od praktycznej strony
+22.11.2024, 12:24 S01E01 — Interakcja z dużym modelem językowym | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s01e01-interakcja-z-duzym-modelem-jezykowym 6/31
+
+===== STRONA 7 =====
+Na tym etapie zakładam, że materiały wdrożeniowe do AI_devs 3 masz już za
+sobą, lub wracasz do nas z poprzednich edycji. W obu przypadkach posiadasz
+przynajmniej podstawową wiedzę na temat modeli językowych. Możemy więc
+przejść do praktycznych przykładów interakcji z modelami.
+Zacznijmy od tego, że domyślna interakcja z modelem językowym opiera się na
+tworzeniu tablicy messages, która zawiera treść konwersacji połączoną z
+instrukcją systemową w formacie ChatML. Jednak nas interesuje coś więcej.
+Mianowicie fakt, że wygenerowanie rezultatu w przypadku Agenta AI składa się z
+wielu zapytań i wywołań funkcji. W przykładzie poniżej widzimy 4 etapy:
+Zrozumienie: Wymaga wczytania pamięci i/lub dostępu do Internetu. W ten
+sposób wykraczamy poza bazową wiedzę modelu i zyskujemy informacje
+przydatne na dalszych etapach. Można to określić jako etap "zastanawiania
+się" lub "analizy".
+Plan działań: Wymaga połączenia wcześniejszych "przemyśleń" połączonych
+z listą dostępnych narzędzi, umiejętności lub innych agentów. Na tej
+podstawie tworzona jest lista akcji, która ma być zrealizowana w dalszych
+krokach.
+Podejmowanie działań: Wymaga wiedzy, planu i dostępnych umiejętności, na
+podstawie których model decyduje o kolejnym kroku i gromadzi informacje
+zwrotne.
+Odpowiedź: Wymaga wiedzy oraz raportu z działań w celu wygenerowania
+ostatecznej odpowiedzi.
+Już na tym etapie trzeba mieć na uwadze to, że powyższa logika, nie musi
+uwzględniać zaangażowania ze strony człowieka i może być realizowana "w tle"
+oraz trwać od kilku sekund do nawet kilku godzin. Może też być uruchamiana
+automatycznie według harmonogramu lub zewnętrznego zdarzenia.
+22.11.2024, 12:24 S01E01 — Interakcja z dużym modelem językowym | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s01e01-interakcja-z-duzym-modelem-jezykowym 7/31
+
+===== STRONA 8 =====
+Widzimy też wyraźnie, że nie chodzi już o proste budowanie konwersacji przez
+tablicę messages, lecz o nową architekturę i wzorce projektowania aplikacji. Co
+ciekawe, nadal mówimy tutaj o oprogramowaniu, które w około 80% przypomina
+klasyczne aplikacje. LLM, prompty oraz narzędzia takie jak bazy wektorowe
+stanowią tylko część rozwiązania. Poza samym kodowaniem kluczową rolę
+odgrywa praca z danymi, różnymi formatami plików, organizacją baz danych oraz
+strategiami wyszukiwania (tzw. retrieval).
+Wracając do prowadzenia interakcji z modelem, w przykładzie thread widzimy
+nietypowy, lecz praktyczny sposób prowadzenia rozmowy. Zamiast przesyłania
+całej historii wiadomości, używamy podsumowania oraz najnowszej wiadomości
+użytkownika. Ten sposób pozwala modelowi zapamiętać kluczowe informacje jak
+imię użytkownika, bez potrzeby przechowywania pełnej konwersacji.
+Aby uruchomić ten przykład, włącz serwer poleceniem bun thread i wykonaj
+zapytanie POST na adres localhost:3000/api/demo.
+Schemat tej interakcji wygląda następująco: po udzieleniu pierwszej odpowiedzi
+generowane jest podsumowanie dotychczasowej rozmowy, które jest dołączane
+do promptu systemowego kolejnej tury. W ten sposób przekazujemy
+"skompresowany" wątek.
+22.11.2024, 12:24 S01E01 — Interakcja z dużym modelem językowym | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s01e01-interakcja-z-duzym-modelem-jezykowym 8/31
+
+===== STRONA 9 =====
+W wyniku takiej kompresji naturalnie tracimy część informacji. Nic jednak nie stoi
+na przeszkodzie, aby dodać mechanizm przeszukiwania wcześniejszych wątków
+na wypadek, gdyby podsumowanie było niewystarczające.
+Przykład thread jest prosty, jednak doskonale obrazuje to, jak możemy
+manipulować przebiegiem konwersacji, a w rezultacie:
+Fakt, że do podsumowania zastosowaliśmy tańszy model, jest przykładem
+optymalizacji kosztów
+Dzięki podsumowaniu model przetwarza mniejszą ilość treści, przez co jego
+uwaga jest bardziej skupiona na aktualnym zadaniu — WAŻNE! w modelach
+klasy GPT-4o jest to bardzo istotna kwestia, wpływająca na
+skuteczność działania modelu
+Podsumowanie pozwala także uniknąć limitu okna kontekstu, co ma znaczenie
+w przypadku modeli Open Source, które mogą odpowiadać za wybrany
+element interakcji
+Podsumowanie może być również wykorzystane w innych częściach logiki
+agenta, a także jako element interfejsu użytkownika lub raportu pracy agent
+W tym przypadku zastosowaliśmy podsumowanie, jednak ten sam schemat
+będziemy stosować np. przy rozpoznawaniu obrazu, dźwięku czy wideo. Tam
+również dodatkowe zapytania do modelu będą wykorzystywane jako kontekst
+promptu systemowego
+Rodzaje interakcji
+Złożona logika Agentów składa się z modułów oraz pojedynczych akcji. Trudno
+mówić o dobrze działającym systemie, jeśli nie zadbamy o detale zarówno po
+stronie promptów, jak i po stronie kodu. Dlatego na tym etapie przejdziemy przez
+kilka przykładów elementarnych akcji, takich jak podejmowanie decyzji,
+klasyfikacja, parsowanie, transformacja i ocena. Wykorzystamy także narzędzie
+PromptFoo, którego uruchomienie omówiłem w lekcji S00E02 — Prompt
+Engineering i o którym będziemy jeszcze mówić w dalszych lekcjach, a aktualnie
+wystarczy nam jego uruchomienie.
+Przykładem pojedynczej akcji może być podejmowanie decyzji przez model na
+podstawie dostępnych danych. Porównać to można do instrukcji warunkowej if
+lub switch, z tą różnicą, że cechuje się większą elastycznością kosztem
+deterministycznego rezultatu.
+Poniższy scenariusz przedstawia logikę weryfikującą potrzebę użycia
+wyszukiwarki internetowej dla danego zapytania. Choć początkowo wskazuje to
+na wykorzystanie Function Calling / Tool Use, nie zawsze jest to oczywiste
+rozwiązanie.
+22.11.2024, 12:24 S01E01 — Interakcja z dużym modelem językowym | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s01e01-interakcja-z-duzym-modelem-jezykowym 9/31
+
+===== STRONA 10 =====
+Mianowicie zakładamy tutaj, że natychmiast mamy komplet niezbędnych
+informacji potrzebnych do uruchomienia wyszukiwania, co zwykle nie jest
+prawdą. Połączenie, na przykład z Firecrawl, może wymagać pobrania listy
+dopuszczalnych domen lub wygenerowania słów kluczowych. Ten proces opiera
+się na dodatkowym kontekście wczytywanym z bazy danych.
+W przykładzie use search (wymaga zainstalowanego PromptFoo), mamy prompt
+odpowiadający za podejmowanie decyzji o zastosowaniu wyszukiwarki. Jego
+zadaniem jest wygenerowanie 0 lub 1 w celu klasyfikacji zapytania. Z tego
+powodu uwzględniłem w nim przykłady few-shot oraz zdefiniowałem zestaw
+zasad dopasowany do początkowych założeń. Następnie działanie takiego
+promptu jest automatycznie weryfikowane na kilkudziesięciu przykładach.
+22.11.2024, 12:24 S01E01 — Interakcja z dużym modelem językowym | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s01e01-interakcja-z-duzym-modelem-jezykowym 10/31
+
+===== STRONA 11 =====
+Podejmowanie decyzji przez LLM może uwzględniać potrzebę wybrania wielu
+opcji, a nie tylko jednej. Wówczas mówimy o klasyfikacji zapytania.
+Skoro jesteśmy już przy przeszukiwaniu Internetu, to pomocny będzie także
+prompt wybierający domeny, do których zawęzimy wyszukiwanie. Jest to
+przydatne, ponieważ autonomiczne przeglądanie stron www szybko prowadzi do
+niskiej jakości źródeł czy serwisów, które wymagają logowania lub blokują dostęp
+do treści.
+Warto więc wypisać sobie listę adresów i opisać je tak, aby LLM mógł
+zdecydować, kiedy je uwzględnić, a kiedy nie. Prompt realizujący to zadanie
+znajduje się w przykładzie pick_domains.
+22.11.2024, 12:24 S01E01 — Interakcja z dużym modelem językowym | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s01e01-interakcja-z-duzym-modelem-jezykowym 11/31
+
+===== STRONA 12 =====
+W powyższym prompcie, w celu zwiększenia skuteczności, zastosowaliśmy
+również wariant Thought Generation, a konkretnie "zero-shot chain of thought".
+Mówimy tutaj o podniesieniu skuteczności, ponieważ w ten sposób dajemy LLM
+"czas na myślenie". Dodatkowo fakt, że właściwość "_thoughts" jest generowana
+na początku, jest powiązany z faktem, że modele językowe są autoregresyjne i
+treść tej pierwszej właściwości wpływa na treść kolejnych — zwiększając w ten
+sposób prawdopodobieństwo uzyskania oczekiwanych rezultatów.
+Pozostając w temacie przeszukiwania internetu, jesteśmy gotowi na wykonanie
+zapytania do wyszukiwarki. Na tym etapie możemy uzyskać wyniki w formacie
+znanym z Google czy DuckDuckGo. Oznacza to, że nie będą to wystarczające
+informacje do udzielenia finalnej odpowiedzi, ale możemy na ich podstawie
+wskazać strony, które będziemy chcieli przeanalizować.
+W przykładzie rate znajduje się prompt oceniający to, czy zwrócony wynik może
+zawierać interesujące nas informacje. Na podstawie zwróconych ocen
+wybierzemy te strony, których zawartość będziemy chcieli wczytać z pomocą np.
+Firecrawl.
+Zbierając to w całość, mamy już:
+Decyzję o tym, czy wyszukiwarka internetu jest potrzebna
+Decyzję o tym, jakie zapytania chcemy do niej skierować
+Możliwość filtrowania zwróconych wyników
+Pozostaje nam więc już tylko wygenerowanie odpowiedzi na oryginalne pytanie
+na podstawie pobranych danych. Zobaczmy, jak możemy to wszystko połączyć w
+22.11.2024, 12:24 S01E01 — Interakcja z dużym modelem językowym | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s01e01-interakcja-z-duzym-modelem-jezykowym 12/31
+
+===== STRONA 13 =====
+całość w przykładzie websearch. Jego logika umożliwia zwykłą rozmowę z LLM,
+ale gdy wykryta zostanie konieczność skorzystania z wyszukiwarki, oryginalne
+zapytanie użytkownika zostaje wykorzystane do przeszukiwania sieci, co zresztą
+można zobaczyć na poniższym filmie.
+Architektura aplikacji
+Patrząc nawet na przykład websearch, można zauważyć, że faktycznie ~80%
+kodu przypomina klasyczną aplikację. Jednak zgodnie z tym, co omawialiśmy w
+22.11.2024, 12:24 S01E01 — Interakcja z dużym modelem językowym | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s01e01-interakcja-z-duzym-modelem-jezykowym 13/31
+
+===== STRONA 14 =====
+lekcji S00E04 — Programowanie, w kodzie zaczyna pojawiać się język naturalny
+oraz elementy, które do tej pory mogły odgrywać nieco mniejszą rolę w
+zależności od projektu.
+Poza strukturą katalogów podziałem odpowiedzialności, architekturą bazy danych
+czy samym stackiem technologicznym, pod uwagę musimy wziąć także rolę
+dużych modeli językowych oraz promptów. Nie chodzi tutaj wyłącznie o wybór
+modelu, hostingu czy napisaniu instrukcji, ale przede wszystkim o sposób
+przepływu danych.
+Jeśli spojrzymy teraz na wizualizację przykładu websearch, to jasno widzimy, że
+działanie kolejnych promptów jest uzależnione od rezultatów poprzednich. Choć
+każdy z nich budujemy indywidualnie, to robiąc to, musimy brać pod uwagę dane
+na których będzie pracować, oraz to w jaki sposób generowane przez niego dane
+będą wykorzystane później.
+Powiększ grafikę, otwierając ją w nowej karcie
+Nieco bardziej rozbudowana wizualizacja pokazuje te zależności nieco wyraźniej.
+I tak nie jest to wszystko, bo mamy tutaj do czynienia z łańcuchem promptów i
+akcjami następującymi po sobie, a nie zawsze tak będzie.
+22.11.2024, 12:24 S01E01 — Interakcja z dużym modelem językowym | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s01e01-interakcja-z-duzym-modelem-jezykowym 14/31
+
+===== STRONA 15 =====
+Na blogu LangChain można przeczytać o podstawach architektury kognitywnej,
+gdzie uwzględniony jest podział na Code, LLM Call, Chain, Router, a także State
+Machine i w pełni autonomiczne systemy o których będziemy jeszcze mówić.
+Tymczasem spróbujmy spojrzeć na to z szerokiej perspektywy, uwzględniając
+elementy, które w tej chwili pominęliśmy w celu uniknięcia dużej złożoności.
+22.11.2024, 12:24 S01E01 — Interakcja z dużym modelem językowym | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s01e01-interakcja-z-duzym-modelem-jezykowym 15/31
+
+===== STRONA 16 =====
+Baza danych (np. PostgreSQL): teraz nie tylko historia konwersacji
+rozpoczyna się za każdym razem od nowa. Treść wyników wyszukiwania oraz
+zawartość wczytanych stron również znikają po zakończeniu żądania. Zatem
+jeśli w kolejnej wiadomości użytkownik zada pytanie pogłębiające, będziemy
+musieli ponownie wczytywać te same dane. Widzimy więc, że będziemy
+chcieli zapisać zarówno historię rozmowy, jak i kontekst wykorzystany do ich
+generowania. Ogólny mechanizm widoczny jest we wcześniejszym
+przykładzie thread, ale uwzględniał on wyłącznie treść rozmowy, bez
+dodatkowego kontekstu
+Silnik wyszukiwania (np. Qdrant): zapisując wspomniane dane, szybko
+dojdziemy do momentu, gdy wczytanie ich wszystkich do kontekstu stanie
+się nieopłacalne lub wprost niemożliwe. Wówczas kluczowe będzie ich
+skuteczne odszukiwanie. Musimy zatem pomyśleć o tym, jak je skutecznie
+zorganizować i opisać, a potem przeszukiwać oraz przekazywać do modelu.
+Naturalnie mówimy tutaj o wyszukiwaniu hybrydowym, np. BM42
+Zarządzanie stanem: podobnie jak w przypadku klasycznych aplikacji, tutaj
+także do gry wchodzi zarządzanie stanem. Jednak tutaj przechowywane dane
+będą obejmować historię promptów czy historię uruchomionych narzędzi wraz
+z informacją zwrotną.
+API: w przypadku websearch mamy do czynienia tylko z dwoma narzędziami
+(web search i web scrapping), jednak zwykle będzie ich znacznie więcej.
+Każde z nich musi zostać zbudowane tak, aby LLM mógł się nim posługiwać,
+rozumieć odpowiedzi oraz obsługiwać błędy
+Ewaluacja promptów: Patrząc na powyższy schemat, staje się jasne, dlaczego
+wcześniej przechodziliśmy przez PromptFoo oraz dlaczego będziemy
+modyfikować prompty, testując je automatycznie na wybranych zestawach
+testowych.
+Wersjonowanie i kopie zapasowe: wersjonowanie odnosi się już nie tylko do
+historii kodu oraz promptów, lecz także do zmian wprowadzanych przez
+model. Przykładowo, agent zarządzający listą zadań może przypadkowo
+zmodyfikować wpisy, których nie chcemy edytować, i musimy mieć łatwy
+sposób ich przywrócenia.
+Kontrola uprawnień: w przykładzie websearch programistycznie ograniczyłem
+listę domen z którymi LLM może się skontaktować. W podobny sposób
+będziemy określać uprawnienia modelu w celu zwiększenia stabilności
+aplikacji.
+Monitorowanie aplikacji: w przykładzie websearch historię wykonanych
+zapytań zapisałem w pliku markdown. Naturalnie, nie będzie to wystarczające
+w produkcyjnych aplikacjach, gdzie będziemy korzystać z LangFuse czy
+podobnych rozwiązań do zaawansowanego monitorowania.
+22.11.2024, 12:24 S01E01 — Interakcja z dużym modelem językowym | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s01e01-interakcja-z-duzym-modelem-jezykowym 16/31
+
+===== STRONA 17 =====
+Asynchroniczność: narzędzie websearch pokazuje, że LLM może działać w
+tle, co wydłuża czas reakcji. W takim przypadku sensowne jest uruchamianie
+skryptu "w tle" lub utworzenie kolejki, po której wykonaniu użytkownik
+otrzyma powiadomienie lub e-mail z informacją o zakończeniu zadania.
+Interfejs: narzędzie websearch może być wykorzystane w interfejsie czatu, co
+pokazałem na filmie. Jednak równie dobrze mógłby to być formularz
+umożliwiający dodanie listy adresów oraz związane z nimi zadania (np.
+"pobierz najnowszy artykuł") wraz z harmonogramem uruchomienia.
+Wszystkimi z wyżej wymienionych punktów będziemy zajmować się w dalszych
+lekcjach, ale nie wszystkie będą wymagane za każdym razem. Będziemy tworzyć
+zarówno proste narzędzia odpowiedzialne za nieskomplikowane akcje, jak i
+rozbudowane rozwiązania wspierające złożone procesy.
+Optymalizacja skuteczności
+Instrukcje z przykładów pick_domains, use_search czy rate zawierają od kilku do
+kilkunastu przykładów Few-Shot. W niektórych przypadkach może być ich nawet
+kilkadziesiąt czy kilkaset i wówczas mówimy o "in-context learningu w oparciu o
+przykłady 'many-shot'" o których możemy przeczytać w Many-Shot In Context
+Learning.
+Uwzględnienie przykładów jest pierwszą techniką, którą powinniśmy brać pod
+uwagę przy optymalizacji skuteczności promptu. Poprzez prezentowanie
+oczekiwanego zachowania w ten sposób, możemy wzmocnić treść głównej
+instrukcji.
+22.11.2024, 12:24 S01E01 — Interakcja z dużym modelem językowym | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s01e01-interakcja-z-duzym-modelem-jezykowym 17/31
+
+===== STRONA 18 =====
+Samym projektowaniem przykładów będziemy zajmować się w dalszych lekcjach,
+natomiast na teraz musisz wiedzieć, że:
+Przykłady zwykle mają formę par prezentujących dane wejściowe (wiadomość
+użytkownika) oraz dane wyjściowe (odpowiedź modelu)
+Liczba przykładów zwykle nie przekracza ~3 - 40 par
+Przykłady powinny prezentować oczekiwane zachowanie i być zróżnicowane
+oraz uwzględniać sytuacje brzegowe (np. takie w których zachowanie modelu
+ma być inne niż oczekiwane)
+Przykłady muszą być dobrane starannie, lecz do ich generowania możemy
+wykorzystać pomoc ze strony modelu
+Przykłady docelowo mogą być wykorzystane na potrzeby Fine-Tuning, a ich
+warianty na potrzeby automatycznych testów
+Duża liczba przykładów może być połączona z mechanizmem cache'owania w
+celu optymalizacji kosztów oraz wydajności
+Technikami dobierania przykładów i pracy z nimi, będziemy zajmować się w
+dalszej części AI_devs 3. Tymczasem Few-Shot możesz zapamiętać jako
+nieodłączny element praktycznie każdego promptu.
+Podstawy pamięci długoterminowej
+Wczytywanie treści z wyszukiwarki oraz stron www do promptu w celu
+odpowiadania na pytania na ich podstawie to przykład Retrieval-Augmented
+Generation. Tutaj z pomocą FireCrawl rozszerzyliśmy bazową wiedzę modelu
+dokładnie w taki sposób, jak będziemy robić to w przypadku baz wiedzy czy
+pamięci tymczasowej oraz długoterminowej agenta. Jest to prawdopodobnie
+znany Ci już schemat, widoczny poniżej, w którym wskazujemy modelowi treść,
+którą ma wykorzystać przy generowaniu odpowiedzi.
+22.11.2024, 12:24 S01E01 — Interakcja z dużym modelem językowym | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s01e01-interakcja-z-duzym-modelem-jezykowym 18/31
+
+===== STRONA 19 =====
+Analogicznie będziemy wczytywać dane z plików, baz danych czy zewnętrznych
+usług. Przykład websearch pokazał nam jednak, że na odszukanie informacji
+będzie składać się szereg dodatkowych kroków, związanych z parafrazą
+zapytania, generowaniem dodatkowych zapytań (tzw. Self-Querying), ocenianiem
+wyników (tzw. Re-rank) i ich filtrowaniem.
+Należy mieć tutaj na uwadze fakt, że podłączanie zewnętrznych źródeł wiedzy do
+naszego systemu może mieć bardzo negatywny wpływ na jego działanie. To
+właśnie z tego powodu ograniczyłem listę domen dla Firecrawl, ale takich sytuacji
+jest więcej. Chociażby wczytywanie dokumentu PDF może wiązać się z
+utratą formatowania, co zaburzy zrozumienie jego zawartości.
+Problemy z formatowaniem to także nie wszystko, ponieważ stale musimy mieć
+na uwadze ograniczoną wiedzę LLM na temat naszego kontekstu. Przykładowo,
+jeśli powiemy "Zapamiętaj, że overment to mój nickname", to system powinien
+zapamiętać "Nickname Adama to overment". W przeciwnym razie w przyszłości
+może uznać, że 'overment' to jego nickname, czego przykład mamy poniżej.
+22.11.2024, 12:24 S01E01 — Interakcja z dużym modelem językowym | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s01e01-interakcja-z-duzym-modelem-jezykowym 19/31
+
+===== STRONA 20 =====
+Inaczej mówiąc model potraktował informację na mój temat tak, jakby była o
+nim.
+O pamięci długoterminowej dla modelu będziemy jeszcze mówić w module
+trzecim AI_devs 3. Na ten moment zapamiętaj, że:
+Jakość wypowiedzi modelu zależy od promptu, ale także od dostarczonych
+danych
+Instrukcja powinna zawierać informacje na temat tego, jak model powinien
+wykorzystywać kontekst w swoich wypowiedziach
+Jeden prompt może zawierać wiele zewnętrznych kontekstów, jednak powinny
+być one wyraźnie od siebie oddzielone
+Model powinien posiadać instrukcję o zachowaniu w sytuacji, gdy dostarczony
+kontekst jest niewystarczający do udzielenia odpowiedzi
+Musimy zadbać nie tylko o jakość źródeł dostarczanych informacji, ale także o
+sposób ich przechowania i dostarczenia do modelu. Wspomniana wyżej
+parafraza wspomnienia pokazuje, że zawsze musimy zadawać sobie pytanie:
+Jak model będzie wykorzystywać dostarczoną wiedzę?
+Podsumowanie
+Niniejsza lekcja to przedsmak tego, czym będziemy zajmować się w
+nadchodzących tygodniach. Jej celem było pokazanie szerokiej perspektywy na
+temat aplikacji wykorzystujących LLM, a przede wszystkim tego, że w dużym
+stopniu są one budowane tak samo, jak oprogramowanie, które tworzymy na co
+dzień.
+To właśnie z tego powodu, jednym z wymagań AI_devs 3 była znajomość
+przynajmniej jednego języka programowania. Co prawda nie wszystkie z
+22.11.2024, 12:24 S01E01 — Interakcja z dużym modelem językowym | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s01e01-interakcja-z-duzym-modelem-jezykowym 20/31
+
+===== STRONA 21 =====
+omawianych elementów będziemy wdrażać samodzielnie i nie musimy posiadać
+doświadczenia w budowie baz danych czy optymalizacji silników wyszukiwania.
+Pomimo tego w nadchodzących tygodniach będziemy mieć kontakt z
+najróżniejszymi zagadnieniami, które mogą być dla Ciebie zupełnie nowe.
+Potraktuj to więc jako możliwość doświadczenia szerokiej perspektywy rozwoju
+aplikacji, a najwięcej uwagi skieruj na obszary, które Ciebie dotyczą (np. front-
+end, back-end czy bazy danych).
+Po dzisiejszej lekcji spróbuj przynajmniej uruchomić przykład websearch i zadać
+mu kilka pytań w celu sprawdzenia jak się w nich odnajduje. Istnieje dość duże
+prawdopodobieństwo, że nie odpowie skutecznie na Twoje pytania — zastanów
+się wtedy, dlaczego tak się dzieje. Przejdź przez prompty z pliku prompts.ts oraz
+sprawdź jak skutecznie Firecrawl radzi sobie z wczytywaniem treści stron, z
+którymi chcesz pracować.
+Możesz także poświęcić chwilę na pracę z PromptFoo, którego podstawową
+konfigurację omawiałem w materiale wdrożeniowym i lekcji S00E02 — Prompt
+Engineering. Do pracy z tym narzędziem wykorzystaj Cursor IDE z
+wczytaną dokumentacją, co ułatwi generowanie plików konfiguracyjnych oraz
+szybsze zrozumienie tego rozwiązania.
+Zamykając klamrą dzisiejszą lekcję, to już na tym etapie powinno być dla Ciebie
+zrozumiałe to, że LLM w kodzie aplikacji pozwala na sprawne przetwarzanie
+języka naturalnego, a także różnych formatów danych (np. audio czy obrazu).
+Daje to nam nowe możliwości, ale nadal fundamentem rozwoju aplikacji pozostaje
+Twoja wiedza oraz doświadczenie.
+NOTATKA ZYGFRYDA
+22.11.2024, 12:24 S01E01 — Interakcja z dużym modelem językowym | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s01e01-interakcja-z-duzym-modelem-jezykowym 21/31
+
+===== STRONA 22 =====
+INSTRUKCJA DO ZADAŃ
+22.11.2024, 12:24 S01E01 — Interakcja z dużym modelem językowym | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s01e01-interakcja-z-duzym-modelem-jezykowym 22/31
+
+===== STRONA 23 =====
+Twoim głównym centrum operacyjnym jest strona centrali:
+https://centrala.ag3nts.org
+Za każdym razem, gdy wykonasz dowolne z zadań, zdobędziesz tzw. flagę.
+Łatwo ją rozpoznać, ponieważ ma ona postać jak poniżej:
+{{FLG:NAZWAFLAGI}}
+Każdą znalezioną flagę raportujesz w centrali. Możesz podać samo
+“NAZWAFLAGIˮ lub cały ciąg znaków. Obie formy działają poprawnie. W świecie
+AI Devs 3 znajdziesz także ukryte flagi, do których dość enigmatyczne
+podpowiedzi znajdują się pod tabelą wyników w centrali. Ich znalezienie nie jest
+konieczne do zdobycia certyfikatu. Traktuj je jako misje poboczne.
+Zadanie
+Zaloguj się do systemu robotów pod adresem xyz.ag3nts.org. Zdobyliśmy login i
+hasło do systemu (tester / 574e112a). Problemem jednak jest ich system ‘anty-
+captchaʼ, który musisz spróbować obejść.Musisz jedynie zautomatyzować proces
+odpowiadania na pytnie zawarte w formularzu. Przy okazji zaloguj się proszę w
+naszej centrali (centrala.ag3nts.org). Tam też możesz zgłosić wszystkie
+znalezione do tej pory flagi. Nie analizuj jeszcze pamięci robota, którą
+przechwycisz. Zostawmy sobie to na jutro.
+Co musisz zrobić w zadaniu?
+Zbadaj formularz logowania do podanej wyżej strony (XYZ) i zauważ, że
+wysyłane są tam trzy zmienne metodą POST: username, password oraz
+22.11.2024, 12:24 S01E01 — Interakcja z dużym modelem językowym | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s01e01-interakcja-z-duzym-modelem-jezykowym 23/31
+
+===== STRONA 24 =====
+Liked by Maks and 237 others
+Comment 983 comment s
+Paweł Mikłas13h
+Like Reply 1 like
+Oskar Lewandowski 13h
+Like Reply 1 like
+Paweł Mikłas12h
+Like Reply 1 like
+Jan Rutkowski 4d
+Like Reply
+overment Admin 4d
+I'm just curious.
+Like Reply
+answer. Zawartość dwóch pierwszych już znasz. Trzecia wymaga
+uzupełnienia
+Napisz prostą aplikację, która pobiera aktualne pytanie wyświetlane na stronie
+(zmienia się ono co 7 sekund)
+Wyślij to pytanie do wybranego LLM-a i pobierz odpowiedź
+Wyślij trzy zmienne z pkt #1 do strony XYZ, uzupełniając pole answer
+odpowiedzią z LLM-a
+Odczytaj odpowiedź serwera. Będzie tam podany adres URL do tajnej
+podstrony. Przejdź tam.
+Powodzenia!
+MM
+Like
+PM
+Czy sekrety też są w formie “FLG“, nie udało mi się znaleźć ani
+jednego jak do tej pory. Jakieś wskazówki?
+OL
+Paweł Mikłas na poczatek zainteresuj sie QR code ktory jest
+nadrukowany na teczce ktora otrzymales z kartami rpg i cala
+reszta 😄
+PM
+Jeden sekret odnaleziony 😅
+JR
+overment wspominałeś chyba że dodasz preworki (week 0) w
+markdown po angielsku, ruszyło coś w temacie może? ;)
+Jan Rutkowski a no :)
+22.11.2024, 12:24 S01E01 — Interakcja z dużym modelem językowym | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s01e01-interakcja-z-duzym-modelem-jezykowym 24/31
+
+===== STRONA 25 =====
+Wojciech Mróz 6d
+See more
+Like Reply 1 like
+Paweł Dulak (dulare) AI_Dev 6d
+I'm here to help
+See more
+Like Reply 1 like
+Maciej Orłowski 6d
+See more
+Like Reply 1 like
+WM
+Spotkał się ktoś może z problemem:
+error: 429 Request too large for gpt-4o in organization org-z1IbxiLnWMOfGVy5oRi
+doA8q on tokens per min (TPM): Limit 3000.
+ code: "rate_limit_exceeded"
+Bład pojawia sie przy odpalaniu websearchʼa - czy to wynika, że
+obecnie na OpenAI jestem na ‘Tier 1ʼ a dopiero od ‘Tier 2ʼ dostajemy
+450k TPM?
+…
+Wojciech Mróz
+1) tak, na Tier 1 limity masz za małe…
+2) model z którego Cursor skorzystał może “nie wiedziećˮ o
+tym jakie obecnie modele są dostępne. Możesz sobie zapisać
+w `.cursorrules` żeby domyślnie wpisywał model gpt-4o lub
+gpt-4o-mini i żeby nigdy nie proponował (tutaj lista).
+Dokumentacja → https://docs.cursor.com/context/rules-for-ai
+ciekawe repo z regułami → …
+hej, potrzebuję pomocy, zaciąłem się na tym, że question jest puste,
+więc na samiutkim początku
+import axios from 'axios';
+import { load } from 'cheerio';
+import OpenAI from 'openai';…
+22.11.2024, 12:24 S01E01 — Interakcja z dużym modelem językowym | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s01e01-interakcja-z-duzym-modelem-jezykowym 25/31
+
+===== STRONA 26 =====
+Paweł Dulak (dulare) AI_Dev 6d
+I'm here to help
+See more
+Like Reply
+Adam Duda Nov 13
+Standaryzuje, optymalizuje i automatyzuje procesy biznesowe.
+Like Reply 1 like
+Paweł Dulak (dulare) AI_Dev Nov 13
+I'm here to help
+Maciej Orłowski nie używam axios i cheerio, nie jestem nawet
+programistą JS, ale podrzucę Ci kawałek który u mnie działa - z
+fetch i zwykłym wyszukaniem tekstowym:
+const url = process.env.XYZ_URL;
+ const response = await fetch(url);
+ const text = await response.text();
+ const lines = text.split("\n");…
+//findthelineinwhichthereis"Question"word
+AD
+Cześć! Dostałem się do pliku i przesłałem flagę, natomiast mam
+problem z zaliczeniem zadania na https://centrala.ag3nts.org/.
+Powinienem przesyłać jakieś dodatkowe informacje w kodzie do
+jakiegoś endpointu? 🤔
+PS dla nie-programistów polecam https://replit.com/ - można
+uruchamiać skrypty w chmurze.
+Adam Duda co masz na myśli pod “przesłałem flagęˮ? Słowo
+które jest flagą należy wpisać w centrali (ręcznie):
+22.11.2024, 12:24 S01E01 — Interakcja z dużym modelem językowym | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s01e01-interakcja-z-duzym-modelem-jezykowym 26/31
+
+===== STRONA 27 =====
+Like Reply
+Adam Duda Nov 13
+Standaryzuje, optymalizuje i automatyzuje procesy biznesowe.
+Like Reply
+Paweł Dulak (dulare) AI_Dev Nov 13
+I'm here to help
+See more
+Like Reply
+Piotr SkubelNov 12
+Przy tym zadaniu nie ma potrzeby wysyłać nic do endpointu.
+AD
+Paweł Dulak (dulare) dzięki za sprawną odpowiedź.
+Flagę wpisałem manualnie — tylko wciąż nie wiem, jak
+odhaczyć zadanie.
+
+Adam Duda OK, wygląda że znalazłeś sekretną flagę, ale nie tą
+z zadania z dnia. Flaga z zadania z dnia jest widoczna w kodzie
+HTML strony “po zalogowaniuˮ.
+Zatem: kiedy się zalgujesz i “widziszˮ stronę z linkiem do
+firmware, tam poniżej widać też kod flagi.
+Dopiero ta flaga zalicza zadanie z dnia.
+to co wpisałeś wcześniej to flaga z sekretów, widocznych
+poniżej (te na zielono to te zaliczone):…
+PS
+22.11.2024, 12:24 S01E01 — Interakcja z dużym modelem językowym | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s01e01-interakcja-z-duzym-modelem-jezykowym 27/31
+
+===== STRONA 28 =====
+Like Reply 1 like
+overment Admin Nov 12
+I'm just curious.
+Like Reply 1 like
+Alan Darmetko Nov 11
+See more
+Like Reply
+Paweł Dulak (dulare) AI_Dev Nov 11
+I'm here to help
+Like Reply
+Alan Darmetko Nov 12
+Przykład websearch z llamą3.2-vision:11b zamiast gpt-4o fajnie działa
+🙂
+Piotr Skubel o widzisz :) Ciekaw jestem czy ostatnie przykłady
+AI_devs 3 będzie można puścić przez modele Open Source.
+Sam tego nie sprawdzałem i pewnie będą potrzebne jakieś
+dopasowania, ale kto wie :)
+AD
+Hej mogę prosić o pomoc. Po kilku dniowym boju z przygotowaniem
+alice i instalacja bun w końcu udało się uruchomić. Po zrobieniu
+skryptu cały czas utrzymuję odpowiedz: Odpowiedź na pytanie: It
+seems like you received a 404 Not Found
+Odpowiedź serwera: 404 Not Found
+URL do tajnej strony lub wynik: <!DOCTYPE HTML PUBLIC
+"-//IETF//DTD HTML 2.0//EN">
+<html><head>…
+Alan Darmetko czy możesz przybliżyć jaki skrypt uruchamiasz?
+Domyślam się że próbujesz pobrać treść strony
+http://xyz.ag3nts.org/ ?
+Pokaż proszę jak wygląda Twój kod, może uda się znaleźć
+problem? Czy ta strona otwiera się u Ciebie w przeglądarce?
+AD
+22.11.2024, 12:24 S01E01 — Interakcja z dużym modelem językowym | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s01e01-interakcja-z-duzym-modelem-jezykowym 28/31
+
+===== STRONA 29 =====
+See more
+Like Reply
+overment Admin 5d
+I'm just curious.
+Like Reply
+MefiorNov 11
+See more
+Like Reply
+Paweł Łukaszuk Nov 11
+Tech Leader, Senior .NET Developer, speaker, trainer
+See more
+require('dotenv').config();
+const fetch = require('node-fetch');
+const username = 'tester';
+const password = '574e112a';
+async function getQuestionAndAnswer() {
+ try {…
+//Pobierzpytanie
+Alan Darmetko pewnie już rozwiązałeś, ale z tego co widzę,
+masz podstronę /login zamiast https://xyz.ag3nts.org/
+M
+Serwus!
+UWAGA SPOJLER!
+Mam pytanie o te misje dodatkową po rozwiązaniu zadania. …
+Mefior
+SPOJLER
+…
+22.11.2024, 12:24 S01E01 — Interakcja z dużym modelem językowym | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s01e01-interakcja-z-duzym-modelem-jezykowym 29/31
+
+===== STRONA 30 =====
+Like Reply 3 likes
+MefiorNov 11
+Like Reply 3 likes
+overment Admin Nov 12
+I'm just curious.
+Like Reply
+Igor PiaseckiNov 11
+See more
+Like Reply
+Tomasz W olny Nov 11
+Like Reply 1 like
+Paweł Dulak (dulare) AI_Dev Nov 11
+I'm here to help
+Like Reply
+Arkadiusz Bicz Nov 11
+Aro
+M
+Paweł Łukaszuk Dzięki będę na to patrzył
+Mefior Jakub 'unknow' Mrugalski Mateusz Chrobok zerkniecie
+proszę?
+IP
+Pytanie dotyczy struktury (thread)
+ const demoMessages: ChatCompletionMessageParam[] = [
+ { content: "Hi! I'm Adam", role: "user" },
+ { content: "How are you?", role: "user" },
+ { content: "Do you know my name?", role: "user" }
+ ];
+Jaka jest zalecana kolejność właściwości content , role.
+Wiem ,że sama zmiana kolejności nie ma znaczenia dla wyszukiwani…
+Igor Piasecki jeśli pytasz o strukturę JSON, to nie ma znaczenie
+czy najpierw jest content a potem role, czy odwrotnie. Jest to
+zupełnie bez znaczenia.
+Igor Piasecki potwierdzam to co pisze Tomasz Wolny - w
+obiekcie JSON, czyli { } nie ma znaczenia kolejność. Natomiast
+w tablicy [ ] już jest to istotne.
+22.11.2024, 12:24 S01E01 — Interakcja z dużym modelem językowym | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s01e01-interakcja-z-duzym-modelem-jezykowym 30/31
+
+===== STRONA 31 =====
+Like Reply
+Paweł Dulak (dulare) AI_Dev Nov 11
+I'm here to help
+Like Reply
+Show more comment s
+Zrobiłem zadanie, dostałem się do pliku, ale nie widze w pliku żadnej
+flagi do zgłoszenia w https://centrala.ag3nts.org/
+Arkadiusz Bicz flaga jest w treści HTML na stronie “po
+zalogowaniuˮ - tej samej na której jest link do pliku
+PS
+Post
+What are your thoughts?
+22.11.2024, 12:24 S01E01 — Interakcja z dużym modelem językowym | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s01e01-interakcja-z-duzym-modelem-jezykowym 31/31

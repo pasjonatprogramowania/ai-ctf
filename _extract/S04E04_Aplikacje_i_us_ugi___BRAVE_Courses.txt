@@ -1,0 +1,710 @@
+
+===== STRONA 1 =====
+S04E04  Aplikacje i usługi
+overment Admin Nov 28
+I'm just curious.
+» Lekka wersja przeglądarkowa «
+📎 Pobierz treść tej lekcji w formacie markdown
+📎 Pobierz treść tej lekcji w formacie markdown (EN)
+EDIT 2024-11-28 14:16 CET - do opisu zadania dodano że opis pola ma być po
+polsku
+EDIT 2024-12-01 18:48 CET - dodano informację o sposobie dostarczenia flagi
+przez Centralę po wykonaniu zadania
+EDIT 2024-12-02 22:21 CET - dodano informację że komendę do tunelowania
+należy wydać na swoim lokalnym komputerze
+Wskazówka: W tej lekcji skupiamy się niemal w pełni na przykładzie tools
+W poprzedniej lekcji skupiliśmy się na źródłach wiedzy dla LLM w postaci plików
+oraz treści stron www. Wspomniałem także, że źródłem informacji mogą
+być zewnętrzne usługi, posiadające API. Poza tym, możemy wykorzystać ten fakt
+nie tylko w celu wczytywania informacji, ale także podejmowania działań.
+Back to Lekcje programu AI3
+PS
+15.12.2024, 20:07 S04E04 — Aplikacje i usługi | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e04-aplikacje-i-uslugi 1/27
+
+===== STRONA 2 =====
+Dlatego w tej lekcji stworzymy kolejny zestaw narzędzi, który umożliwi połączenie
+modelu ze światem zewnętrznym. Na przykładach zobaczymy, jak istotna jest
+spójność formatu wymiany danych i jak można ułatwić budowanie narzędzi na
+własne potrzeby, korzystając z rozwiązań no-code.
+Omawiane przykłady znajdują się w katalogu tools, a wśród nich są:
+Google Maps: Umożliwia precyzyjne określanie wskazówek dojazdu oraz
+wczytywanie informacji na temat miejsc.
+Spotify: Pozwala na przeszukiwanie bazy utworów, albumów i playlist, a także
+odtwarzanie muzyki na dostępnym urządzeniu.
+Resend: Pozwala na przesyłanie wiadomości e-mail z pomocą platformy
+resend
+Speak: (tylko macOS) pozwala na odtworzenie komunikatu głosowego z
+pomocą polecenia say
+Dodatkowo w kodzie znajdują się także klasy dla SMS API, Google Calendar oraz
+YouTube (ze względu na zmianę polityki prywatności Google, ta klasa działa
+wyłącznie na komputerze lokalnym).
+WAŻNE: W związku z koniecznością posiadania kont i kluczy API dla
+wymienionych wyżej usług, potraktuj ich uruchomienie jako opcjonalne. W tej
+lekcji chodzi nam przede wszystkim o schematy i praktyki tworzenia narzędzi,
+a nie konkretne implementacje, które przedstawiam.
+Uprawnienia i dostępność
+W lekcji S00E03 — API oraz w praktycznie każdym z przykładów, pojawiał się
+wątek uprawnień, które nadajemy modelowi oraz agentom AI. Do tej pory jednak
+niemal zawsze poruszaliśmy się po przykładach odczytywania danych.
+Tym razem przejdziemy do narzędzi, w przypadku których ewentualna pomyłka
+może przełożyć się na rezultat niemożliwy do odwrócenia (np. wysłanie maila) lub
+generujące niepotrzebne trudności. Dlatego, podobnie jak w przykładzie
+websearch będzie nam zależało na programistycznych ograniczeniach, dzięki
+którym ewentualne pomyłki w odpowiedziach zostaną przechwycone, lub po
+prostu nie będzie na nie miejsca.
+Patrząc na przykłady narzędzi, przez które będziemy przechodzić, zastanów się
+nad zestawem technologicznym z którego korzystasz lub który wykorzystuje
+Twoja firma. Sprawdź czy rozwiązania z którymi pracujesz oferują dostęp do API
+oraz jakie metody i formaty odpowiedzi są dostępne. Następnie zadaj sobie
+pytanie: w jaki sposób możesz je wykorzystać w celu ułatwienia, optymalizacji
+bądź automatyzacji wybranych procesów.
+15.12.2024, 20:07 S04E04 — Aplikacje i usługi | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e04-aplikacje-i-uslugi 2/27
+
+===== STRONA 3 =====
+Weź także przede wszystkim pod uwagę fakt, niedeterministycznej natury
+modeli. W sytuacji gdy będziesz potrzebować 100% precyzji, zastosowanie
+modeli nie będzie dobrym pomysłem. Może się jednak okazać, że
+niedeterministyczne odpowiedzi mogą stanowić wartość.
+Ostatecznie zawsze dbaj o ograniczanie uprawnień modelu do wyłącznie tych
+koniecznych. Gdy nie będzie to możliwe, a pomoc LLM nadal będzie potrzebna,
+uwzględnij etap weryfikacji przez człowieka.
+Interfejs
+Pomimo tego, że w przypadku narzędzi takich jak Google Maps nie mówimy o
+przetwarzaniu dokumentów, to i tak jako dane wejściowe/wyjściowe będziemy
+stosować struktury dokumentów (treść + metadane). Dzięki temu zachowamy
+spójność pomiędzy narzędziami i przykładowo:
+Narzędzie Google Maps będzie mogło przetwarzać listę lokalizacji wczytanych
+z wybranych stron www czy plików PDF, albo nagrań audio
+Narzędzie Google Calendar będzie mogło otrzymać listę wiadomości e-mail na
+podstawie których utworzy spotkania w kalendarzu
+Narzędzie Resend będzie mogło otrzymać raporty, na podstawie których
+prześle prywatny newsletter lub wiadomości do wybranych osób (np. zespołu)
+No i takie konfiguracje mogą uwzględniać także zaangażowanie kilku narzędzi
+pomiędzy którymi będziemy przekazywać dane.
+Dane w postaci dokumentów będziemy zwracać zarówno w przypadku
+powodzenia, jak i wystąpienia błędu. Dzięki temu agent otrzyma informację nie
+tylko o tym, że zadanie się nie powiodło, ale także o szczegółach błędu, co
+zwykle doprowadzi do jego automatycznego rozwiązania.
+15.12.2024, 20:07 S04E04 — Aplikacje i usługi | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e04-aplikacje-i-uslugi 3/27
+
+===== STRONA 4 =====
+Struktura dokumentów nie musi być dokładnie taka, jak w moich przykładach.
+Liczy się jedynie zachowanie spójności oraz na tyle dużej elastyczności, aby ten
+sam format był zachowany dla każdego z narzędzi.
+Narzędzia no-code
+Dla usług takich jak Google Calendar, Google Maps czy Spotify, potrzebujemy
+autoryzacji z pomocą OAuth 2.0. Skorzystanie z niej zwykle wymaga wczytania
+się w dokumentację oraz publikacji endpointów odpowiedzialnych za
+przekierowanie do strony logowania oraz odebrania tokenów potrzebnych do
+dalszych zapytań.
+Programistyczne połączenie z narzędziami zazwyczaj przynosi korzyści, ale
+czasami czas potrzebny na ich wdrożenie nie jest uzasadniony. Na przykład, jeśli
+tworzymy agenta do obsługi skrzynki e-mail w celu wykonania prostych operacji,
+takich jak tworzenie szkicu wiadomości, budowanie całej integracji od podstaw
+nie ma sensu.
+W takich sytuacjach warto skorzystać z platform no-code, takich jak make.com.
+W przypadku Make, możemy utworzyć scenariusz rozpoczynający się i kończący
+modułem Webhook. W rezultacie automatyzacja ta, zostanie uruchomiona w
+chwili, gdy prześlemy zapytanie HTTP na adres wygenerowany w module
+"Custom Webhook". W odpowiedzi otrzymamy wszystko to, co zostanie
+uwzględnione w module Webhook Response.
+15.12.2024, 20:07 S04E04 — Aplikacje i usługi | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e04-aplikacje-i-uslugi 4/27
+
+===== STRONA 5 =====
+Praca z Make wykracza poza zakres naszego szkolenia, więc odsyłam do
+materiałów na stronie Make Academy. Natomiast dodam do tego kilka głównych
+wskazówek:
+Webhook musi być zabezpieczony przed przypadkowym wywołaniem. W
+ustawieniach zaawansowanych modułu możemy aktywować opcję
+przechwytywania nagłówków HTTP w celu odczytania z nich nagłówka
+Authorization. Szczegóły na ten temat, można znaleźć tutaj
+Moduł webhook response umożliwia ręczne wpisanie treści obiektu JSON, ale
+nie jest to zalecane ze względu na obsługę znaków specjalnych. Zamiast tego,
+zawsze powinniśmy korzystać z modułu Create JSON, który pozwala
+zdefiniować strukturę obiektu, na podstawie której wygenerowany zostanie
+JSON String. Przykład zastosowania, widoczny jest poniżej.
+15.12.2024, 20:07 S04E04 — Aplikacje i usługi | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e04-aplikacje-i-uslugi 5/27
+
+===== STRONA 6 =====
+Ze względu na rozwój LLM coraz rzadziej polecam rozwiązania no-code,
+ponieważ utworzenie połączenia z API, w tym także obsługi procesu OAuth 2.0,
+jest coraz prostsze. Po prostu musimy upewnić się, że do wiadomości
+systemowej modelu wkleimy treść dokumentacji i/lub przykłady pochodzące z
+SDK, a model bez większych problemów zaimplementuje nam całą logikę.
+Przy narzędziach no-code warto jednak zostać albo w wymienionej wyżej
+sytuacji (własne rozwiązania, na które nie mamy zbyt dużo czasu) albo:
+gdy zależy nam na połączeniu ze sobą wielu usług
+gdy zależy nam na możliwości łatwego edytowania logiki, bez otwierania kodu
+gdy zależy nam na zaangażowaniu osób, które nie potrafią programować /
+posługiwać się generowanym kodem
+gdy potrzebujemy jednorazowego rozwiązania lub jesteśmy na etapie
+prototypu
+gdy chcemy uniknąć utrzymania integracji, np. w wyniku zmieniającego się
+API
+Ogólnie rzecz biorąc, coraz większe możliwości LLM w generowaniu kodu
+sprawiają, że korzyści z szybkiej implementacji logiki przy użyciu no-code są
+mniejsze. Natomiast wartość narzędzi no-code nadal jest obecna, ale zmienia
+się ich rola.
+Google Maps
+Google Maps dostępne jest poprzez utworzenie aplikacji na Google Cloud lub
+poprzez natywną integrację w make.com (jednak tutaj i tak potrzebujemy
+identyfikatorów wygenerowanych w Google Cloud). Dostępne akcje obejmują
+między innymi: wczytywanie informacji na temat miejsc, oraz określanie
+wskazówek dojazdu do miejsca docelowego.
+Dla określenia informacji na temat trasy, użytkownik zwykle będzie dostarczał
+niepełne dane, takie jak: "jak długo zajmie mi droga do Warszawy?" lub "ile
+potrzebuję na dojazd do domu?".
+Dla takich zapytań, API Google Maps nie będzie dla nas zbyt pomocne. Ale jeśli w
+kontekście pojawią się dokumenty zawierające informacje o tym gdzie obecnie
+znajduje się użytkownik oraz gdzie jest "dom", to odnalezienie trasy będzie
+możliwe.
+15.12.2024, 20:07 S04E04 — Aplikacje i usługi | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e04-aplikacje-i-uslugi 6/27
+
+===== STRONA 7 =====
+W lekcji S01E02 — Kontekst pokazywałem podobny przykład, w którym agent
+'uruchamiał ulubioną muzykę' bez podania wykonawcy.
+Zatem dla każdego z narzędzi musimy przemyśleć zapytania oraz scenariusze,
+które będziemy chcieli obsłużyć. Natomiast nie powinniśmy tutaj myśleć o
+konkretnych przypadkach, ale ogólnych zasadach.
+Przykładowo w kodzie aplikacji nie mam żadnej wzmianki o tym, że agent ma
+'dowiedzieć się, jaka jest ulubiona muzyka użytkownika'. W zamian, agent zadaje
+sobie serię pytań, aby lepiej zrozumieć intencję użytkownika. Chodzi więc o
+spekulacyjne zadawanie pytań (Speculative RAG) i próbę doprecyzowania
+nieścisłości oraz odnalezienia brakujących informacji.
+Bardzo pomocny w takich sytuacjach jest także sam LLM, który także na
+podstawie kilku przykładów, jest w stanie nam pomóc w generalizacji oraz
+określeniu schematów. Poniżej znajduje się fragment mojej konwersacji (zawiera
+literówki) w której po opisie problemu proszę o uchwycenie szerokiej
+perspektywy, a nie konkretnej sytuacji.
+15.12.2024, 20:07 S04E04 — Aplikacje i usługi | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e04-aplikacje-i-uslugi 7/27
+
+===== STRONA 8 =====
+Lekcja z tego narzędzia jest więc następująca:
+System musi dążyć do odkrycia / zdobycia brakujących informacji, korzystając
+z pamięci długoterminowej i/lub zewnętrznych usług
+Rozwiązywanie problemów powinno opierać się na schematach, zasadach i
+regułach, a nie na pojedynczych przypadkach, których będzie zbyt wiele, aby
+je wszystkie zaadresować
+Wysyłanie wiadomości
+Wysyłanie maili, wiadomości prywatnych czy SMS, których treść tworzy LLM jest
+często wymieniane jako potrzeba biznesowa w kontekście procesów
+sprzedażowych i marketingowych. Niemal nigdy nie będzie to dobry pomysł
+(choć takie procesy działają na dużej skali i zwykle określane są jako 'opłacalne').
+Pozostawiając bez komentarza aspekty etyczne takich rozwiązań, możliwość
+kontaktowania się poprzez różne kanały jest przydatna.
+Wiemy, że część zadań wykonywanych przez agenta będzie asynchroniczna i
+nierzadko będzie zajmować kilkanaście minut lub kilka godzin. Wśród nich będą
+także akcje uruchamiane w odpowiedzi na zdarzenie czy ustaloną porę.
+Warto więc rozważyć połączenie się z usługami takimi jak:
+Resend lub dowolna alternatywa umożliwiająca przesyłanie maili
+transakcyjnych
+SMSAPI lub alternatywa (np. Twilio) umożliwiająca przesyłanie SMS
+Slack lub inny komunikator posiadający API
+Jednak usługi te, nie powinny być wykorzystywane do przesyłania masowych
+wiadomości. Co więcej lista kontaktów powinna być ograniczona lub wprost
+ustawiona na tylko jeden adres — nasz.
+Poza limitami, największym wyzwaniem jest sprawienie, by LLM był w stanie
+wygenerować treść, która faktycznie będzie dla nas wartościowa. Niestety
+15.12.2024, 20:07 S04E04 — Aplikacje i usługi | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e04-aplikacje-i-uslugi 8/27
+
+===== STRONA 9 =====
+zwykle taka nie jest, co widać na poniższym przykładzie wiadomości w
+odpowiedzi na prośbę o "listę filmów w których grał Keanu Reeves".
+Jednak po dopasowaniu promptu do naszych potrzeb i osobistych preferencji,
+otrzymujemy rezultat który skrajnie różni się od poprzedniego. Sam ton
+wypowiedzi, zwięzłość oraz przede wszystkim wypełnienie polecenia w pełni
+charakteryzują wiadomości pisane przez człowieka. Natomiast przede wszystkim
+— taki komunikat niesie realną wartość.
+15.12.2024, 20:07 S04E04 — Aplikacje i usługi | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e04-aplikacje-i-uslugi 9/27
+
+===== STRONA 10 =====
+W przypadku tools/ResendService, mamy tylko jeden prompt odpowiedzialny za
+napisanie treści wiadomości. Natomiast na przykładzie web, wiemy, że możemy
+rozwinąć logikę o serię promptów tworzących rozbudowaną wiadomość. W razie
+potrzeby, możemy uwzględnić w niej również użycie szablonu HTML, aby
+przygotować pełnoprawny newsletter.
+Wniosek z tego narzędzia jest następujący:
+Przesyłanie wiadomości z pomocą komunikatorów oraz maila, powinno być
+możliwe, ale bardzo ograniczone. Sytuacja w której LLM decyduje się na
+wysłanie prywatnej korespondencji na przypadkowy adres e-mail, jest bardzo
+możliwa
+Sposób formatowania i zapisu treści powinien być dopasowany z pomocą
+promptów oraz przykładów, które możliwie ograniczą domyślne zachowanie
+modelu związane z generowaniem bardzo ogólnych treści
+W związku z tym, że nie będziemy mieć możliwości wprowadzania poprawek
+w treści wiadomości, musimy poświęcić więcej czasu na dopasowanie
+promptu
+Poniższy prompt kształtowałem z pomocą LLM, korzystając przy tym z meta-
+promptu z lekcji S00E02 — Prompt Engineering. Stworzenie takiej instrukcji nie
+15.12.2024, 20:07 S04E04 — Aplikacje i usługi | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e04-aplikacje-i-uslugi 10/27
+
+===== STRONA 11 =====
+jest jednak automatyczne i wymaga kilku iteracji w których wspólnie z modelem
+kształtujemy kolejne zachowania.
+Podobnie jak w przypadku innych narzędzi, w odpowiedzi przesyłamy dokument
+z treścią wiadomości oraz statusem akcji lub informacją o jej niepowodzeniu.
+Akcje związane z komunikacją powinny uwzględniać także zasady posługiwania
+się nimi. Przykładowo rozbudowane komunikaty powinny być przekierowane na
+e-mail, a pilne wiadomości wymagające natychmiastowej reakcji, powinny
+trafić na SMS.
+Rozrywka
+Nie wszystkie integracje będą opierać się o ustandaryzowane interfejsy i gotowe
+do użycia API. Niekiedy na własne potrzeby będziemy musieli znaleźć
+'kreatywne' rozwiązanie pozornie nierozwiązywalnego lub trudnego do
+rozwiązania problemu.
+Jedną z takich integracji może być powiadomienie w postaci komunikatu
+głosowego uruchamianego na naszym komputerze. Jednym z rozwiązań, jest
+wykorzystanie skryptu bash i polecenia say (macOS) lub narzędzi
+15.12.2024, 20:07 S04E04 — Aplikacje i usługi | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e04-aplikacje-i-uslugi 11/27
+
+===== STRONA 12 =====
+umożliwiających odtwarzanie plików audio (np. afplay). Takie polecenie powinno
+być dostępne zdalnie (np. przez ngrok).
+W związku z tym, że ta akcja dostępna jest wyłącznie w systemie macOS, nie
+będziemy poświęcać jej dużo czasu. Poza tym, jej implementacja jest bardzo
+prosta i sprowadza się do uruchomienia jednego polecenia.
+Od dłuższego czasu korzystam z powiadomień głosowych, które świetnie
+sprawdzają się jako przypomnienia oraz do informowania o zakończonych
+zadaniach.
+Drugim przykładem akcji, którą wykorzystuję dla rozrywki, jest integracja ze
+Spotify. W poprzednich edycjach AI_devs korzystałem w tym celu ze scenariusza
+automatyzacji Make. Natomiast teraz dzięki logice wygenerowanej przez LLM,
+nawiązałem połączenie bezpośrednio z API.
+Dzięki temu taki scenariusz:
+15.12.2024, 20:07 S04E04 — Aplikacje i usługi | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e04-aplikacje-i-uslugi 12/27
+
+===== STRONA 13 =====
+Został zastąpiony jedną klasą tools/SpotifyService, a odnalezienie i uruchomienie
+utworu sprowadza się do wywołania funkcji await
+assistantService.playMusic('Title, artist');. Jest to także potwierdzenie tego, co
+pisałem wyżej na temat narzędzi no-code oraz zmiany ich roli w obliczu coraz
+lepszych modeli językowych.
+Ważne: Aby uruchomić narzędzie Spotify, musisz utworzyć aplikację na
+developer.spotify.com i wypełnić klucze w pliku .env. Następnie, po
+uruchomieniu aplikacji, przejdź na adres /spotify/auth (nasz localhost musi być
+dostępny w Internecie, a endpoint /spotify/callback dodany w panelu aplikacji
+developerskiej Spotify). To spowoduje, że tokeny zostaną dopisane do pliku
+.env (nie jest to praktyka zalecana na produkcji, ale w tym przypadku nie mamy
+bazy danych, więc musimy z tego skorzystać), a Spotify będzie dostępne po
+ponownym uruchomieniu serwera.
+Sam przykład integracji ze Spotify również zawiera kilka ciekawych sugestii, ale
+opiera się o podobne schematy, co przykład z Google Maps.
+Konkretnie zapytania użytkownika mogą być bardzo ogólne i odnosić się do
+rzeczy takich jak:
+Play the track that was playing when Memphis saw Eleanor for the first time in
+Gone in 60 Seconds.
+Czyli chodzi o odwołanie do konkretnej sceny z filmu "60 Sekund". Pomimo braku
+tytułu utworu, model korzystając ze swojej bazowej wiedzy, poprawnie go
+identyfikuje.
+Baza Spotify nie jest kompletna, a czasem zawiera kilka wariantów tego samego
+kawałka. Dlatego w akcji playMusic widocznej poniżej nie tylko korzystam z
+wyszukiwarki (this.searchMusic), ale także korzystam z promptu
+spotifyPlayPrompt, którego zadaniem jest podjęcie decyzji o tym, który rekord z
+wyników wyszukiwania uruchomić.
+15.12.2024, 20:07 S04E04 — Aplikacje i usługi | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e04-aplikacje-i-uslugi 13/27
+
+===== STRONA 14 =====
+Wyniki wyszukiwania Spotify zawierają wiele szczegółowych informacji, które z
+perspektywy naszej integracji można pominąć. Dlatego używam funkcji
+pomocniczej formatMusicSearchResults, aby wybrać tylko te właściwości, które
+są istotne. Jest to podyktowane także ograniczaniem 'szumu' i dążeniem do
+utrzymania uwagi modelu na zadaniu.
+Wnioski:
+Tworzenie narzędzi dla agenta może także nawiązywać do naszego hobby czy
+zainteresowań. Nawet jeśli ich użyteczność będzie podważalna, to i tak
+budując je, zdobywamy doświadczenie przydatne w innych sytuacjach
+Kreatywne rozwiązywanie problemów, szczególnie w przypadku gdy
+budujemy coś na potrzeby własne bądź wewnątrzfirmowe jest bardzo
+15.12.2024, 20:07 S04E04 — Aplikacje i usługi | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e04-aplikacje-i-uslugi 14/27
+
+===== STRONA 15 =====
+wskazane. Nie wszystkie aplikacje i usługi posiadają oficjalne API i czasem
+musimy poszukać alternatywnych ścieżek
+Po raz kolejny przekonaliśmy się, że zbudowanie warstwy pośredniej
+pomiędzy LLM, a naszą aplikacją, jest wskazane. Pozwala to nam na
+utrzymanie kontroli pomiędzy formatem wymiany danych oraz transformacją
+zapytań
+Dobre praktyki
+Zbierając w całość dobre praktyki na temat budowania narzędzi dla modelu:
+Jeden prompt = jeden problem: rozbudowane zadania powinny
+być podzielone na mniejsze kroki, a model w danej chwili musi otrzymywać
+minimum informacji
+Generalizacja problemu: problemy mają swoją przyczynę, którą należy odkryć
+i zaadresować. Jeśli prompt nie działa w sytuacji X, nie próbuj jej rozwiązać,
+lecz znaleźć jej powód lub schemat według którego działa model
+Pomoc ze strony modelu: w planowaniu, pisaniu kodu, pisaniu promptów,
+generowaniu zestawów danych testowych, debugowaniu — zawsze pracuj
+wspólnie z modelem
+Seria akcji: narzędzia powinny być projektowane tak, aby możliwe było
+wykonanie wielu zapytań jednocześnie. W ten sposób model będzie
+miał możliwość zebrania wszystkich potrzebnych informacji za jednym razem,
+co przekłada się pozytywnie na ogólną efektywność.
+Wspólny interfejs: wartość łączenia modelu z narzędziami nie polega tylko na
+ich bezpośrednim połączeniu, ale na możliwości podłączenia wielu narzędzi,
+po które model sięga wtedy, gdy jest to konieczne.
+Komplet informacji: narzędzia zawsze muszą zwracać komplet informacji na
+temat pozyskanych danych lub błędów, które miały miejsce. W sytuacji gdy
+dane nie będą kompletne i poprawnie oznaczone, agent nie będzie potrafił się
+nimi posługiwać.
+Ograniczenia: odciążanie modelu z podejmowania decyzji powinno być
+priorytetem nie tylko ze względu na stabilność systemu, ale także jego
+wydajność
+Ułatwienia: tam gdzie to możliwe, warto stosować ułatwienia albo w postaci
+narzędzi no-code, albo gotowych rozwiązań, które pozwolą nam się skupić na
+innych obszarach systemu
+Obserwowanie: wszystkie kroki związane z posługiwaniem się narzędziami,
+powinny być logowane i/lub zapisywane w bazie danych. Dostęp do tych
+informacji powinien mieć zarówno człowiek, jak i sam system (choć to zależy
+od jego przeznaczenia). Zgromadzone dane z czasem będą także użyteczne
+15.12.2024, 20:07 S04E04 — Aplikacje i usługi | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e04-aplikacje-i-uslugi 15/27
+
+===== STRONA 16 =====
+na potrzeby budowania zestawów danych testowych oraz dalszego
+kształtowania promptów.
+Podsumowanie
+Integrowanie LLM z otaczającymi nas usługami i urządzeniami poprzez
+budowanie narzędzi w taki sposób, aby model mógł się nimi swobodnie
+posługiwać, stanowi kolejny fundamentalny element agentów AI.
+Jeśli masz zabrać ze sobą z tej lekcji tylko jedną rzecz, to spójrz na przykłady
+implementacji narzędzi z katalogu tools. Następnie wybierz jedno narzędzie,
+usługę bądź urządzenie z Twojego otoczenia i sprawdź jak wygląda dostępność
+przez API. Wybierz takie, które oferuje możliwość integracji i zaplanuj akcje, które
+mogą być przydatne dla LLM.
+Zastanów się też jak agent wyposażony w takie narzędzie, mógłby wnosić
+wartość Tobie, lub jak mógłby wspierać procesy wewnątrzfirmowe. Uwzględnij
+także możliwość połączenia z innymi narzędziami i podziel się swoimi
+przemyśleniami w komentarzu.
+NOTATKA ZYGFRYDA
+15.12.2024, 20:07 S04E04 — Aplikacje i usługi | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e04-aplikacje-i-uslugi 16/27
+
+===== STRONA 17 =====
+ZADANIE
+15.12.2024, 20:07 S04E04 — Aplikacje i usługi | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e04-aplikacje-i-uslugi 17/27
+
+===== STRONA 18 =====
+Zdobyliśmy mapę okolic Grudziądza, gdzie prawdopodobnie ukrywa się profesor
+Maj, a przynajmniej tam znaleziono jego samochód. Pomóż naszemu pilotowi
+drona zbadać ten teren i podpowiedz mu, co znajduje się pod nim, podczas gdy
+on będzie latał po okolicy.
+Oto zdobyta mapa - pilot każdy lot zaczyna od punktu startowego w lewym
+górnym rogu mapy.
+15.12.2024, 20:07 S04E04 — Aplikacje i usługi | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e04-aplikacje-i-uslugi 18/27
+
+===== STRONA 19 =====
+Musisz przygotować API działające po protokole HTTPS, a następnie wysłać do
+centrali URL do tego API jako odpowiedź na zadanie o nazwie webhook.
+Pracownik centrali wyśle na Twoje API metodą POST dane w formacie JSON w
+formie jak poniżej:
+{
+"instruction":"tutaj instrukcja gdzie poleciał dron"
+}
+Opis lotu drona może być w dowolnej formie i jest to tekst w języku naturalnym,
+np. “poleciałem jedno pole w prawo, a później na sam dółˮ. Twoim zadaniem jest
+odpowiedzenie w maksymalnie dwóch słowach, co tam się znajduje. W naszym
+przykładzie odpowiedzią byłyby np. “skałyˮ.
+15.12.2024, 20:07 S04E04 — Aplikacje i usługi | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e04-aplikacje-i-uslugi 19/27
+
+===== STRONA 20 =====
+Centrala wyśle do Twojego API kilka takich opisów lotów. Jeden po drugim.
+Każdy w oddzielnym zapytaniu. Zadanie uznawane jest za zaliczone, gdy
+wszystkie loty skończą się sukcesem. Przekazanie pilotowi nieprawdziwych
+informacji nawigacyjnych kończy się rozbiciem drona.
+W tym zadaniu możesz wykorzystać hosting na Azylu, jeśli masz na to ochotę
+(nie ma obowiązku tego robić!). Możesz także wykorzystać np. usługę ngrok, aby
+wystawić nam swoją lokalną aplikację wprost z Twojego dysku.
+Jak wysłać URL do API do centrali?
+{
+ "apikey":"TWOJ-KLUCZ",
+ "answer":"https://azyl-12345.ag3nts.org/moje_api",
+ "task":"webhook"
+}
+Co należy zrobić w zadaniu?
+Tworzysz aplikację (hostowaną tam, gdzie zechcesz), która przyjmuje
+requesty w formie JSON-a po HTTPS.
+Musisz przygotować dość złożonego prompta, który w sposób zrozumiały dla
+LLM-a wyjaśni mu, jak wygląda mapa, którą właśnie oglądasz. Sugerujemy
+NIE korzystać tutaj z modelu graficznego rozpoznającego obraz. To mogłoby
+być bardzo kosztowne i skomplikowane.
+Wysyłasz URL-a do Twojego API do centrali
+Centrala wysyła serię zapytań pod adres URL, który został wysłany w polu
+“answerˮ
+JSON od centrali zawiera pole “instructionˮ z opisem lotu drona
+Twoim zadaniem jest zwrócenie poprawnego JSON-a z polem “descriptionˮ
+zawierającego opis pola, na którym znajduje się dron po odbyciu lotu
+Opis miejsca, nad którym zawisł dron może mieć maksymalnie dwa słowa -
+opis ma być po polsku
+Twój JSON może mieć tyle pól, ile potrzebujesz (przydatne przy ‘głośnym
+myśleniuʼ!), ale tylko description jest brane pod uwagę.
+Jeśli zaliczysz trzy loty, otrzymasz flagę. Flaga zostanie przesłana w
+odpowiedzi na wywołanie, w którym podajesz URL swojej aplikacji do centrali
+(punkt 3 instrukcji).
+15.12.2024, 20:07 S04E04 — Aplikacje i usługi | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e04-aplikacje-i-uslugi 20/27
+
+===== STRONA 21 =====
+93 likes 597 comment s
+Henryk Żuliński5h
+See more
+Like Reply 1 like
+Henryk Żuliński5h
+UWAGA: absolutnie kluczowym elementem zadania jest sprytne opisanie
+modelowi językowemu, jak wygląda świat z mapy. Musi to być zrobione w sposób
+jednoznaczny. Pamiętaj także, że mapa ma formę kwadratu 4x4. Pamiętaj także,
+że Twoje API powinno być bezstanowe, co oznacza, że NIE zapamiętujesz, gdzie
+skończył się ostatni lot drona. Zawsze zaczynasz z pozycji startowej.
+Jeśli masz aktywne konto na Azylu, możesz też użyć SSH do przekierowania
+swojego lokalnego portu (na przykładzie = 3000) na swój port na Azylu (na
+przykladzie = 50005). Robi się to komendą wydaną na lokalnym komputerze w
+ten sposób:
+ssh -R 50005:localhost:3000 agent10005@azyl.ag3nts.org -p 5022
+Oczywiście podajesz swoją nazwę użytkownika. SSH po zalogowaniu będzie
+wyświetlało linię poleceń, ale będzie też działający tunel w tle, który przekieruje
+wywołania twojej dedykowanej strony (na przykładzie = https://azyl-
+50005.ag3nts.org/) do twojej aplikacji lokalnej.
+UWAGA - przy takim rozwiązaniu, Twoja aplikacja powinna serwować ruch
+nieszyfrowany, czyli http:// i zostawić Azylowi jego zaszyfrowanie (dzieje sie to
+automatycznie)
+HŻ
+Paweł Dulak (dulare)
+Mam dziwny problem - kiedy wystawiam aplikację poprzez ngrok
+domyślnie jest włączone https i aplikacja działa bez zarzutu.
+Jednak kiedy wystawię ją jako http (`ngrok http 5001 --scheme http`)
+okazuje się że nie mogę się do appki dobić (komenda w cli się
+wykonuje poprawnie).
+Szukałem rozwiązań w necie ale jakoś nie bardzo widzę coś co by
+odpowiadało na mój problem o_O…
+HŻ
+W instrukcji w sumie podajecie informację że powinno być to
+rozwiązanie z `https` - jednak jak wysyłam request przy
+serwowaniu `https` dostaję zwrotkę:
+```
+15.12.2024, 20:07 S04E04 — Aplikacje i usługi | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e04-aplikacje-i-uslugi 21/27
+
+===== STRONA 22 =====
+Like Reply 1 like
+Paweł Dulak (dulare) AI_Dev 1 2h
+I'm here to help
+See more
+Like Reply
+Krzysztof Kesicki18h
+Like Reply 1 like
+{'code': -340, 'message': 'You have to provide URL to your API
+served via HTTPS protocol'}
+```
+Henryk Żuliński Twój lokalny serwer, jeśli serwujesz aplikację
+przez ngrok, powinien odpowiadać z użyciem HTTP. Warstwę
+HTTPS dodaje ngrok.
+Podobnie z tunelowaniem przez Azyl - warstawa HTTPS jest
+dodawana przez pośrednika.
+Do swojego lokalnego serwera powinieneś się łączyć z CLI za
+pomocą czystego HTTP, wtedy dodać tunelowanie przez ngrok
+- w taki sposób będzie działać. …
+KK
+mam problem z wystawieniem api na swojej subdomenie przez
+cloudflare tunnel, wiecie co to za błąd?
+15.12.2024, 20:07 S04E04 — Aplikacje i usługi | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e04-aplikacje-i-uslugi 22/27
+
+===== STRONA 23 =====
+Paweł Dulak (dulare) AI_Dev 1 13h
+I'm here to help
+Like Reply
+Krzysztof Kesicki3h
+Like Reply 1 like
+Paweł Dulak (dulare) AI_Dev 1 2h
+I'm here to help
+Like Reply
+Mariusz Bednarz 2d
+See more
+Like Reply 1 like
+Paweł Dulak (dulare) AI_Dev 1 1d
+I'm here to help
+Krzysztof Kesicki 403 = forbidden
+Próbowałeś się do tego swojego adresu dostać samodzielnie z
+postmana? Albo z przeglądarki? Wtedy działa?
+KK
+Paweł Dulak (dulare) z przeglądarki i z postmana działa bez
+problemu, wydaje mi się że może coś jest blokowane po stronie
+cloudflare. Flow wygląda następująco:
+cf tunnel → nginx local server → apka na moim laptopie.
+Poddałem się z tym setupem i robię przy użyciu Azyla + ssh
+port forwarding (sprawdziłem i to działa bez problemu)
+Krzysztof Kesicki OK, dobrze że działa przez Azyl, z CF tunel
+nie mam doświadczenia, musiał bym robić od zera…
+MB
+Apka wystawiona na azylu (Nest).
+Wysyłam endpoint na /raport (robię to postmanem, nie chce mi się
+kombinować) widzę że idzie pierwsza instrukcja, apka dokonuje
+analizy lotu, zwraca pozycję…
+I dostaję w postmanie
+{…
+"code":-399
+15.12.2024, 20:07 S04E04 — Aplikacje i usługi | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e04-aplikacje-i-uslugi 23/27
+
+===== STRONA 24 =====
+See more
+Like Reply 1 like
+Mariusz Bednarz 1d
+Like Reply 1 like
+Mariusz Bednarz 1d
+Like Reply 1 like
+Marcin Bratek 2d
+Like Reply 1 like
+Paweł Dulak (dulare) AI_Dev 1 2d
+I'm here to help
+Like Reply
+Aleksander Golus 2d
+Studenciak 🤓
+Mariusz Bednarz głównym problemem jest to że Twój Nest
+wysyła kod 201 w odpowiedzi o zapytanie o nawigację.
+Centrala oczekuje kodu 200.
+Możesz to zmienić używając dekoratora `@HttpCode(200)`
+https://docs.nestjs.com/controllers
+Nest domyślnie wysyła 201 na żądania POST.
+Przebieg tego zadania jest następujący:…
+MB
+`@HttpCode(200)` tego mi brakowało! Teraz wszystko jasne!
+MB
+Paweł Dulak (dulare) “Pan porucznik to jednak fachowiecˮ,
+flaga wpadła od razu 😎
+MB
+Hej, w jaki sposób mogę zresetować hasło do azylu? Pamiętam, że to
+pytanie gdzieś się pojawiło, ale w tym momencie nie mogę znaleźć…
+Marcin Bratek wyślij mi na priv swój email, zajmę się tym
+Jak ktoś chce sobie postawić naprawdę prosty szybki i darmowy
+serwer to szczerze polecam deno land. Piszecie kod w deno (to jest
+nowy runtime jsa od twórcy node.js), a serwer deployujecie w deno
+land. To się spina z GH więc wystarczy pushować kod i funkcja
+serverlessowa odpala się z bomby. Mogę posłużyć pomocą chociaż
+poradników na necie jest mnóstwo
+15.12.2024, 20:07 S04E04 — Aplikacje i usługi | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e04-aplikacje-i-uslugi 24/27
+
+===== STRONA 25 =====
+Like Reply 1 like
+Tomasz R omano wski 2d
+See more
+Like Reply 1 like
+Paweł Dulak (dulare) AI_Dev 1 2d
+I'm here to help
+Like Reply
+Tomasz R omano wski 2d
+Like Reply 1 like
+Tomasz R omano wski 2d
+Like Reply 1 like
+Show more replies
+TR
+Przygotowałem API server, próbuję zapodać do centrali i dostaję błąd:
+webhook = {
+ "apikey": os.getenv("AIDEVS_API_KEY"),
+ "answer": "https://<my_url>",
+ "task": "webhook"
+}
+submit_answer(webhook, "webhook") #my util method…
+Tomasz Romanowski czy Twój serwer jest HTTPS czy HTTP?
+Bo centrala twierdzi że http… Jak skonfigurowałeś swój
+serwer?
+TR
+Paweł Dulak (dulare) Właśnie przetestowałem go następującym
+curl i biega:
+URL=https://bolek7000.bieda.it
+curl -k -X POST $URL/get_coordinates \
+-H "Content-Type: application/json" \
+-d '{"instruction": "Poleciałem całkiem na prawo"}'
+TR
+Mam vps na mikrusie. App server to zwykły flask, podpiąłem go
+do mikrusowej subdomeny w standardowy mikrusowy spobób.
+Z mojej strony wszystko biega.
+15.12.2024, 20:07 S04E04 — Aplikacje i usługi | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e04-aplikacje-i-uslugi 25/27
+
+===== STRONA 26 =====
+Mateusz Drogowski 2d
+📡 Telecom Eng 🤖 AI Enthusiast 📈 Investor
+Like Reply 1 like
+Adam K ęsy 2d
+Like Reply 1 like
+Paweł Dulak (dulare) AI_Dev 1 2d
+I'm here to help
+Like Reply
+Ania Kuś 3d
+Like Reply 5 likes
+Paweł Dulak (dulare) AI_Dev 1 3d
+I'm here to help
+Like Reply 1 like
+Paweł Wojcieszak 3d
+Like Reply 1 like
+Czy ktoś próbował integracji z usługami Apple, np. Music? Mamy
+dostępne Apple Music API
+https://developer.apple.com/documentation/applemusicapi ale do
+dyspozycji jest również integracja no codę / low code poprzez
+Shortcuts, które wewnątrz ekosystemu Apple radzi sobie dobrze.
+AK
+Czy skoro nie zalecacie graficznego skanowania mapy, to czy dobrze
+rozumiem, że w prompcie należy opisać każdy kwadrat mapy?
+Adam Kęsy tak, opisanie go ręcznie będzie najmniej
+kosztochłonne :)
+Świętuję małe sukcesy 🥳 Zaczynając AI_devs ledwo wiedziałam co
+to serwer (oczywiście z przymrużeniem oka ;)). A teraz w niecałą
+godzinkę skonfigurowałam serwer przez ngrok, który działa :D
+Do rozwiązania zadania jeszcze pewnie daleka droga, ale to już jutro.
+Ania Kuś super widzieć taki postęp :)
+PW
+Mam pytanie, Jaki jest mój port na azylu na który mogę przekierować
+ruch z mojego lokalnego portu ?
+To jakiś konkretny związany z moim numerem usera, czy dowolny ? -
+jeśli tak to jaki wybrać
+15.12.2024, 20:07 S04E04 — Aplikacje i usługi | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e04-aplikacje-i-uslugi 26/27
+
+===== STRONA 27 =====
+Paweł Dulak (dulare) AI_Dev 1 3d
+I'm here to help
+Like Reply
+Paweł Wojcieszak 2d
+Like Reply 1 like
+Paweł Wojcieszak 2d
+See more
+Like Reply 1 like
+Show more replies
+Show more comment s
+Paweł Wojcieszak Powinieneś zobaczyć ten numer portu w
+momencie logowania na Azyl:
+Tak, jest związany z Twoim numerem użytkownika, z tego co
+pamiętam to numer użytkownika + 40000
+PW
+Paweł Dulak (dulare) super dziękuje :)
+PW
+Paweł Dulak (dulare) mam jeszcze jedno pytanie bo cos mi nie
+działa jak trzeba chyba z tym tunelowaniem.
+1. Napisałem prosta app z api we flask.
+2. Wystawiłem ją na lokalnym local_port: http://localhost:
+{local_port}/api/data i lokalnie wszystko mi dział git - api
+przyjmuje request POST w json.
+3. Otwieram tunel:…
+PS
+Post
+What are your thoughts?
+15.12.2024, 20:07 S04E04 — Aplikacje i usługi | BRAVE Courses
+https://bravecourses.circle.so/c/lekcje-programu-ai3-806660/s04e04-aplikacje-i-uslugi 27/27
