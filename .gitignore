@@ -1,6 +1,11 @@
 # Materialy zrodlowe (kursy BRAVE) - ~303 MB, trzymane lokalnie
 *.pdf
 
+# Archiwa / backupy folderu
+*.zip
+*.7z
+*.tar.gz
+
 # Sekrety
 .apikey
 .apikey.*
